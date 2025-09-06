@@ -94,4 +94,48 @@ class AppTextStyles {
     color: AppColors.textSecondary,
     height: 1.2,
   );
+
+  // Heading styles
+  static const TextStyle h1 = TextStyle(
+    fontSize: 32.0,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  static const TextStyle h2 = TextStyle(
+    fontSize: 28.0,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  static const TextStyle h3 = TextStyle(
+    fontSize: 24.0,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  static const TextStyle h4 = TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  static const TextStyle h5 = TextStyle(
+    fontSize: 18.0,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  // Body text
+  static const TextStyle body = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
 }

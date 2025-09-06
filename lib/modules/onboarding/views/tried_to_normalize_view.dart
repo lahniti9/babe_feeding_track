@@ -10,8 +10,8 @@ class TriedToNormalizeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionMultiView(
+
+    return Obx(() => QuestionMultiView(
       title: "What have you tried to normalize sleep?",
       options: const [
         QuestionMultiOption(
@@ -54,6 +54,6 @@ class TriedToNormalizeView extends StatelessWidget {
       },
       onNext: () => Get.toNamed(Routes.needsLearnToSleep),
       requireSelection: true,
-    );
+    ));
   }
 }

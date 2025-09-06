@@ -38,7 +38,10 @@ class SleepStatementView extends StatelessWidget {
       selectedValue: controller.getAnswer<String>('sleep_statement'),
       onSelectionChanged: (value) {
         controller.saveAnswer('sleep_statement', value);
-        Get.toNamed(Routes.appetite);
+        // Small delay to show selection feedback
+        Future.delayed(const Duration(milliseconds: 150), () {
+          Get.toNamed(Routes.appetite);
+        });
       },
       autoNavigate: true,
     );

@@ -4,9 +4,11 @@ import '../../core/theme/colors.dart';
 import '../../core/theme/text.dart';
 import '../timeline/events_view.dart';
 import '../stats/statistics_view.dart';
-import '../spurt_calendar/spurt_calendar_view.dart';
+import '../spurt/views/spurt_calendar_view.dart';
 import '../children/children_view.dart';
 import '../profile/settings_view.dart';
+import '../profile/profile_controller.dart';
+import '../children/services/children_store.dart';
 import 'tabs_controller.dart';
 
 class TabsView extends StatelessWidget {
@@ -15,7 +17,9 @@ class TabsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(TabsController());
-    
+    final profileController = Get.find<ProfileController>();
+    final childrenStore = Get.find<ChildrenStore>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Obx(() {
@@ -25,7 +29,9 @@ class TabsView extends StatelessWidget {
           case TabIndex.statistics:
             return const StatisticsView();
           case TabIndex.spurtCalendar:
-            return const SpurtCalendarView();
+            return SpurtCalendarView(
+              childId: profileController.activeChild?.id ?? 'default-child',
+            );
           case TabIndex.children:
             return const ChildrenView();
           case TabIndex.settings:
@@ -56,7 +62,7 @@ class TabsView extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(_getIconData('child_care')),
-            label: 'Naji',
+            label: childrenStore.activeChildDisplayName,
           ),
           BottomNavigationBarItem(
             icon: Icon(_getIconData('settings')),

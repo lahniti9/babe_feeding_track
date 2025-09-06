@@ -63,6 +63,7 @@ class Routes {
   static const String events = '/events';
   static const String statistics = '/statistics';
   static const String spurtCalendar = '/spurt-calendar';
+  static const String spurtDetail = '/spurt-detail';
   static const String children = '/children';
   static const String settings = '/settings';
 
@@ -71,4 +72,11 @@ class Routes {
   static const String eventDetail = '/event-detail';
   static const String childProfile = '/child-profile';
   static const String teammateProfile = '/teammate-profile';
+
+  // Events module sheets
+  static const String sleepEntry = '/sleep-entry';
+  static const String sleepExact = '/sleep-exact';
+  static const String bedtimeRoutine = '/bedtime-routine';
+  static const String bottleEntry = '/bottle-entry';
+  static const String commentSheet = '/comment-sheet';
 }

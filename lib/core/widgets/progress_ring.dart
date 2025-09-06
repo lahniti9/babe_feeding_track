@@ -58,17 +58,15 @@ class _ProgressRingState extends State<ProgressRing>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      color: AppColors.background,
-      child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: widget.size,
-              height: widget.size,
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: widget.size,
+            height: widget.size,
               child: AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
@@ -105,7 +103,6 @@ class _ProgressRingState extends State<ProgressRing>
             ],
           ],
         ),
-      ),
     );
   }
 }

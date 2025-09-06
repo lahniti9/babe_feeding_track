@@ -59,6 +59,10 @@ import '../modules/onboarding/views/streak_view.dart';
 import '../modules/tabs/tabs_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
 import '../modules/tabs/bindings/tabs_binding.dart';
+import '../modules/events/views/sleep_exact_view.dart';
+import '../modules/spurt/views/spurt_calendar_view.dart';
+import '../modules/spurt/views/spurt_detail_view.dart';
+import '../modules/spurt/bindings/spurt_binding.dart';
 
 class AppPages {
   static const initial = Routes.splash;
@@ -356,6 +360,25 @@ class AppPages {
       name: Routes.tabs,
       page: () => const TabsView(),
       binding: TabsBinding(),
+    ),
+
+    // Events module sheets
+    GetPage(
+      name: Routes.sleepExact,
+      page: () => const SleepExactView(childId: 'child_1'),
+      binding: TabsBinding(),
+    ),
+
+    // Spurt module routes
+    GetPage(
+      name: Routes.spurtCalendar,
+      page: () => const SpurtCalendarView(childId: 'default-child'),
+      binding: SpurtBinding(),
+    ),
+    GetPage(
+      name: Routes.spurtDetail,
+      page: () => const SpurtDetailView(week: 1), // Default week, will be overridden by arguments
+      binding: SpurtBinding(),
     ),
   ];
 }

@@ -10,8 +10,8 @@ class SimilarChangesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionMultiView(
+
+    return Obx(() => QuestionMultiView(
       title: "Have you noticed any of these changes recently?",
       options: const [
         QuestionMultiOption(
@@ -54,6 +54,6 @@ class SimilarChangesView extends StatelessWidget {
       },
       onNext: () => Get.toNamed(Routes.spurtTimeline),
       requireSelection: true,
-    );
+    ));
   }
 }

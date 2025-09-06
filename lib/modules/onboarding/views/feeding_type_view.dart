@@ -11,8 +11,8 @@ class FeedingTypeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return SelectableCardsView(
+
+    return Obx(() => SelectableCardsView(
       title: "What type of feeding are you doing?",
       options: [
         SelectableCardOption(
@@ -51,6 +51,6 @@ class FeedingTypeView extends StatelessWidget {
         controller.saveAnswer('feeding_type', value);
       },
       onNext: () => Get.toNamed(Routes.feedingRightPlace),
-    );
+    ));
   }
 }

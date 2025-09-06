@@ -10,8 +10,8 @@ class SelfCareView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionMultiView(
+
+    return Obx(() => QuestionMultiView(
       title: "How do you take care of yourself?",
       options: const [
         QuestionMultiOption(
@@ -54,6 +54,6 @@ class SelfCareView extends StatelessWidget {
       },
       onNext: () => Get.toNamed(Routes.sleepStatement),
       requireSelection: true,
-    );
+    ));
   }
 }

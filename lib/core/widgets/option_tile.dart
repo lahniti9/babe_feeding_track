@@ -37,7 +37,7 @@ class OptionTile extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
               border: Border.all(
-                color: selected ? AppColors.borderSelected : Colors.transparent,
+                color: selected ? AppColors.primary : Colors.transparent,
                 width: 2,
               ),
             ),

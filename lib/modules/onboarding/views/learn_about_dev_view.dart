@@ -10,8 +10,8 @@ class LearnAboutDevView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionMultiView(
+
+    return Obx(() => QuestionMultiView(
       title: "What would you like to learn about child development?",
       options: const [
         QuestionMultiOption(
@@ -58,6 +58,6 @@ class LearnAboutDevView extends StatelessWidget {
       },
       onNext: () => Get.toNamed(Routes.spurtIntro),
       requireSelection: true,
-    );
+    ));
   }
 }

@@ -10,8 +10,8 @@ class EmotionalStateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionSingleView(
+
+    return Obx(() => QuestionSingleView(
       title: "How are you feeling emotionally?",
       options: const [
         QuestionOption(
@@ -38,9 +38,12 @@ class EmotionalStateView extends StatelessWidget {
       selectedValue: controller.getAnswer<String>('emotional_state'),
       onSelectionChanged: (value) {
         controller.saveAnswer('emotional_state', value);
-        Get.toNamed(Routes.emotionGrid);
+        // Small delay to show selection feedback
+        Future.delayed(const Duration(milliseconds: 150), () {
+          Get.toNamed(Routes.emotionGrid);
+        });
       },
       autoNavigate: true,
-    );
+    ));
   }
 }

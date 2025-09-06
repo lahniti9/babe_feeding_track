@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/models.dart';
@@ -77,13 +78,54 @@ class OnboardingController extends GetxController {
   
   // Save answer for a question
   void saveAnswer(String questionId, dynamic value) {
-    _answers[questionId] = value;
+    // Convert DateTime to string for storage
+    if (value is DateTime) {
+      _answers[questionId] = value.toIso8601String();
+    } else if (value is TimeOfDay) {
+      _answers[questionId] = '${value.hour}:${value.minute}';
+    } else {
+      _answers[questionId] = value;
+    }
     _storage.write('onboarding_answers', _answers);
   }
   
   // Get answer for a question
   T? getAnswer<T>(String questionId) {
     final value = _answers[questionId];
+
+    // Handle DateTime conversion
+    if (T == DateTime && value is String) {
+      try {
+        return DateTime.parse(value) as T;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Handle TimeOfDay conversion
+    if (T == TimeOfDay && value is String) {
+      try {
+        final parts = value.split(':');
+        if (parts.length == 2) {
+          return TimeOfDay(
+            hour: int.parse(parts[0]),
+            minute: int.parse(parts[1]),
+          ) as T;
+        }
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Handle List<String> conversion
+    if (T.toString() == 'List<String>' && value is List) {
+      try {
+        return List<String>.from(value) as T;
+      } catch (e) {
+        return null;
+      }
+    }
+
     if (value is T) return value;
     return null;
   }

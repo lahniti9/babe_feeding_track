@@ -10,8 +10,8 @@ class RoutineImproveView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionMultiView(
+
+    return Obx(() => QuestionMultiView(
       title: "What would you like to improve about your routine?",
       options: const [
         QuestionMultiOption(
@@ -54,6 +54,6 @@ class RoutineImproveView extends StatelessWidget {
       },
       onNext: () => Get.toNamed(Routes.nightFeeds),
       requireSelection: true,
-    );
+    ));
   }
 }

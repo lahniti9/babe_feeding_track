@@ -10,8 +10,8 @@ class NightFeedsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionSingleView(
+
+    return Obx(() => QuestionSingleView(
       title: "How often does your baby feed at night?",
       options: const [
         QuestionOption(
@@ -38,9 +38,12 @@ class NightFeedsView extends StatelessWidget {
       selectedValue: controller.getAnswer<String>('night_feeds'),
       onSelectionChanged: (value) {
         controller.saveAnswer('night_feeds', value);
-        Get.toNamed(Routes.feedingType);
+        // Small delay to show selection feedback
+        Future.delayed(const Duration(milliseconds: 150), () {
+          Get.toNamed(Routes.feedingType);
+        });
       },
       autoNavigate: true,
-    );
+    ));
   }
 }

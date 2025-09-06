@@ -10,8 +10,8 @@ class SleepIssuesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<OnboardingController>();
-    
-    return QuestionMultiView(
+
+    return Obx(() => QuestionMultiView(
       title: "What sleep challenges are you experiencing?",
       options: const [
         QuestionMultiOption(
@@ -58,6 +58,6 @@ class SleepIssuesView extends StatelessWidget {
       },
       onNext: () => Get.toNamed(Routes.napsPerDay),
       requireSelection: true,
-    );
+    ));
   }
 }
