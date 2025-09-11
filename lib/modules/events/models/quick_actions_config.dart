@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'event.dart';
 import 'quick_action.dart';
+import '../../../core/theme/colors.dart';
 
 const _violet1 = Color(0xFF6B46FE);
 const _violet2 = Color(0xFF7B5CFF);
-const _orange  = Color(0xFFFFA629);
+const _coral   = AppColors.coral;        // Updated to use coral
 const _brown   = Color(0xFF9C6F63);
 const _teal    = Color(0xFF3BB3C4);
 const _red     = Color(0xFFE14E63);
@@ -30,10 +31,10 @@ const quickActions = <QuickAction>[
     roles: allRoles
   ),
   QuickAction(
-    kind: EventKind.bottle, 
-    label: 'Bottle', 
-    icon: Icons.local_drink, 
-    bgColor: _orange, 
+    kind: EventKind.bottle,
+    label: 'Bottle',
+    icon: Icons.local_drink,
+    bgColor: _coral,
     roles: allRoles
   ),
   QuickAction(
@@ -52,17 +53,24 @@ const quickActions = <QuickAction>[
     roles: allRoles
   ),
   QuickAction(
-    kind: EventKind.cry, 
-    label: 'Cry', 
-    icon: Icons.sick_outlined, 
-    bgColor: _teal, 
+    kind: EventKind.cry,
+    label: 'Cry',
+    icon: Icons.sick_outlined,
+    bgColor: _teal,
     roles: allRoles
   ),
   QuickAction(
-    kind: EventKind.expressing, 
-    label: 'Expressing', 
-    icon: Icons.pregnant_woman, 
-    bgColor: _red, 
+    kind: EventKind.feeding,
+    label: 'Feeding',
+    icon: Icons.child_care,
+    bgColor: _red,
+    roles: {UserRole.mom}
+  ), // mom only
+  QuickAction(
+    kind: EventKind.expressing,
+    label: 'Expressing',
+    icon: Icons.pregnant_woman,
+    bgColor: _red,
     roles: {UserRole.mom}
   ), // mom only
   QuickAction(

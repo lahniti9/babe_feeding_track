@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import '../models/event.dart';
+import '../models/sleep_event.dart';
 import 'events_controller.dart';
+import '../../children/services/children_store.dart';
 
 class SimpleSleepController extends GetxController {
   // Timer state
@@ -38,7 +39,7 @@ class SimpleSleepController extends GetxController {
     ticker?.cancel();
   }
 
-  // Stop timer and save as EventModel (for now)
+  // Stop timer and save as SleepEvent
   void stopTimerAndSave() {
     if (fellAsleep.value == null) return;
 
@@ -46,42 +47,31 @@ class SimpleSleepController extends GetxController {
     ticker?.cancel();
     wokeUp.value = DateTime.now();
 
-    final duration = wokeUp.value!.difference(fellAsleep.value!);
-    final durationText = _formatDuration(duration);
+    // Create a clean SleepEvent with no tags initially
+    final childrenStore = Get.find<ChildrenStore>();
+    final activeChildId = childrenStore.activeId.value ?? 'default-child';
 
-    // Create EventModel for compatibility
-    final event = EventModel(
+    final sleepEvent = SleepEvent(
       id: 'sleep_${DateTime.now().millisecondsSinceEpoch}',
-      kind: EventKind.sleeping,
-      time: fellAsleep.value!,
-      endTime: wokeUp.value,
-      title: 'Naji slept $durationText',
-      subtitle: 'Start of sleep: content\nEnd of sleep: woke up naturally\nHow: nursing',
-      showPlus: true,
+      childId: activeChildId,
+      fellAsleep: fellAsleep.value!,
+      wokeUp: wokeUp.value!,
+      comment: null, // No comment initially
+      startTags: [], // No start tags initially
+      endTags: [], // No end tags initially
+      howTags: [], // No how tags initially
     );
 
     final eventsController = Get.find<EventsController>();
-    eventsController.addEvent(event);
+    eventsController.upsertSleep(sleepEvent);
 
     Get.back();
     _reset();
   }
 
-  // Format duration for display
-  String _formatDuration(Duration duration) {
-    if (duration.inHours > 0) {
-      return '${duration.inHours} hr${duration.inHours > 1 ? 's' : ''}, ${duration.inMinutes % 60} min';
-    } else if (duration.inMinutes > 0) {
-      return '${duration.inMinutes} min';
-    } else {
-      return '${duration.inSeconds} sec${duration.inSeconds != 1 ? 's' : ''}';
-    }
-  }
 
-  // Open exact time view
-  void openExactTimeView() {
-    Get.toNamed('/sleep-exact');
-  }
+
+
 
   // Reset timer
   void resetTimer() {

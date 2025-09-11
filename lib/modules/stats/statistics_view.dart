@@ -92,7 +92,12 @@ class StatisticsView extends StatelessWidget {
     if (controller.currentChildId != null) {
       Get.to(() => HeadCircView(childId: controller.currentChildId!));
     } else {
-      Get.snackbar("Error", "No active child selected");
+      Get.snackbar(
+        "No Child Selected",
+        "Please add a child first or complete the onboarding process",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -100,7 +105,12 @@ class StatisticsView extends StatelessWidget {
     if (controller.currentChildId != null) {
       Get.to(() => HeightView(childId: controller.currentChildId!));
     } else {
-      Get.snackbar("Error", "No active child selected");
+      Get.snackbar(
+        "No Child Selected",
+        "Please add a child first or complete the onboarding process",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -108,7 +118,12 @@ class StatisticsView extends StatelessWidget {
     if (controller.currentChildId != null) {
       Get.to(() => WeightView(childId: controller.currentChildId!));
     } else {
-      Get.snackbar("Error", "No active child selected");
+      Get.snackbar(
+        "No Child Selected",
+        "Please add a child first or complete the onboarding process",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
     }
   }
 

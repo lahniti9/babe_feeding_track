@@ -75,8 +75,7 @@ class SleepEntryView extends StatelessWidget {
           // Bottom controls
           _buildTimerBottomControls(controller),
 
-          // From time button
-          _buildFromTimeButton(controller),
+
         ],
       ),
     );
@@ -202,39 +201,5 @@ class SleepEntryView extends StatelessWidget {
     );
   }
 
-  Widget _buildFromTimeButton(SimpleSleepController controller) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(top: AppSpacing.md),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.textSecondary.withValues(alpha: 0.3)),
-      ),
-      child: GestureDetector(
-        onTap: controller.openExactTimeView,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.schedule,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              'from 00:00',
-              style: AppTextStyles.buttonTextSmall.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 }

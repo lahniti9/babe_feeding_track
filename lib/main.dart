@@ -6,13 +6,15 @@ import 'core/theme/app_theme.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 import 'modules/children/services/children_store.dart';
+import 'modules/events/services/events_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize GetStorage
   await GetStorage.init();
-  // Initialize ChildrenStore
+  // Initialize stores
   Get.put(ChildrenStore());
+  Get.put(EventsStore());
   runApp(const BabeFeedingTrackApp());
 }
 
@@ -21,15 +23,11 @@ class BabeFeedingTrackApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if onboarding is completed
-    final storage = GetStorage();
-    final isOnboardingCompleted = storage.read('onboarding_completed') ?? false;
-    final initialRoute = isOnboardingCompleted ? Routes.tabs : Routes.splash;
-
+    // Always start with splash screen for beautiful app launch
     return GetMaterialApp(
       title: 'Babe Feeding Track',
       theme: AppTheme.darkTheme,
-      initialRoute: initialRoute,
+      initialRoute: Routes.splash,
       getPages: AppPages.routes,
       debugShowCheckedModeBanner: false,
     );

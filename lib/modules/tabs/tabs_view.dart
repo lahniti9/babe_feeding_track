@@ -29,9 +29,7 @@ class TabsView extends StatelessWidget {
           case TabIndex.statistics:
             return const StatisticsView();
           case TabIndex.spurtCalendar:
-            return SpurtCalendarView(
-              childId: profileController.activeChild?.id ?? 'default-child',
-            );
+            return const SpurtCalendarView();
           case TabIndex.children:
             return const ChildrenView();
           case TabIndex.settings:

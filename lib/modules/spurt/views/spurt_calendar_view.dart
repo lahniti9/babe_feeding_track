@@ -4,22 +4,11 @@ import '../controllers/spurt_controller.dart';
 import '../widgets/spurt_tile.dart';
 
 class SpurtCalendarView extends StatelessWidget {
-  final String childId;
-
-  const SpurtCalendarView({
-    super.key,
-    required this.childId,
-  });
+  const SpurtCalendarView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // For demo purposes, using a fixed birth date
-    // In real app, this would come from the child's profile
-    final birthDate = DateTime.now().subtract(const Duration(days: 30)); // 30 days ago
-    final controller = Get.put(SpurtController(
-      birthDate: birthDate,
-      childName: 'Baby', // Would come from child profile
-    ));
+    final controller = Get.put(SpurtController());
 
     return Scaffold(
       backgroundColor: const Color(0xFF121212), // Dark background

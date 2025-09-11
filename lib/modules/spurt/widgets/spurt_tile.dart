@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/colors.dart';
 import '../models/spurt_models.dart';
 import '../views/spurt_detail_view.dart';
 
@@ -21,7 +22,7 @@ class SpurtTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (episode?.type) {
-      SpurtType.growthLeap => const Color(0xFFFFA629), // Orange
+      SpurtType.growthLeap => AppColors.coral, // Coral
       SpurtType.fussyPhase => const Color(0xFF28C076), // Green
       _ => const Color(0xFF1A1A1A), // Dark grey for normal weeks
     };
@@ -112,7 +113,7 @@ class _ScribbleRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFFFE08D) // Light yellow/orange
+      ..color = AppColors.lightCoral // Light coral
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/event.dart';
 import 'events_controller.dart';
+import '../../children/services/children_store.dart';
 
 class BedtimeRoutineController extends GetxController {
   // Time selection
@@ -44,9 +45,13 @@ class BedtimeRoutineController extends GetxController {
   // Save bedtime routine
   void save() {
     if (steps.isEmpty) return;
-    
+
+    final childrenStore = Get.find<ChildrenStore>();
+    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+
     final event = EventModel(
       id: editingEventId ?? 'event_${DateTime.now().millisecondsSinceEpoch}',
+      childId: activeChildId,
       kind: EventKind.bedtimeRoutine,
       time: time.value,
       title: 'Bedtime routine',

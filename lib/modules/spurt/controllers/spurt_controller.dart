@@ -1,14 +1,34 @@
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:collection/collection.dart';
 import '../models/spurt_models.dart';
 import '../data/spurt_presets.dart';
+import '../../children/services/children_store.dart';
 
 class SpurtController extends GetxController {
-  SpurtController({required this.birthDate, required this.childName});
+  late final DateTime birthDate;
+  late final String childName;
 
-  final DateTime birthDate;
-  final String childName;
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeFromActiveChild();
+    // Set initial selected week to current week
+    selectedWeek.value = currentWeek;
+  }
+
+  void _initializeFromActiveChild() {
+    final childrenStore = Get.find<ChildrenStore>();
+    final activeChild = childrenStore.active;
+
+    if (activeChild != null) {
+      birthDate = activeChild.birthDate;
+      childName = activeChild.name;
+    } else {
+      // Fallback to current date if no active child
+      birthDate = DateTime.now();
+      childName = 'Baby';
+    }
+  }
 
   final episodes = spurtEpisodes.obs;
   final selectedWeek = 1.obs;
@@ -117,12 +137,7 @@ class SpurtController extends GetxController {
   /// Get weeks for grid display
   List<int> get weekNumbers => List.generate(totalWeeks, (index) => index + 1);
 
-  @override
-  void onInit() {
-    super.onInit();
-    // Set initial selected week to current week
-    selectedWeek.value = currentWeek;
-  }
+  // Removed duplicate onInit - initialization is done in _initializeFromActiveChild
 }
 
 /// Controller for detail view

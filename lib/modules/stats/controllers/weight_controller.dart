@@ -6,6 +6,8 @@ import '../../events/models/event.dart';
 import '../models/stats_models.dart';
 import '../services/stats_aggregator.dart';
 import '../../profile/profile_controller.dart';
+import '../../events/services/events_store.dart';
+import '../../events/models/event_record.dart' as er;
 
 class WeightController extends GetxController {
   final String childId;
@@ -44,11 +46,11 @@ class WeightController extends GetxController {
 
   void _loadMeasurements() {
     _isLoading.value = true;
-    
+
     try {
       // Get range based on selected period
       final range = _getRangeForPeriod(_selectedPeriod.value);
-      
+
       // Load events from storage
       final eventsData = _storage.read('events') ?? [];
       final events = (eventsData as List)
@@ -76,11 +78,30 @@ class WeightController extends GetxController {
         eventModels,
       );
 
-      // Combine and sort measurements
-      final allMeasurements = [...oldMeasurements, ...newMeasurements];
-      allMeasurements.sort((a, b) => a.x.compareTo(b.x));
+      // Also get from new EventsStore
+      try {
+        final eventsStore = Get.find<EventsStore>();
+        final weightEvents = eventsStore.getByChild(childId)
+            .where((e) => e.type == er.EventType.weight)
+            .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
+            .toList();
 
-      _measurements.value = allMeasurements;
+        final newSystemMeasurements = weightEvents.map((e) {
+          final valueKg = e.data['valueKg'] as num? ?? 0;
+          return Point(e.startAt, valueKg.toDouble() * 1000); // Convert to grams for consistency
+        }).toList();
+
+        // Combine all measurements
+        final allMeasurements = [...oldMeasurements, ...newMeasurements, ...newSystemMeasurements];
+        allMeasurements.sort((a, b) => a.x.compareTo(b.x));
+
+        _measurements.value = allMeasurements;
+      } catch (e) {
+        // EventsStore not available, use old system only
+        final allMeasurements = [...oldMeasurements, ...newMeasurements];
+        allMeasurements.sort((a, b) => a.x.compareTo(b.x));
+        _measurements.value = allMeasurements;
+      }
     } catch (e) {
       print('Error loading weight measurements: $e');
       _measurements.value = [];

@@ -6,10 +6,18 @@ import '../views/sleep_entry_view.dart';
 import '../views/sleep_exact_view.dart';
 import '../views/bedtime_routine_view.dart';
 import '../views/bottle_entry_view.dart';
-import '../views/comment_sheet.dart';
+
+import '../views/cry_sheet.dart';
+import '../views/feeding_sheet.dart';
 import '../models/sleep_event.dart';
+import '../models/cry_event.dart';
+import '../models/breast_feeding_event.dart';
+import '../models/event_record.dart';
+import '../services/events_store.dart';
+import '../services/event_router.dart';
 import 'bedtime_routine_controller.dart';
 import 'bottle_entry_controller.dart';
+import '../../children/services/children_store.dart';
 
 class EventsController extends GetxController {
   final _storage = GetStorage();
@@ -30,17 +38,38 @@ class EventsController extends GetxController {
   final _isLoading = false.obs;
   bool get isLoading => _isLoading.value;
 
+  // EventsStore reference
+  late EventsStore _eventsStore;
+
   @override
   void onInit() {
     super.onInit();
     // Initialize events list with explicit dynamic typing
     events = <dynamic>[].obs;
+    _eventsStore = Get.find<EventsStore>();
     _loadEvents();
+
+    // Listen to EventsStore changes
+    ever(_eventsStore.items, (_) => _loadEvents());
   }
 
-  // Get filtered events
+  // Get filtered events for active child
   List<dynamic> get filtered {
-    var filteredEvents = events.toList();
+    final childrenStore = Get.find<ChildrenStore>();
+    final activeChildId = childrenStore.activeId.value;
+
+    var filteredEvents = events.where((event) {
+      // Filter by active child
+      if (activeChildId != null) {
+        if (event is EventModel && event.childId != activeChildId) {
+          return false;
+        }
+        if (event is SleepEvent && event.childId != activeChildId) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
 
     // Apply active filter from long-press
     if (activeFilter.value != null) {
@@ -59,6 +88,41 @@ class EventsController extends GetxController {
   EventKind _getEventKind(dynamic event) {
     if (event is EventModel) return event.kind;
     if (event is SleepEvent) return EventKind.sleeping;
+    if (event is CryEvent) return EventKind.cry;
+    if (event is BreastFeedingEvent) return EventKind.feeding;
+    if (event is EventRecord) {
+      // Map EventRecord types to EventKind
+      switch (event.type) {
+        case EventType.feedingBottle:
+          return EventKind.bottle;
+        case EventType.expressing:
+          return EventKind.expressing;
+        case EventType.spitUp:
+          return EventKind.spitUp;
+        case EventType.diaper:
+          return EventKind.diaper;
+        case EventType.temperature:
+          return EventKind.temperature;
+        case EventType.weight:
+          return EventKind.weight;
+        case EventType.height:
+          return EventKind.height;
+        case EventType.headCircumference:
+          return EventKind.headCircumference;
+        case EventType.medicine:
+          return EventKind.medicine;
+        case EventType.doctor:
+          return EventKind.doctor;
+        case EventType.bathing:
+          return EventKind.bathing;
+        case EventType.walking:
+          return EventKind.walking;
+        case EventType.food:
+          return EventKind.food;
+        default:
+          return EventKind.activity;
+      }
+    }
     return EventKind.activity; // fallback
   }
 
@@ -66,7 +130,15 @@ class EventsController extends GetxController {
   DateTime _getEventTime(dynamic event) {
     if (event is EventModel) return event.time;
     if (event is SleepEvent) return event.wokeUp;
+    if (event is CryEvent) return event.time;
+    if (event is BreastFeedingEvent) return event.startAt;
+    if (event is EventRecord) return event.startAt;
     return DateTime.now(); // fallback
+  }
+
+  // Public method to get EventKind from EventRecord
+  EventKind getEventKindFromRecord(EventRecord event) {
+    return _getEventKind(event);
   }
 
   // Group events by date for display
@@ -96,10 +168,17 @@ class EventsController extends GetxController {
     return grouped;
   }
 
+  int getTodayEventCount() {
+    final todayEvents = groupedEvents['Today'] ?? [];
+    return todayEvents.length;
+  }
+
   // Load events from storage
   void _loadEvents() {
     final eventsData = _storage.read('events_v2');
     final sleepEventsData = _storage.read('sleep_events');
+    final cryEventsData = _storage.read('cry_events');
+    final feedingEventsData = _storage.read('feeding_events');
 
     List<dynamic> allEvents = <dynamic>[];
 
@@ -117,6 +196,59 @@ class EventsController extends GetxController {
           .toList());
     }
 
+    // Load CryEvent events
+    if (cryEventsData != null) {
+      allEvents.addAll((cryEventsData as List)
+          .map((event) => CryEvent.fromJson(Map<String, dynamic>.from(event)))
+          .toList());
+    }
+
+    // Load BreastFeedingEvent events
+    if (feedingEventsData != null) {
+      allEvents.addAll((feedingEventsData as List)
+          .map((event) => BreastFeedingEvent.fromJson(Map<String, dynamic>.from(event)))
+          .toList());
+    }
+
+    // Load EventRecord events from EventsStore
+    allEvents.addAll(_eventsStore.items);
+
+    // Sort by timestamp (newest first)
+    allEvents.sort((a, b) {
+      DateTime aTime;
+      DateTime bTime;
+
+      if (a is EventModel) {
+        aTime = a.time;
+      } else if (a is SleepEvent) {
+        aTime = a.wokeUp;
+      } else if (a is CryEvent) {
+        aTime = a.time;
+      } else if (a is BreastFeedingEvent) {
+        aTime = a.startAt;
+      } else if (a is EventRecord) {
+        aTime = a.startAt;
+      } else {
+        aTime = DateTime.now();
+      }
+
+      if (b is EventModel) {
+        bTime = b.time;
+      } else if (b is SleepEvent) {
+        bTime = b.wokeUp;
+      } else if (b is CryEvent) {
+        bTime = b.time;
+      } else if (b is BreastFeedingEvent) {
+        bTime = b.startAt;
+      } else if (b is EventRecord) {
+        bTime = b.startAt;
+      } else {
+        bTime = DateTime.now();
+      }
+
+      return bTime.compareTo(aTime);
+    });
+
     // Recreate the events list to ensure correct typing
     events.clear();
     events.addAll(allEvents);
@@ -126,14 +258,20 @@ class EventsController extends GetxController {
   void _saveEvents() {
     final eventModels = events.whereType<EventModel>().toList();
     final sleepEvents = events.whereType<SleepEvent>().toList();
+    final cryEvents = events.whereType<CryEvent>().toList();
+    final feedingEvents = events.whereType<BreastFeedingEvent>().toList();
 
     // Save EventModel events to the main storage
     _storage.write('events_v2', eventModels.map((event) => event.toJson()).toList());
 
-    // Save SleepEvent events to separate storage (if any)
-    if (sleepEvents.isNotEmpty) {
-      _storage.write('sleep_events', sleepEvents.map((event) => event.toJson()).toList());
-    }
+    // Save SleepEvent events to separate storage
+    _storage.write('sleep_events', sleepEvents.map((event) => event.toJson()).toList());
+
+    // Save CryEvent events to separate storage
+    _storage.write('cry_events', cryEvents.map((event) => event.toJson()).toList());
+
+    // Save BreastFeedingEvent events to separate storage
+    _storage.write('feeding_events', feedingEvents.map((event) => event.toJson()).toList());
   }
 
   // Add new event
@@ -156,11 +294,29 @@ class EventsController extends GetxController {
     _saveEvents();
   }
 
+  // Add cry event
+  void addCryEvent(CryEvent cryEvent) {
+    final newEvents = <dynamic>[cryEvent, ...events];
+    events.clear();
+    events.addAll(newEvents);
+    _saveEvents();
+  }
+
+  // Add feeding event
+  void addFeedingEvent(BreastFeedingEvent feedingEvent) {
+    final newEvents = <dynamic>[feedingEvent, ...events];
+    events.clear();
+    events.addAll(newEvents);
+    _saveEvents();
+  }
+
   // Remove event by id
   void remove(String id) {
     events.removeWhere((e) =>
       (e is EventModel && e.id == id) ||
-      (e is SleepEvent && e.id == id)
+      (e is SleepEvent && e.id == id) ||
+      (e is CryEvent && e.id == id) ||
+      (e is BreastFeedingEvent && e.id == id)
     );
     _saveEvents();
   }
@@ -222,6 +378,8 @@ class EventsController extends GetxController {
         matches = true;
       } else if (event is SleepEvent && kind == EventKind.sleeping) {
         matches = true;
+      } else if (event is EventRecord && _getEventKind(event) == kind) {
+        matches = true;
       }
 
       if (matches) {
@@ -235,7 +393,7 @@ class EventsController extends GetxController {
 
       if (event is EventModel) {
         final updatedEvent = event.copyWith(
-          tags: [...event.tags, text],
+          comment: text,
         );
         events[idx] = updatedEvent;
         _saveEvents();
@@ -251,6 +409,11 @@ class EventsController extends GetxController {
         _saveEvents();
         // Trigger UI update
         events.refresh();
+      } else if (event is EventRecord) {
+        // Update EventRecord comment via EventsStore
+        final updatedEvent = event.copyWith(comment: text);
+        _eventsStore.update(updatedEvent);
+        // The events list will be updated automatically via the reactive listener
       }
     }
   }
@@ -289,61 +452,59 @@ class EventsController extends GetxController {
         );
         break;
       case EventKind.bottle:
-        Get.put(BottleEntryController());
-        Get.bottomSheet(
-          const BottleEntryView(),
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-        );
+        EventRouter.openEventSheet(EventType.feedingBottle);
         break;
       case EventKind.diaper:
-        _quickAddEvent(kind, 'Diaper change');
+        EventRouter.openEventSheet(EventType.diaper);
         break;
       case EventKind.condition:
+        EventRouter.openEventSheet(EventType.condition);
+        break;
+      case EventKind.cry:
         Get.bottomSheet(
-          CommentSheet(kind: kind),
+          const CrySheet(),
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
         );
         break;
-      case EventKind.cry:
-        _quickAddEvent(kind, 'Crying');
+      case EventKind.feeding:
+        EventRouter.openEventSheet(EventType.feedingBreast);
         break;
       case EventKind.expressing:
-        _quickAddEvent(kind, 'Expressing');
+        EventRouter.openEventSheet(EventType.expressing);
         break;
       case EventKind.spitUp:
-        _quickAddEvent(kind, 'Spit-up');
+        EventRouter.openEventSheet(EventType.spitUp);
         break;
       case EventKind.food:
-        _quickAddEvent(kind, 'Food');
+        EventRouter.openEventSheet(EventType.food);
         break;
       case EventKind.weight:
-        _quickAddEvent(kind, 'Weight measurement');
+        EventRouter.openEventSheet(EventType.weight);
         break;
       case EventKind.height:
-        _quickAddEvent(kind, 'Height measurement');
+        EventRouter.openEventSheet(EventType.height);
         break;
       case EventKind.headCircumference:
-        _quickAddEvent(kind, 'Head circumference');
+        EventRouter.openEventSheet(EventType.headCircumference);
         break;
       case EventKind.medicine:
-        _quickAddEvent(kind, 'Medicine');
+        EventRouter.openEventSheet(EventType.medicine);
         break;
       case EventKind.temperature:
-        _quickAddEvent(kind, 'Temperature');
+        EventRouter.openEventSheet(EventType.temperature);
         break;
       case EventKind.doctor:
-        _quickAddEvent(kind, 'Doctor visit');
+        EventRouter.openEventSheet(EventType.doctor);
         break;
       case EventKind.bathing:
-        _quickAddEvent(kind, 'Bath time');
+        EventRouter.openEventSheet(EventType.bathing);
         break;
       case EventKind.walking:
-        _quickAddEvent(kind, 'Walking');
+        EventRouter.openEventSheet(EventType.walking);
         break;
       case EventKind.activity:
-        _quickAddEvent(kind, 'Activity');
+        EventRouter.openEventSheet(EventType.activity);
         break;
     }
   }
@@ -360,8 +521,12 @@ class EventsController extends GetxController {
 
   // Quick add helper for simple events
   void _quickAddEvent(EventKind kind, String title) {
+    final childrenStore = Get.find<ChildrenStore>();
+    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+
     final event = EventModel(
       id: _generateId(),
+      childId: activeChildId,
       kind: kind,
       time: DateTime.now(),
       title: title,

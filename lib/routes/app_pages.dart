@@ -372,7 +372,7 @@ class AppPages {
     // Spurt module routes
     GetPage(
       name: Routes.spurtCalendar,
-      page: () => const SpurtCalendarView(childId: 'default-child'),
+      page: () => const SpurtCalendarView(),
       binding: SpurtBinding(),
     ),
     GetPage(

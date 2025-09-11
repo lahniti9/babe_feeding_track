@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import '../../profile/profile_controller.dart';
+import '../../children/services/children_store.dart';
 
 class StatsHomeController extends GetxController {
-  final ProfileController _profileController = Get.find<ProfileController>();
+  final ChildrenStore _childrenStore = Get.find<ChildrenStore>();
 
   // Current active child
-  String? get currentChildId => _profileController.activeChild?.id;
+  String? get currentChildId => _childrenStore.activeId.value;
 
   // Navigation methods for each stats section
   void navigateToHeadCircumference() {

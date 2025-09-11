@@ -109,9 +109,9 @@ class SleepExactView extends StatelessWidget {
                 // START OF SLEEP tags
                 _SectionHeader(icon: Icons.bedtime, label: 'START OF SLEEP'),
                 const SizedBox(height: 8),
-                _ChipsWrap(
-                  options: kSleepStartTags, 
-                  selected: c.startTags,
+                _SingleSelectChips(
+                  options: kSleepStartTags,
+                  selected: c.startTag,
                   onToggle: c.toggleStartTag,
                 ),
 
@@ -120,9 +120,9 @@ class SleepExactView extends StatelessWidget {
                 // END OF SLEEP tags
                 _SectionHeader(icon: Icons.notifications_active_outlined, label: 'END OF SLEEP'),
                 const SizedBox(height: 8),
-                _ChipsWrap(
-                  options: kSleepEndTags, 
-                  selected: c.endTags,
+                _SingleSelectChips(
+                  options: kSleepEndTags,
+                  selected: c.endTag,
                   onToggle: c.toggleEndTag,
                 ),
 
@@ -131,37 +131,20 @@ class SleepExactView extends StatelessWidget {
                 // HOW tags
                 _SectionHeader(icon: Icons.help_outline, label: 'HOW'),
                 const SizedBox(height: 8),
-                _ChipsWrap(
-                  options: kSleepHowTags, 
-                  selected: c.howTags,
+                _SingleSelectChips(
+                  options: kSleepHowTags,
+                  selected: c.howTag,
                   onToggle: c.toggleHowTag,
                 ),
 
                 const SizedBox(height: 24),
 
-                // Bottom pills
-                Row(
-                  children: [
-                    Expanded(
-                      child: _BigPill(
-                        leading: const Icon(Icons.check, color: Colors.white),
-                        label: 'Done',
-                        color: const Color(0xFF2E7D32), // green
-                        onTap: c.save,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Obx(() => _BigPill(
-                        leading: const Icon(Icons.play_arrow, color: Colors.white),
-                        label: c.resumeLabel,             // "from 15:44"
-                        color: const Color(0xFF2A2A2A),
-                        onTap: () {
-                          // optional: start a timer from fellAsleep again
-                        },
-                      )),
-                    ),
-                  ],
+                // Bottom button
+                _BigPill(
+                  leading: const Icon(Icons.check, color: Colors.white),
+                  label: 'Done',
+                  color: const Color(0xFF2E7D32), // green
+                  onTap: c.save,
                 ),
               ],
             ),
@@ -272,10 +255,29 @@ class _TimeRow extends StatelessWidget {
   }
 }
 
-class _CommentBox extends StatelessWidget {
+class _CommentBox extends StatefulWidget {
   final SleepEntryController controller;
 
   const _CommentBox({required this.controller});
+
+  @override
+  State<_CommentBox> createState() => _CommentBoxState();
+}
+
+class _CommentBoxState extends State<_CommentBox> {
+  late TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.controller.comment.value);
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -289,6 +291,7 @@ class _CommentBox extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: TextField(
+            controller: _textController,
             maxLines: 4,
             style: const TextStyle(color: Colors.white),
             decoration: const InputDecoration(
@@ -296,14 +299,14 @@ class _CommentBox extends StatelessWidget {
               hintStyle: TextStyle(color: Colors.white60),
               border: InputBorder.none,
             ),
-            onChanged: controller.updateComment,
+            onChanged: widget.controller.updateComment,
           ),
         ),
         const SizedBox(height: 8),
         Obx(() => Text(
-          '${controller.commentCharacterCount} / 300',
+          '${widget.controller.commentCharacterCount} / 300',
           style: TextStyle(
-            color: controller.commentAtLimit ? Colors.red : Colors.white60,
+            color: widget.controller.commentAtLimit ? Colors.red : Colors.white60,
             fontSize: 12,
           ),
         )),
@@ -338,12 +341,12 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _ChipsWrap extends StatelessWidget {
+class _SingleSelectChips extends StatelessWidget {
   final List<String> options;
-  final RxSet<String> selected;
+  final RxnString selected;
   final Function(String) onToggle;
 
-  const _ChipsWrap({
+  const _SingleSelectChips({
     required this.options,
     required this.selected,
     required this.onToggle,
@@ -355,7 +358,7 @@ class _ChipsWrap extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: options.map((option) {
-        final isSelected = selected.contains(option);
+        final isSelected = selected.value == option;
         return GestureDetector(
           onTap: () => onToggle(option),
           child: Container(

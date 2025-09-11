@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/colors.dart';
 import '../controllers/spurt_controller.dart';
 import '../widgets/section_card.dart';
 import '../widgets/date_strip.dart';
@@ -217,7 +218,7 @@ class SpurtDetailView extends StatelessWidget {
       child: ElevatedButton(
         onPressed: controller.onGotItTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFFA629), // Orange
+          backgroundColor: AppColors.coral, // Coral
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),

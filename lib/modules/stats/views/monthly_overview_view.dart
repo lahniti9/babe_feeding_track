@@ -165,7 +165,7 @@ class MonthlyOverviewView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildLegendItem('Bottle', Colors.orange),
+        _buildLegendItem('Bottle', AppColors.coral),
         _buildLegendItem('Daytime sleep', Colors.purple),
         _buildLegendItem('All events', Colors.blue),
       ],
@@ -198,7 +198,7 @@ class MonthlyOverviewView extends StatelessWidget {
   Color _getEventColor(String eventType) {
     switch (eventType) {
       case 'Bottle':
-        return Colors.orange;
+        return AppColors.coral;
       case 'Daytime sleep':
         return Colors.purple;
       default:

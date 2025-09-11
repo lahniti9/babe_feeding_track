@@ -5,6 +5,7 @@ import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../models/event.dart';
 import 'events_controller.dart';
+import '../../children/services/children_store.dart';
 
 class BottleEntryController extends GetxController {
   // Time selection
@@ -56,9 +57,13 @@ class BottleEntryController extends GetxController {
   // Save bottle entry
   void save() {
     if (amountOz <= 0) return;
-    
+
+    final childrenStore = Get.find<ChildrenStore>();
+    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+
     final event = EventModel(
       id: editingEventId ?? 'event_${DateTime.now().millisecondsSinceEpoch}',
+      childId: activeChildId,
       kind: EventKind.bottle,
       time: time.value,
       title: 'Bottle',

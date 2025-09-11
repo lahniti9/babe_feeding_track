@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../models/sleep_event.dart';
 import 'events_controller.dart';
 
@@ -10,9 +9,9 @@ class SleepEntryController extends GetxController {
       fellAsleep.value = initial.fellAsleep;
       wokeUp.value = initial.wokeUp;
       comment.value = initial.comment ?? '';
-      startTags.addAll(initial.startTags);
-      endTags.addAll(initial.endTags);
-      howTags.addAll(initial.howTags);
+      startTag.value = initial.startTags.isNotEmpty ? initial.startTags.first : null;
+      endTag.value = initial.endTags.isNotEmpty ? initial.endTags.first : null;
+      howTag.value = initial.howTags.isNotEmpty ? initial.howTags.first : null;
       isEdit.value = true;
     }
   }
@@ -25,11 +24,9 @@ class SleepEntryController extends GetxController {
   final wokeUp = DateTime.now().obs;
 
   final comment = ''.obs;
-  final RxSet<String> startTags = <String>{}.obs;
-  final RxSet<String> endTags = <String>{}.obs;
-  final RxSet<String> howTags = <String>{}.obs;
-
-  String get resumeLabel => 'from ${DateFormat.Hm().format(fellAsleep.value)}';
+  final RxnString startTag = RxnString(); // Single selection
+  final RxnString endTag = RxnString();   // Single selection
+  final RxnString howTag = RxnString();   // Single selection
 
   bool get valid => !wokeUp.value.isBefore(fellAsleep.value);
 
@@ -39,9 +36,9 @@ class SleepEntryController extends GetxController {
     fellAsleep: fellAsleep.value,
     wokeUp: wokeUp.value,
     comment: comment.value.isEmpty ? null : comment.value.trim(),
-    startTags: startTags.toList(),
-    endTags: endTags.toList(),
-    howTags: howTags.toList(),
+    startTags: startTag.value != null ? [startTag.value!] : [],
+    endTags: endTag.value != null ? [endTag.value!] : [],
+    howTags: howTag.value != null ? [howTag.value!] : [],
   );
 
   void save() {
@@ -61,28 +58,28 @@ class SleepEntryController extends GetxController {
     }
   }
 
-  // Tag toggle methods
+  // Tag selection methods (single selection)
   void toggleStartTag(String tag) {
-    if (startTags.contains(tag)) {
-      startTags.remove(tag);
+    if (startTag.value == tag) {
+      startTag.value = null; // Deselect if already selected
     } else {
-      startTags.add(tag);
+      startTag.value = tag; // Select new tag
     }
   }
 
   void toggleEndTag(String tag) {
-    if (endTags.contains(tag)) {
-      endTags.remove(tag);
+    if (endTag.value == tag) {
+      endTag.value = null; // Deselect if already selected
     } else {
-      endTags.add(tag);
+      endTag.value = tag; // Select new tag
     }
   }
 
   void toggleHowTag(String tag) {
-    if (howTags.contains(tag)) {
-      howTags.remove(tag);
+    if (howTag.value == tag) {
+      howTag.value = null; // Deselect if already selected
     } else {
-      howTags.add(tag);
+      howTag.value = tag; // Select new tag
     }
   }
 

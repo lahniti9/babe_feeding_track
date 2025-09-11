@@ -23,14 +23,30 @@ class TimelineEntry extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.border.withValues(alpha: 0.1),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Timeline line and icon
-            _buildTimelineIndicator(),
-            const SizedBox(width: AppSpacing.lg),
-            
+            // Enhanced timeline indicator
+            _buildEnhancedTimelineIndicator(),
+            const SizedBox(width: 16),
+
             // Content
             Expanded(
               child: Column(
@@ -44,10 +60,11 @@ class TimelineEntry extends StatelessWidget {
                           model.displayTitle,
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),
-                      if (model.showPlus) _buildPlusButton(),
+                      _buildEnhancedPlusButton(),
                     ],
                   ),
                   
@@ -71,6 +88,12 @@ class TimelineEntry extends StatelessWidget {
                           .toList(),
                     ),
                   ],
+
+                  // Comment display
+                  if (model.comment != null && model.comment!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildCommentDisplay(model.comment!),
+                  ],
                 ],
               ),
             ),
@@ -85,57 +108,84 @@ class TimelineEntry extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineIndicator() {
-    return Column(
-      children: [
-        // Timeline line (top)
-        Container(
+  Widget _buildEnhancedTimelineIndicator() {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: _getKindColor().withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: _getKindColor().withValues(alpha: 0.3),
           width: 2,
-          height: 12,
-          color: AppColors.border,
         ),
-        // Icon
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: _getKindColor(),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            _getKindIcon(),
-            color: Colors.white,
-            size: 14,
-          ),
-        ),
-        // Timeline line (bottom)
-        Container(
-          width: 2,
-          height: 12,
-          color: AppColors.border,
-        ),
-      ],
+      ),
+      child: Icon(
+        _getKindIcon(),
+        color: _getKindColor(),
+        size: 24,
+      ),
     );
   }
 
-  Widget _buildPlusButton() {
+  Widget _buildCommentDisplay(String comment) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.coral.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.coral.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.chat_bubble_outline,
+            color: AppColors.coral,
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              comment,
+              style: AppTextStyles.captionMedium.copyWith(
+                color: Colors.white,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnhancedPlusButton() {
     return GestureDetector(
       onTap: onPlusTap,
       child: Container(
-        width: 20,
-        height: 20,
-        decoration: const BoxDecoration(
-          color: AppColors.textSecondary,
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: AppColors.coral.withValues(alpha: 0.1),
           shape: BoxShape.circle,
+          border: Border.all(
+            color: AppColors.coral.withValues(alpha: 0.3),
+            width: 1,
+          ),
         ),
-        child: const Icon(
+        child: Icon(
           Icons.add,
-          color: Colors.white,
-          size: 12,
+          color: AppColors.coral,
+          size: 16,
         ),
       ),
     );
   }
+
+
 
   Widget _buildTimeDisplay() {
     final timeFormat = DateFormat('HH:mm');

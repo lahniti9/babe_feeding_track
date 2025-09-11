@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:uuid/uuid.dart';
 import '../../../data/models/models.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/widgets/metric_toggle.dart';
+import '../../children/services/children_store.dart';
+import '../../children/models/child_profile.dart';
+import '../../profile/profile_controller.dart';
 
 class OnboardingController extends GetxController {
   final _storage = GetStorage();
@@ -206,8 +210,50 @@ class OnboardingController extends GetxController {
   
   // Complete onboarding
   void completeOnboarding() {
+    // Create the first child profile from onboarding data
+    _createFirstChildProfile();
+
     _storage.write('onboarding_completed', true);
     Get.offAllNamed(Routes.tabs);
+  }
+
+  // Create first child profile from onboarding data
+  void _createFirstChildProfile() {
+    final childrenStore = Get.find<ChildrenStore>();
+    final profileController = Get.find<ProfileController>();
+
+    final childId = const Uuid().v4();
+    final childName = _babyName.value.trim().isEmpty ? 'Baby' : _babyName.value.trim();
+
+    // Convert Gender to BabyGender for new system
+    final babyGender = _babyGender.value == Gender.boy
+        ? BabyGender.boy
+        : BabyGender.girl;
+
+    // Create child profile for new system (ChildrenStore)
+    final newChildProfile = ChildProfile(
+      id: childId,
+      name: childName,
+      gender: babyGender,
+      birthDate: _babyBirthday.value,
+      avatar: null, // No avatar from onboarding
+    );
+
+    // Create child for old system (ProfileController) for backward compatibility
+    final now = DateTime.now();
+    final oldChild = Child(
+      id: childId,
+      name: childName,
+      birthday: _babyBirthday.value,
+      gender: _babyGender.value,
+      birthWeight: Weight.fromGrams(3500), // Default birth weight: 3.5kg
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    // Add to both systems
+    childrenStore.add(newChildProfile);
+    profileController.addChild(oldChild);
   }
   
   // Check if onboarding is completed
