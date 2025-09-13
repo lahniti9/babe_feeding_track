@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/colors.dart';
-import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../models/breast_feeding_event.dart';
-import '../models/event.dart';
 
 class FeedingTimelineEntry extends StatelessWidget {
   final BreastFeedingEvent event;
@@ -26,28 +24,35 @@ class FeedingTimelineEntry extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.border.withValues(alpha: 0.1),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Timeline line and icon
-            _buildTimelineIndicator(),
-            const SizedBox(width: AppSpacing.lg),
-            
+            // Enhanced timeline indicator
+            _buildEnhancedTimelineIndicator(),
+            const SizedBox(width: 16),
+
             // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top left caption (relative time)
-                  Text(
-                    relativeTime(event.startAt),
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  
                   // Title row with plus button
                   Row(
                     children: [
@@ -56,27 +61,53 @@ class FeedingTimelineEntry extends StatelessWidget {
                           title,
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),
-                      _buildPlusButton(),
+                      _buildEnhancedPlusButton(),
                     ],
                   ),
-                  
+
+                  // Subtitle with child name
+                  const SizedBox(height: 4),
+                  Text(
+                    name,
+                    style: AppTextStyles.captionMedium,
+                  ),
+
                   // Detail lines
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: 8),
                   _buildDetailLines(),
+
+                  // Comment display
+                  if (event.comment != null && event.comment!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildCommentDisplay(event.comment!),
+                  ],
                 ],
               ),
             ),
-            
-            const SizedBox(width: AppSpacing.lg),
-            
+
             // Time (right-aligned)
-            Text(
-              DateFormat('HH:mm').format(event.startAt),
-              style: AppTextStyles.caption,
-              textAlign: TextAlign.right,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  relativeTime(event.startAt),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  DateFormat('HH:mm').format(event.startAt),
+                  style: AppTextStyles.caption.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -84,55 +115,78 @@ class FeedingTimelineEntry extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineIndicator() {
-    return Column(
-      children: [
-        // Timeline line (top)
-        Container(
+  Widget _buildEnhancedTimelineIndicator() {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE14E63).withValues(alpha: 0.1), // Pink for feeding
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: const Color(0xFFE14E63).withValues(alpha: 0.3),
           width: 2,
-          height: 12,
-          color: AppColors.border,
         ),
-        // Icon
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE14E63), // red
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(
-            Icons.child_care,
-            color: Colors.white,
-            size: 18,
-          ),
-        ),
-        // Timeline line (bottom)
-        Container(
-          width: 2,
-          height: 12,
-          color: AppColors.border,
-        ),
-      ],
+      ),
+      child: const Icon(
+        Icons.child_care,
+        color: Color(0xFFE14E63),
+        size: 24,
+      ),
     );
   }
 
-  Widget _buildPlusButton() {
+  Widget _buildEnhancedPlusButton() {
     return GestureDetector(
       onTap: onPlusTap,
       child: Container(
-        width: 24,
-        height: 24,
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          color: AppColors.coral.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: AppColors.coral.withValues(alpha: 0.3),
+            width: 1,
+          ),
         ),
         child: Icon(
           Icons.add,
-          size: 16,
-          color: AppColors.textSecondary,
+          color: AppColors.coral,
+          size: 18,
         ),
+      ),
+    );
+  }
+
+  Widget _buildCommentDisplay(String comment) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.coral.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.coral.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.chat_bubble_outline,
+            color: AppColors.coral,
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              comment,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: Colors.white,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -141,11 +195,9 @@ class FeedingTimelineEntry extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _DetailLine('Total ${prettySecs(event.total.inSeconds)}'
-            + (event.volumeOz != null ? ' • ${event.volumeOz} oz' : '')),
+        _DetailLine('Total ${prettySecs(event.total.inSeconds)}${event.volumeOz != null ? ' • ${event.volumeOz} oz' : ''}'),
         _DetailLine('Left ${prettySecs(event.left.inSeconds)}  •  Right ${prettySecs(event.right.inSeconds)}'),
-        if (event.comment != null && event.comment!.isNotEmpty)
-          _CommentLine(event.comment!),
+        // Comment removed from here - it's displayed separately below
       ],
     );
   }
@@ -170,47 +222,7 @@ class _DetailLine extends StatelessWidget {
   }
 }
 
-class _CommentLine extends StatelessWidget {
-  final String comment;
 
-  const _CommentLine(this.comment);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.comment_outlined,
-            size: 16,
-            color: AppColors.primary,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              comment,
-              style: AppTextStyles.captionMedium.copyWith(
-                color: AppColors.textPrimary,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // Helper function to get child name by ID
 String childNameById(String childId) {

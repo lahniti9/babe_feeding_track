@@ -65,8 +65,17 @@ abstract class TimerEventController extends GetxController with WidgetsBindingOb
     }
 
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final data = {
       'seconds': seconds.value,
       ...additionalData,
@@ -80,7 +89,7 @@ abstract class TimerEventController extends GetxController with WidgetsBindingOb
       endAt: startAt.value.add(Duration(seconds: seconds.value)),
       data: data,
     ));
-    
+
     Get.back();
   }
 

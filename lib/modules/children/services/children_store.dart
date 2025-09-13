@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:collection/collection.dart';
 import '../models/child_profile.dart';
 
 class ChildrenStore extends GetxService {
@@ -44,6 +44,16 @@ class ChildrenStore extends GetxService {
     }
     _saveChildren();
     _saveActiveId();
+
+    // Notify other services about child deletion for cleanup
+    _notifyChildDeleted(id);
+  }
+
+  // Notify other services when a child is deleted
+  void _notifyChildDeleted(String childId) {
+    // This could trigger cleanup in EventsController and EventsStore
+    // For now, we'll rely on the cleanup methods in EventsController
+    debugPrint('Child $childId was deleted');
   }
 
   // Load children from storage
@@ -87,4 +97,28 @@ class ChildrenStore extends GetxService {
   ChildProfile? getChildById(String childId) {
     return children.firstWhereOrNull((child) => child.id == childId);
   }
+
+  // Safely get active child ID with validation
+  String? getValidActiveChildId() {
+    final id = activeId.value;
+    if (id == null || children.isEmpty) {
+      return null;
+    }
+
+    // Verify the active child still exists
+    final child = getChildById(id);
+    if (child == null) {
+      // Active child was deleted, set to first available child
+      if (children.isNotEmpty) {
+        setActive(children.first.id);
+        return children.first.id;
+      }
+      return null;
+    }
+
+    return id;
+  }
+
+  // Check if we have a valid active child for event creation
+  bool get canCreateEvents => getValidActiveChildId() != null;
 }

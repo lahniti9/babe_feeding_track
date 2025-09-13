@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/diaper_controller.dart';
+import '../models/event_record.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/time_row.dart';
 import '../widgets/segmented_row.dart';
 import '../widgets/chip_group_row.dart';
 
 class DiaperSheet extends StatelessWidget {
-  const DiaperSheet({super.key});
+  final EventRecord? existingEvent;
+
+  const DiaperSheet({super.key, this.existingEvent});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DiaperController());
+
+    // If editing an existing event, populate the controller
+    if (existingEvent != null) {
+      controller.editEvent(existingEvent!);
+    }
 
     return Obx(() => EventSheet(
       title: 'Diaper',

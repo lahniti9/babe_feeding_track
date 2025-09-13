@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 import '../models/event_record.dart';
@@ -90,8 +89,17 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> save({bool withVolume = true}) async {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final data = {
       'seconds': elapsed.value,
       'side': side.value,
@@ -108,7 +116,7 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
       endAt: time.value.add(Duration(seconds: elapsed.value)),
       data: data,
     ));
-    
+
     Get.back(); // Close current sheet
   }
 

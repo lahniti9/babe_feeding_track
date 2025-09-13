@@ -52,7 +52,7 @@ class SimilarChangesView extends StatelessWidget {
         
         controller.saveAnswer('similar_changes', newValues);
       },
-      onNext: () => Get.toNamed(Routes.spurtTimeline),
+      onNext: () => Get.toNamed(Routes.promiseFingerprint),
       requireSelection: true,
     ));
   }

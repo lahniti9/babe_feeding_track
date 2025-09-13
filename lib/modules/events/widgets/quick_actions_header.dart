@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/event.dart';
-import '../models/quick_action.dart';
 import '../models/quick_actions_config.dart';
 
 class QuickActionsHeader extends StatelessWidget {

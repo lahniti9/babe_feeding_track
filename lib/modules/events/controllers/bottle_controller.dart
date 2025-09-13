@@ -12,8 +12,17 @@ class BottleController extends GetxController {
 
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     await Get.find<EventsStore>().add(EventRecord(
       id: const Uuid().v4(),
       childId: activeChildId,

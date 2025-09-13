@@ -47,7 +47,16 @@ class BedtimeRoutineController extends GetxController {
     if (steps.isEmpty) return;
 
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
     final event = EventModel(
       id: editingEventId ?? 'event_${DateTime.now().millisecondsSinceEpoch}',
@@ -59,14 +68,14 @@ class BedtimeRoutineController extends GetxController {
       tags: [],
       showPlus: true,
     );
-    
+
     final eventsController = Get.find<EventsController>();
     if (isEditMode.value && editingEventId != null) {
       // Update existing event
       eventsController.remove(editingEventId!);
     }
     eventsController.addEvent(event);
-    
+
     Get.back();
     _reset();
   }

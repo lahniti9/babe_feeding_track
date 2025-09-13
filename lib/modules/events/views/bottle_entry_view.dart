@@ -15,6 +15,9 @@ class BottleEntryView extends StatelessWidget {
     final controller = Get.put(BottleEntryController());
     
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.75, // Limit to 75% of screen height
+      ),
       decoration: const BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

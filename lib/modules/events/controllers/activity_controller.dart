@@ -92,8 +92,17 @@ class ActivityController extends GetxController with WidgetsBindingObserver {
     }
 
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final noteText = note.value.trim();
 
     await Get.find<EventsStore>().add(EventRecord(
@@ -110,7 +119,7 @@ class ActivityController extends GetxController with WidgetsBindingObserver {
       },
       comment: noteText.isEmpty ? null : noteText,
     ));
-    
+
     Get.back();
   }
 

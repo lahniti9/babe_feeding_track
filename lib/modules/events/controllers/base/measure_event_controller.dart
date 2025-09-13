@@ -40,8 +40,17 @@ abstract class MeasureEventController extends GetxController {
 
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final data = {
       'value': value.value,
       'unit': unit.value,
@@ -55,7 +64,7 @@ abstract class MeasureEventController extends GetxController {
       startAt: time.value,
       data: data,
     ));
-    
+
     Get.back();
   }
 }

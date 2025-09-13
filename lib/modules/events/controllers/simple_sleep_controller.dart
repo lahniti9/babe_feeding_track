@@ -49,7 +49,16 @@ class SimpleSleepController extends GetxController {
 
     // Create a clean SleepEvent with no tags initially
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
     final sleepEvent = SleepEvent(
       id: 'sleep_${DateTime.now().millisecondsSinceEpoch}',

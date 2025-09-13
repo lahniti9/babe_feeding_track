@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../controllers/expressing_controller.dart';
 import '../widgets/event_sheet_scaffold.dart';
-import '../widgets/primary_pill.dart';
 import '../../../core/theme/spacing.dart';
 
 class ExpressingVolumeSheet extends StatelessWidget {

@@ -13,6 +13,7 @@ class HabitView extends StatelessWidget {
       body: "Consistent tracking helps you understand your baby's patterns and needs. Just like watering a plant, regular care leads to healthy growth and development.",
       ctaText: "Sounds Good",
       onCtaTap: () => Get.toNamed(Routes.alreadyAdded),
+      showBack: false,
     );
   }
 }

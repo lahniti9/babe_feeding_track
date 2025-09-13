@@ -59,7 +59,16 @@ class BottleEntryController extends GetxController {
     if (amountOz <= 0) return;
 
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
     final event = EventModel(
       id: editingEventId ?? 'event_${DateTime.now().millisecondsSinceEpoch}',
@@ -71,14 +80,14 @@ class BottleEntryController extends GetxController {
       tags: [],
       showPlus: false,
     );
-    
+
     final eventsController = Get.find<EventsController>();
     if (isEditMode.value && editingEventId != null) {
       // Update existing event
       eventsController.remove(editingEventId!);
     }
     eventsController.addEvent(event);
-    
+
     Get.back();
     _reset();
   }

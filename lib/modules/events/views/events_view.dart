@@ -12,6 +12,7 @@ import '../widgets/swipe_actions.dart';
 import '../widgets/sleep_timeline_entry.dart';
 import '../widgets/cry_timeline_entry.dart';
 import '../widgets/feeding_timeline_entry.dart';
+import '../widgets/event_record_timeline_entry.dart';
 import '../models/event.dart';
 import '../models/sleep_event.dart';
 import '../models/cry_event.dart';
@@ -19,6 +20,7 @@ import '../models/breast_feeding_event.dart';
 import '../models/event_record.dart';
 
 import '../views/comment_sheet.dart';
+import '../../children/services/children_store.dart';
 
 class EventsView extends StatelessWidget {
   const EventsView({super.key});
@@ -79,76 +81,7 @@ class EventsView extends StatelessWidget {
   }
 
   Widget _buildEnhancedHeader(EventsController controller) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.border.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Obx(() {
-        final todayCount = controller.getTodayEventCount();
-        return Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Today\'s Timeline',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$todayCount events recorded',
-                    style: AppTextStyles.captionMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.coral.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.coral.withValues(alpha: 0.3),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.timeline,
-                    color: AppColors.coral,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Live',
-                    style: TextStyle(
-                      color: AppColors.coral,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      }),
-    );
+    return const SizedBox.shrink(); // Remove the entire header
   }
 
   Widget _buildEnhancedEmptyState() {
@@ -299,19 +232,19 @@ class EventsView extends StatelessWidget {
       return SleepTimelineEntry(
         event: event,
         onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(EventKind.sleeping),
+        onPlusTap: () => _openCommentSheet(EventKind.sleeping, existingComment: event.comment),
       );
     } else if (event is CryEvent) {
       return CryTimelineEntry(
         event: event,
         onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(EventKind.cry),
+        onPlusTap: () => _openCommentSheet(EventKind.cry), // CryEvent doesn't have comment field
       );
     } else if (event is BreastFeedingEvent) {
       return FeedingTimelineEntry(
         event: event,
         onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(EventKind.feeding),
+        onPlusTap: () => _openCommentSheet(EventKind.feeding, existingComment: event.comment),
       );
     } else if (event is EventRecord) {
       final eventKind = controller.getEventKindFromRecord(event);
@@ -324,7 +257,7 @@ class EventsView extends StatelessWidget {
         child: TimelineEntry(
           model: event,
           onTap: () => controller.edit(event),
-          onPlusTap: () => _openCommentSheet(event.kind), // Always show plus button
+          onPlusTap: () => _openCommentSheet(event.kind, existingComment: event.comment), // Always show plus button
         ),
       );
     }
@@ -332,27 +265,24 @@ class EventsView extends StatelessWidget {
   }
 
   Widget _buildEventRecordWidget(EventRecord event, EventKind eventKind, EventsController controller) {
-    // Create a custom EventModel from EventRecord for display
-    final eventModel = EventModel(
-      id: event.id,
-      childId: event.childId,
-      kind: eventKind,
-      time: event.startAt,
-      endTime: event.endAt,
-      title: _getEventRecordTitle(event),
-      subtitle: _getEventRecordSubtitle(event),
-      comment: event.comment,
-      showPlus: true,
-    );
-
     return SwipeActions(
-      model: eventModel,
+      model: EventModel(
+        id: event.id,
+        childId: event.childId,
+        kind: eventKind,
+        time: event.startAt,
+        endTime: event.endAt,
+        title: _getEventRecordTitle(event),
+        subtitle: _getEventRecordSubtitle(event),
+        comment: event.comment,
+        showPlus: true,
+      ),
       onEdit: () => controller.edit(event),
       onRemove: () => controller.remove(event.id),
-      child: TimelineEntry(
-        model: eventModel,
+      child: EventRecordTimelineEntry(
+        event: event,
         onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(eventKind),
+        onPlusTap: () => _openCommentSheet(eventKind, existingComment: event.comment),
       ),
     );
   }
@@ -367,32 +297,171 @@ class EventsView extends StatelessWidget {
       case EventType.diaper:
         final kind = event.data['kind'] as String? ?? 'pee';
         final colors = event.data['color'] as List? ?? [];
-        final colorText = colors.isNotEmpty ? ' (${colors.join(', ').toLowerCase()})' : '';
-        return '${kind.capitalizeFirst}$colorText';
+        final consistency = event.data['consistency'] as List? ?? [];
+        String details = '';
+        if (colors.isNotEmpty) {
+          details += ' (${colors.join(', ').toLowerCase()}';
+          if (consistency.isNotEmpty) {
+            details += ', ${consistency.join(', ').toLowerCase()}';
+          }
+          details += ')';
+        } else if (consistency.isNotEmpty) {
+          details += ' (${consistency.join(', ').toLowerCase()})';
+        }
+        return '${kind.capitalizeFirst}$details';
+      case EventType.condition:
+        final moods = event.data['moods'] as List? ?? [];
+        final severity = event.data['severity'] as String? ?? 'mild';
+        if (moods.isNotEmpty) {
+          return '${moods.join(', ').toLowerCase().capitalizeFirst} • $severity';
+        }
+        return 'Condition • $severity';
       case EventType.temperature:
-        final temp = event.data['temperature'] as num? ?? 0;
+        final value = event.data['value'] as num? ?? 0;
         final unit = event.data['unit'] as String? ?? '°F';
-        return 'Temperature • $temp$unit';
+        final method = event.data['method'] as List? ?? [];
+        final condition = event.data['condition'] as List? ?? [];
+        String title = 'Temperature • $value$unit';
+        if (method.isNotEmpty) title += ' • ${method.join(', ').toLowerCase()}';
+        if (condition.isNotEmpty) title += ' • ${condition.join(', ').toLowerCase()}';
+        return title;
       case EventType.weight:
-        final weight = event.data['weight'] as num? ?? 0;
-        final unit = event.data['unit'] as String? ?? 'lbs';
-        return 'Weight • $weight $unit';
+        final pounds = event.data['pounds'] as num? ?? 0;
+        final ounces = event.data['ounces'] as num? ?? 0;
+        final unit = event.data['unit'] as String? ?? 'lb/oz';
+        if (pounds > 0 || ounces > 0) {
+          return 'Weight • ${pounds}lb ${ounces}oz';
+        }
+        final value = event.data['value'] as num? ?? 0;
+        return 'Weight • $value $unit';
       case EventType.height:
-        final height = event.data['height'] as num? ?? 0;
-        final unit = event.data['unit'] as String? ?? 'in';
-        return 'Height • $height $unit';
+        final valueCm = event.data['valueCm'] as num? ?? 0;
+        final unit = event.data['unit'] as String? ?? 'cm';
+        return 'Height • $valueCm $unit';
+      case EventType.headCircumference:
+        final valueCm = event.data['valueCm'] as num? ?? 0;
+        final unit = event.data['unit'] as String? ?? 'cm';
+        return 'Head circumference • $valueCm $unit';
+      case EventType.medicine:
+        final name = event.data['name'] as String? ?? 'Medicine';
+        final dose = event.data['dose'] as num? ?? 0;
+        final unit = event.data['unit'] as String? ?? '';
+        final reason = event.data['reason'] as List? ?? [];
+        String title = name;
+        if (dose > 0) title += ' • $dose $unit';
+        if (reason.isNotEmpty) title += ' • ${reason.join(', ').toLowerCase()}';
+        return title;
+      case EventType.expressing:
+        final volume = event.data['volume'] as num? ?? 0;
+        final unit = event.data['unit'] as String? ?? 'ml';
+        final method = event.data['method'] as String? ?? 'pump';
+        final side = event.data['side'] as String? ?? '';
+        final seconds = event.data['seconds'] as num? ?? 0;
+        String title = 'Expressed $volume $unit';
+        if (method.isNotEmpty) title += ' • $method';
+        if (side.isNotEmpty) title += ' • $side side';
+        if (seconds > 0) {
+          final minutes = (seconds / 60).round();
+          title += ' • ${minutes}min';
+        }
+        return title;
+      case EventType.spitUp:
+        final amount = event.data['amount'] as String? ?? 'small';
+        final timing = event.data['timing'] as String? ?? '';
+        return timing.isNotEmpty ? 'Spit up ($amount) • $timing' : 'Spit up ($amount)';
+      case EventType.food:
+        final food = event.data['food'] as String? ?? 'Food';
+        final amount = event.data['amount'] as String? ?? '';
+        final reaction = event.data['reaction'] as List? ?? [];
+        String title = food;
+        if (amount.isNotEmpty) title += ' • ${amount.replaceAll('_', ' ')}';
+        if (reaction.isNotEmpty) title += ' • ${reaction.join(', ').toLowerCase()}';
+        return title;
+      case EventType.doctor:
+        final reason = event.data['reason'] as List? ?? [];
+        final outcome = event.data['outcome'] as List? ?? [];
+        String title = 'Doctor visit';
+        if (reason.isNotEmpty) title += ' • ${reason.join(', ').toLowerCase()}';
+        if (outcome.isNotEmpty) title += ' • ${outcome.join(', ').toLowerCase()}';
+        return title;
+      case EventType.bathing:
+        final seconds = event.data['seconds'] as num? ?? 0;
+        final aids = event.data['aids'] as List? ?? [];
+        final mood = event.data['mood'] as List? ?? [];
+        String title = 'Bath';
+        if (seconds > 0) {
+          final minutes = (seconds / 60).round();
+          title += ' • ${minutes}min';
+        }
+        if (aids.isNotEmpty) title += ' • ${aids.join(', ').toLowerCase()}';
+        if (mood.isNotEmpty) title += ' • ${mood.join(', ').toLowerCase()}';
+        return title;
+      case EventType.walking:
+        final seconds = event.data['seconds'] as num? ?? 0;
+        final mode = event.data['mode'] as List? ?? [];
+        final place = event.data['place'] as List? ?? [];
+        String title = 'Walk';
+        if (seconds > 0) {
+          final minutes = (seconds / 60).round();
+          title += ' • ${minutes}min';
+        }
+        if (mode.isNotEmpty) title += ' • ${mode.join(', ').toLowerCase()}';
+        if (place.isNotEmpty) title += ' • ${place.join(', ').toLowerCase()}';
+        return title;
+      case EventType.activity:
+        final activityType = event.data['type'] as String? ?? 'play';
+        final seconds = event.data['seconds'] as num? ?? 0;
+        final intensity = event.data['intensity'] as String? ?? '';
+        String title = activityType.capitalizeFirst ?? activityType;
+        if (seconds > 0) {
+          final minutes = (seconds / 60).round();
+          title += ' • ${minutes}min';
+        }
+        if (intensity.isNotEmpty) title += ' • $intensity intensity';
+        return title;
+      case EventType.cry:
+        final sounds = event.data['sounds'] as List? ?? [];
+        final volume = event.data['volume'] as List? ?? [];
+        String title = 'Crying';
+        if (sounds.isNotEmpty) title += ' • ${sounds.join(', ').toLowerCase()}';
+        if (volume.isNotEmpty) title += ' • ${volume.join(', ').toLowerCase()}';
+        return title;
       default:
         return event.type.name.capitalizeFirst ?? 'Event';
     }
   }
 
   String _getEventRecordSubtitle(EventRecord event) {
-    return 'Baby'; // TODO: Get actual child name
+    try {
+      final childrenStore = Get.find<ChildrenStore>();
+      final child = childrenStore.getChildById(event.childId);
+      final childName = child?.name ?? 'Baby';
+
+      // Add additional details for some event types
+      switch (event.type) {
+        case EventType.medicine:
+          final frequency = event.data['frequency'] as String? ?? '';
+          return frequency.isNotEmpty ? '$childName • $frequency' : childName;
+        case EventType.condition:
+          final note = event.data['note'] as String? ?? '';
+          return note.isNotEmpty ? '$childName • ${note.length > 20 ? '${note.substring(0, 20)}...' : note}' : childName;
+        case EventType.doctor:
+          final reason = event.data['reason'] as String? ?? '';
+          return reason.isNotEmpty ? '$childName • $reason' : childName;
+        default:
+          return childName;
+      }
+    } catch (e) {
+      return 'Baby';
+    }
   }
 
-  void _openCommentSheet(EventKind kind) {
+  void _openCommentSheet(EventKind kind, {String? existingComment}) {
     Get.bottomSheet(
-      CommentSheet(kind: kind),
+      CommentSheet(
+        kind: kind,
+        existingComment: existingComment,
+      ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );

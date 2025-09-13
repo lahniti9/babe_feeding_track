@@ -42,18 +42,27 @@ abstract class TagEventController extends GetxController {
 
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final data = <String, dynamic>{};
-    
+
     // Add chip group data
     for (final entry in chipGroups.entries) {
       data[entry.key] = entry.value.toList();
     }
-    
+
     // Add additional data
     data.addAll(additionalData);
-    
+
     // Add comment if not empty
     final commentText = comment.value.trim();
 
@@ -65,7 +74,7 @@ abstract class TagEventController extends GetxController {
       data: data,
       comment: commentText.isEmpty ? null : commentText,
     ));
-    
+
     Get.back();
   }
 }

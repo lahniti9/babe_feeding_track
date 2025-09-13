@@ -23,8 +23,6 @@ class FeedingView extends StatelessWidget {
 
     return Obx(() => ChartScaffold(
           title: 'Feeding',
-          showFullReport: true,
-          onFullReportTap: controller.openFullReport,
           body: controller.isLoading
               ? const Center(child: CircularProgressIndicator())
               : _buildContent(controller),

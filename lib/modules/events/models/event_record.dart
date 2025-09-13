@@ -77,7 +77,7 @@ class EventRecord {
     comment: comment ?? this.comment,
   );
 
-  Duration? get duration => endAt != null ? endAt!.difference(startAt) : null;
+  Duration? get duration => endAt?.difference(startAt);
 }
 
 // Extension for display names

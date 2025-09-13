@@ -20,8 +20,6 @@ class MonthlyOverviewView extends StatelessWidget {
 
     return Obx(() => ChartScaffold(
           title: 'Monthly Overview',
-          showFullReport: true,
-          onFullReportTap: controller.openFullReport,
           body: controller.isLoading
               ? const Center(child: CircularProgressIndicator())
               : _buildContent(controller),

@@ -15,7 +15,7 @@ class StreakView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BCScaffold(
-      showBack: true,
+      showBack: false,
       body: Column(
         children: [
           Expanded(

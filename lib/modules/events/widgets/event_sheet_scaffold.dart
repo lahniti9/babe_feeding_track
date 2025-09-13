@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/colors.dart';
-import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 
 class EventSheetScaffold extends StatelessWidget {
@@ -22,6 +21,9 @@ class EventSheetScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.75, // Limit to 75% of screen height
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF151515),
         borderRadius: const BorderRadius.only(

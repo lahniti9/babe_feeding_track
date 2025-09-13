@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/event_record.dart';
+import '../../children/services/children_store.dart';
 
 class EventsStore extends GetxService {
   final _storage = GetStorage();
@@ -13,11 +14,21 @@ class EventsStore extends GetxService {
   }
 
   Future<void> add(EventRecord event) async {
+    // Validate event before adding
+    if (!_validateEvent(event)) {
+      return;
+    }
+
     items.insert(0, event);
     await _saveEvents();
   }
 
   Future<void> update(EventRecord event) async {
+    // Validate event before updating
+    if (!_validateEvent(event)) {
+      return;
+    }
+
     final index = items.indexWhere((e) => e.id == event.id);
     if (index >= 0) {
       items[index] = event;
@@ -109,5 +120,63 @@ class EventsStore extends GetxService {
   EventRecord? getLatest(EventType type) {
     final typeEvents = getByType(type);
     return typeEvents.isNotEmpty ? typeEvents.first : null;
+  }
+
+  // Validate event data before saving
+  bool _validateEvent(EventRecord event) {
+    // Check if child ID is valid
+    final childrenStore = Get.find<ChildrenStore>();
+    final child = childrenStore.getChildById(event.childId);
+
+    if (child == null) {
+      Get.snackbar(
+        'Invalid Child',
+        'The selected child no longer exists. Please select a valid child.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    // Check if event has required fields
+    if (event.id.isEmpty) {
+      Get.snackbar(
+        'Invalid Event',
+        'Event ID is required.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    // Check for duplicate event IDs (except during updates)
+    final existingEvent = items.firstWhereOrNull((e) => e.id == event.id);
+    if (existingEvent != null) {
+      // This is an update, which is allowed
+      return true;
+    }
+
+    // Validate event time is not in the future (with some tolerance)
+    final now = DateTime.now();
+    final maxFutureTime = now.add(const Duration(minutes: 5)); // Allow 5 minutes tolerance
+
+    if (event.startAt.isAfter(maxFutureTime)) {
+      Get.snackbar(
+        'Invalid Time',
+        'Event time cannot be in the future.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    // Validate end time if present
+    if (event.endAt != null && event.endAt!.isBefore(event.startAt)) {
+      Get.snackbar(
+        'Invalid Time Range',
+        'End time must be after start time.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    return true;
   }
 }

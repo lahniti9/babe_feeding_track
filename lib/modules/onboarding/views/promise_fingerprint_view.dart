@@ -55,7 +55,7 @@ class _PromiseFingerprintViewState extends State<PromiseFingerprintView> {
   @override
   Widget build(BuildContext context) {
     return BCScaffold(
-      showBack: true,
+      showBack: false,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),

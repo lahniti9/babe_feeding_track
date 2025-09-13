@@ -51,6 +51,22 @@ class _ProgressRingState extends State<ProgressRing>
   }
 
   @override
+  void didUpdateWidget(ProgressRing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.percent != widget.percent) {
+      _animation = Tween<double>(
+        begin: _animation.value,
+        end: widget.percent,
+      ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ));
+      _animationController.reset();
+      _animationController.forward();
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();

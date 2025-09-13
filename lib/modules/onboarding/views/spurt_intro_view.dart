@@ -13,6 +13,7 @@ class SpurtIntroView extends StatelessWidget {
       body: "Growth spurts are periods of rapid development that can affect your baby's eating, sleeping, and behavior. Understanding these patterns will help you support your baby through these important phases.",
       ctaText: "Next",
       onCtaTap: () => Get.toNamed(Routes.similarChanges),
+      showBack: false,
     );
   }
 }

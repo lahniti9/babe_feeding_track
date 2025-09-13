@@ -14,6 +14,9 @@ class SleepEntryView extends StatelessWidget {
     final controller = Get.put(SimpleSleepController());
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7, // Limit to 70% of screen height
+      ),
       decoration: const BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

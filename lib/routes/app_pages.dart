@@ -29,7 +29,7 @@ import '../modules/onboarding/views/sleep_issues_view.dart';
 import '../modules/onboarding/views/naps_per_day_view.dart';
 import '../modules/onboarding/views/night_sleep_period_view.dart';
 import '../modules/onboarding/views/last_fell_asleep_view.dart';
-import '../modules/onboarding/views/mark_3_days_view.dart';
+
 import '../modules/onboarding/views/whats_on_your_side_view.dart';
 import '../modules/onboarding/views/emotional_state_view.dart';
 import '../modules/onboarding/views/emotion_grid_view.dart';
@@ -44,14 +44,13 @@ import '../modules/onboarding/views/intro_food_soon_view.dart';
 import '../modules/onboarding/views/learn_about_dev_view.dart';
 import '../modules/onboarding/views/spurt_intro_view.dart';
 import '../modules/onboarding/views/similar_changes_view.dart';
-import '../modules/onboarding/views/spurt_timeline_view.dart';
+
 import '../modules/onboarding/views/promise_fingerprint_view.dart';
 import '../modules/onboarding/views/you_can_do_it_view.dart';
 import '../modules/onboarding/views/setup_progress_view.dart';
-import '../modules/onboarding/views/with_without_view.dart';
+
 import '../modules/onboarding/views/jumpstart_view.dart';
-import '../modules/onboarding/views/log_recent_view.dart';
-import '../modules/onboarding/views/add_event_time_view.dart';
+
 import '../modules/onboarding/views/well_done_view.dart';
 import '../modules/onboarding/views/habit_view.dart';
 import '../modules/onboarding/views/already_added_view.dart';
@@ -204,11 +203,7 @@ class AppPages {
       page: () => const LastFellAsleepView(),
       binding: OnboardingBinding(),
     ),
-    GetPage(
-      name: Routes.mark3Days,
-      page: () => const Mark3DaysView(),
-      binding: OnboardingBinding(),
-    ),
+
     GetPage(
       name: Routes.whatsOnYourSide,
       page: () => const WhatsOnYourSideView(),
@@ -279,11 +274,7 @@ class AppPages {
       page: () => const SimilarChangesView(),
       binding: OnboardingBinding(),
     ),
-    GetPage(
-      name: Routes.spurtTimeline,
-      page: () => const SpurtTimelineView(),
-      binding: OnboardingBinding(),
-    ),
+
     GetPage(
       name: Routes.promiseFingerprint,
       page: () => const PromiseFingerprintView(),
@@ -314,26 +305,13 @@ class AppPages {
       page: () => const Setup87View(),
       binding: OnboardingBinding(),
     ),
-    GetPage(
-      name: Routes.withWithout,
-      page: () => const WithWithoutView(),
-      binding: OnboardingBinding(),
-    ),
+
     GetPage(
       name: Routes.jumpstart,
       page: () => const JumpstartView(),
       binding: OnboardingBinding(),
     ),
-    GetPage(
-      name: Routes.logRecent,
-      page: () => const LogRecentView(),
-      binding: OnboardingBinding(),
-    ),
-    GetPage(
-      name: Routes.addEventTime,
-      page: () => const AddEventTimeView(),
-      binding: OnboardingBinding(),
-    ),
+
     GetPage(
       name: Routes.wellDone,
       page: () => const WellDoneView(),

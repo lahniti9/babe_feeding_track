@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/condition_controller.dart';
+import '../models/event_record.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/time_row.dart';
 import '../widgets/comment_row.dart';
 
 class ConditionSheet extends StatelessWidget {
-  const ConditionSheet({super.key});
+  final EventRecord? existingEvent;
+
+  const ConditionSheet({super.key, this.existingEvent});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ConditionController());
+
+    // If editing an existing event, populate the controller
+    if (existingEvent != null) {
+      controller.editEvent(existingEvent!);
+    }
 
     return Obx(() => EventSheet(
       title: 'Condition',

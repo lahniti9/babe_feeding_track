@@ -34,7 +34,7 @@ class LastFellAsleepView extends StatelessWidget {
       selectedValue: controller.getAnswer<String>('last_fell_asleep'),
       onSelectionChanged: (value) {
         controller.saveAnswer('last_fell_asleep', value);
-        Get.toNamed(Routes.mark3Days);
+        Get.toNamed(Routes.whatsOnYourSide);
       },
       autoNavigate: true,
     );

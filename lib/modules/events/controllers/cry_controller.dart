@@ -31,8 +31,17 @@ class CryController extends GetxController {
 
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
-    
+    final activeChildId = childrenStore.getValidActiveChildId();
+
+    if (activeChildId == null) {
+      Get.snackbar(
+        'No Child Selected',
+        'Please add a child profile before creating events.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     final event = CryEvent(
       id: 'cry_${DateTime.now().millisecondsSinceEpoch}',
       childId: activeChildId,
@@ -43,7 +52,7 @@ class CryController extends GetxController {
       duration: durations.toSet(),
       behaviour: behaviours.toSet(),
     );
-    
+
     Get.find<EventsController>().addCryEvent(event);
     Get.back();
   }

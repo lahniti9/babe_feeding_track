@@ -13,6 +13,7 @@ class TeamReadyView extends StatelessWidget {
       body: "Your care team is all set up! Now everyone can stay connected and work together to give your baby the best care possible.",
       ctaText: "Let's Care Together",
       onCtaTap: () => Get.toNamed(Routes.routineImprove),
+      showBack: false,
     );
   }
 }

@@ -13,6 +13,7 @@ class FeedingRightPlaceView extends StatelessWidget {
       body: "Great choice! We'll help you track feeding patterns, understand your baby's needs, and provide personalized guidance for your feeding journey.",
       ctaText: "Next",
       onCtaTap: () => Get.toNamed(Routes.sleepIssues),
+      showBack: false,
     );
   }
 }

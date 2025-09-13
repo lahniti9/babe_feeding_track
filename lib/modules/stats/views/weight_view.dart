@@ -20,9 +20,7 @@ class WeightView extends StatelessWidget {
 
     return Obx(() => ChartScaffold(
           title: 'Weight',
-          showFullReport: true,
           showLock: true, // Premium feature
-          onFullReportTap: controller.openFullReport,
           body: controller.isLoading
               ? const Center(child: CircularProgressIndicator())
               : controller.measurements.isEmpty

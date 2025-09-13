@@ -13,6 +13,7 @@ class NeedsLearnToSleepView extends StatelessWidget {
       body: "Just like walking and talking, sleeping is a skill that babies need to learn. We'll help you understand your baby's sleep patterns and provide gentle guidance to improve rest for the whole family.",
       ctaText: "Next",
       onCtaTap: () => Get.toNamed(Routes.startFeedingKnowHow),
+      showBack: false,
     );
   }
 }

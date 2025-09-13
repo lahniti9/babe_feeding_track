@@ -1,3 +1,6 @@
+import 'package:get/get.dart';
+import '../../children/services/children_store.dart';
+
 class SleepEvent {
   final String id;
   final String childId;                 // to fetch child name
@@ -123,6 +126,13 @@ String relativeTime(DateTime t) {
 }
 
 String childNameById(String id) {
-  // TODO: Get from ProfileController when available
-  return 'Naji'; // Default for now
+  try {
+    // Get from ChildrenStore
+    final childrenStore = Get.find<ChildrenStore>();
+    final child = childrenStore.getChildById(id);
+    return child?.name ?? 'Baby'; // Fallback to 'Baby' if child not found
+  } catch (e) {
+    // Fallback if ChildrenStore is not available
+    return 'Baby';
+  }
 }

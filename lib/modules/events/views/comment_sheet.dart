@@ -5,20 +5,55 @@ import '../../../core/theme/text.dart';
 import '../controllers/comment_controller.dart';
 import '../models/event.dart';
 
-class CommentSheet extends StatelessWidget {
+class CommentSheet extends StatefulWidget {
   final EventKind kind;
+  final String? existingComment;
 
   const CommentSheet({
     super.key,
     required this.kind,
+    this.existingComment,
   });
 
   @override
+  State<CommentSheet> createState() => _CommentSheetState();
+}
+
+class _CommentSheetState extends State<CommentSheet> {
+  late String controllerTag;
+  late CommentController controller;
+  late TextEditingController textController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use a unique tag to ensure fresh controller instance
+    controllerTag = 'comment_${widget.kind.name}_${DateTime.now().millisecondsSinceEpoch}';
+    controller = Get.put(CommentController(), tag: controllerTag);
+    controller.init(widget.kind, comment: widget.existingComment);
+
+    // Initialize TextEditingController with existing comment
+    textController = TextEditingController(text: widget.existingComment ?? '');
+
+    // Sync TextEditingController with CommentController
+    textController.addListener(() {
+      controller.updateText(textController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controllers
+    textController.dispose();
+    Get.delete<CommentController>(tag: controllerTag);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CommentController());
-    controller.init(kind);
 
     return Container(
+      height: MediaQuery.of(context).size.height * 0.6, // Limit to 60% of screen height
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -101,7 +136,7 @@ class CommentSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Comment',
+                      widget.existingComment != null ? 'Edit Comment' : 'Add Comment',
                       style: AppTextStyles.titleLarge.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -110,7 +145,7 @@ class CommentSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'for ${kind.displayName}',
+                      'for ${widget.kind.displayName}',
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                         fontSize: 16,
@@ -120,7 +155,10 @@ class CommentSheet extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: controller.clearText,
+                onTap: () {
+                  textController.clear();
+                  controller.clearText();
+                },
                 child: Container(
                   width: 40,
                   height: 40,
@@ -129,7 +167,7 @@ class CommentSheet extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.delete_outline,
+                    widget.existingComment != null ? Icons.delete_outline : Icons.clear,
                     color: AppColors.textSecondary,
                     size: 20,
                   ),
@@ -184,6 +222,7 @@ class CommentSheet extends StatelessWidget {
                 ),
               ),
               child: TextField(
+                controller: textController,
                 maxLines: null,
                 expands: true,
                 style: AppTextStyles.bodyMedium.copyWith(
@@ -199,7 +238,7 @@ class CommentSheet extends StatelessWidget {
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
                 ),
-                onChanged: controller.updateText,
+                // onChanged is handled by textController.addListener() in initState
               ),
             ),
           ),
@@ -234,17 +273,17 @@ class CommentSheet extends StatelessWidget {
   Widget _buildEnhancedBottomButton(CommentController controller) {
     return SafeArea(
       child: Obx(() => GestureDetector(
-        onTap: controller.isValid ? controller.save : null,
+        onTap: _canSave(controller) ? controller.save : null,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(
-            color: controller.isValid
+            color: _canSave(controller)
                 ? AppColors.coral
                 : AppColors.textSecondary.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(28),
-            boxShadow: controller.isValid ? [
+            boxShadow: _canSave(controller) ? [
               BoxShadow(
                 color: AppColors.coral.withValues(alpha: 0.3),
                 blurRadius: 12,
@@ -262,27 +301,55 @@ class CommentSheet extends StatelessWidget {
             children: [
               Icon(
                 Icons.check_circle,
-                color: controller.isValid
+                color: _canSave(controller)
                     ? Colors.white
                     : AppColors.textSecondary,
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Text(
-                'Save Comment',
+              Obx(() => Text(
+                _getButtonText(controller),
                 style: AppTextStyles.buttonText.copyWith(
-                  color: controller.isValid
+                  color: _canSave(controller)
                       ? Colors.white
                       : AppColors.textSecondary,
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
-              ),
+              )),
             ],
           ),
         ),
       )),
     );
+  }
+
+  String _getButtonText(CommentController controller) {
+    if (widget.existingComment != null) {
+      // Editing mode
+      if (controller.text.value.trim().isEmpty) {
+        return 'Delete Comment';
+      } else if (controller.hasChanged) {
+        return 'Update Comment';
+      } else {
+        return 'No Changes';
+      }
+    } else {
+      // Adding mode
+      return 'Save Comment';
+    }
+  }
+
+  bool _canSave(CommentController controller) {
+    if (widget.existingComment != null) {
+      // In editing mode, can save if:
+      // 1. Text is empty (deletion) OR
+      // 2. Text has changed from original
+      return controller.text.value.trim().isEmpty || controller.hasChanged;
+    } else {
+      // In adding mode, can save if text is not empty
+      return controller.isValid;
+    }
   }
 }

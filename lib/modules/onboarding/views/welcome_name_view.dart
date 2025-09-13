@@ -16,6 +16,7 @@ class WelcomeNameView extends StatelessWidget {
       body: "Great to have you here! Let's continue setting up your baby's profile.",
       ctaText: "Next",
       onCtaTap: () => Get.toNamed(Routes.babyName),
+      showBack: false,
     );
   }
 }

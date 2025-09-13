@@ -13,6 +13,7 @@ class WhatsOnYourSideView extends StatelessWidget {
       body: "You have everything you need to be a great parent. Trust your instincts, lean on your support system, and remember that every baby is unique.",
       ctaText: "Next",
       onCtaTap: () => Get.toNamed(Routes.emotionalState),
+      showBack: false,
     );
   }
 }

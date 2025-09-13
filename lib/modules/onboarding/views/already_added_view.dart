@@ -13,6 +13,7 @@ class AlreadyAddedView extends StatelessWidget {
       body: "Great! Your first event has been recorded and added to your baby's timeline. You can view all activities in the Events tab and track patterns over time.",
       ctaText: "Got it!",
       onCtaTap: () => Get.toNamed(Routes.streak),
+      showBack: false,
     );
   }
 }

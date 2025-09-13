@@ -8,7 +8,6 @@ import '../views/bedtime_routine_view.dart';
 import '../views/bottle_entry_view.dart';
 
 import '../views/cry_sheet.dart';
-import '../views/feeding_sheet.dart';
 import '../models/sleep_event.dart';
 import '../models/cry_event.dart';
 import '../models/breast_feeding_event.dart';
@@ -51,20 +50,36 @@ class EventsController extends GetxController {
 
     // Listen to EventsStore changes
     ever(_eventsStore.items, (_) => _loadEvents());
+
+    // Clean up orphaned events and check data consistency on initialization
+    _cleanupOrphanedEvents();
+    _checkDataConsistency();
   }
 
   // Get filtered events for active child
   List<dynamic> get filtered {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value;
+    final activeChildId = childrenStore.getValidActiveChildId();
 
     var filteredEvents = events.where((event) {
-      // Filter by active child
+      // Filter by active child - handle all event types
       if (activeChildId != null) {
-        if (event is EventModel && event.childId != activeChildId) {
-          return false;
+        String? eventChildId;
+
+        if (event is EventModel) {
+          eventChildId = event.childId;
+        } else if (event is SleepEvent) {
+          eventChildId = event.childId;
+        } else if (event is CryEvent) {
+          eventChildId = event.childId;
+        } else if (event is BreastFeedingEvent) {
+          eventChildId = event.childId;
+        } else if (event is EventRecord) {
+          eventChildId = event.childId;
         }
-        if (event is SleepEvent && event.childId != activeChildId) {
+
+        // If we couldn't determine the child ID or it doesn't match, filter it out
+        if (eventChildId == null || eventChildId != activeChildId) {
           return false;
         }
       }
@@ -333,6 +348,24 @@ class EventsController extends GetxController {
       return;
     }
 
+    if (event is CryEvent) {
+      // For cry events, open the cry sheet
+      EventRouter.openEventSheet(EventType.cry);
+      return;
+    }
+
+    if (event is BreastFeedingEvent) {
+      // For breast feeding events, open the feeding sheet
+      EventRouter.openEventSheet(EventType.feedingBreast);
+      return;
+    }
+
+    if (event is EventRecord) {
+      // For EventRecord, use EventRouter to open the appropriate sheet with existing data
+      EventRouter.openEventSheet(event.type, existingEvent: event);
+      return;
+    }
+
     if (event is EventModel) {
       switch (event.kind) {
         case EventKind.sleeping:
@@ -359,14 +392,60 @@ class EventsController extends GetxController {
             backgroundColor: Colors.transparent,
           );
           break;
-        default:
-          // For other types, just show a simple edit dialog
+        case EventKind.cry:
+          EventRouter.openEventSheet(EventType.cry);
+          break;
+        case EventKind.feeding:
+          EventRouter.openEventSheet(EventType.feedingBreast);
+          break;
+        case EventKind.diaper:
+          EventRouter.openEventSheet(EventType.diaper);
+          break;
+        case EventKind.condition:
+          EventRouter.openEventSheet(EventType.condition);
+          break;
+        case EventKind.expressing:
+          EventRouter.openEventSheet(EventType.expressing);
+          break;
+        case EventKind.spitUp:
+          EventRouter.openEventSheet(EventType.spitUp);
+          break;
+        case EventKind.food:
+          EventRouter.openEventSheet(EventType.food);
+          break;
+        case EventKind.weight:
+          EventRouter.openEventSheet(EventType.weight);
+          break;
+        case EventKind.height:
+          EventRouter.openEventSheet(EventType.height);
+          break;
+        case EventKind.headCircumference:
+          EventRouter.openEventSheet(EventType.headCircumference);
+          break;
+        case EventKind.medicine:
+          EventRouter.openEventSheet(EventType.medicine);
+          break;
+        case EventKind.temperature:
+          EventRouter.openEventSheet(EventType.temperature);
+          break;
+        case EventKind.doctor:
+          EventRouter.openEventSheet(EventType.doctor);
+          break;
+        case EventKind.bathing:
+          EventRouter.openEventSheet(EventType.bathing);
+          break;
+        case EventKind.walking:
+          EventRouter.openEventSheet(EventType.walking);
+          break;
+        case EventKind.activity:
+          EventRouter.openEventSheet(EventType.activity);
           break;
       }
     }
   }
   // Add comment to last event of specific kind
   void addCommentToLast(EventKind kind, String text) {
+
     // Find the most recent event of the specified kind
     // Since events are sorted newest first, we want the first match
     int idx = -1;
@@ -384,6 +463,7 @@ class EventsController extends GetxController {
 
       if (matches) {
         idx = i;
+
         break; // Found the most recent event of this kind
       }
     }
@@ -393,7 +473,7 @@ class EventsController extends GetxController {
 
       if (event is EventModel) {
         final updatedEvent = event.copyWith(
-          comment: text,
+          comment: text.isEmpty ? null : text, // Set to null if empty (deletion)
         );
         events[idx] = updatedEvent;
         _saveEvents();
@@ -401,9 +481,7 @@ class EventsController extends GetxController {
         events.refresh();
       } else if (event is SleepEvent && kind == EventKind.sleeping) {
         final updatedEvent = event.copyWith(
-          comment: event.comment != null
-              ? '${event.comment}\n$text'
-              : text,
+          comment: text.isEmpty ? null : text, // Set to null if empty (deletion)
         );
         events[idx] = updatedEvent;
         _saveEvents();
@@ -411,7 +489,9 @@ class EventsController extends GetxController {
         events.refresh();
       } else if (event is EventRecord) {
         // Update EventRecord comment via EventsStore
-        final updatedEvent = event.copyWith(comment: text);
+        final updatedEvent = event.copyWith(
+          comment: text.isEmpty ? null : text, // Set to null if empty (deletion)
+        );
         _eventsStore.update(updatedEvent);
         // The events list will be updated automatically via the reactive listener
       }
@@ -514,27 +594,152 @@ class EventsController extends GetxController {
     activeFilter.value = activeFilter.value == kind ? null : kind;
   }
 
-  // Generate unique ID for new events
-  String _generateId() {
-    return 'event_${DateTime.now().millisecondsSinceEpoch}';
-  }
-
-  // Quick add helper for simple events
-  void _quickAddEvent(EventKind kind, String title) {
+  // Clean up events that belong to deleted children
+  void _cleanupOrphanedEvents() {
     final childrenStore = Get.find<ChildrenStore>();
-    final activeChildId = childrenStore.activeId.value ?? 'default-child';
+    final validChildIds = childrenStore.children.map((c) => c.id).toSet();
 
-    final event = EventModel(
-      id: _generateId(),
-      childId: activeChildId,
-      kind: kind,
-      time: DateTime.now(),
-      title: title,
-      subtitle: 'Quick added',
-      showPlus: true,
-    );
-    addEvent(event);
+    // Remove events from the main events list that belong to deleted children
+    final eventsToRemove = <dynamic>[];
+
+    for (final event in events) {
+      String? eventChildId;
+
+      if (event is EventModel) {
+        eventChildId = event.childId;
+      } else if (event is SleepEvent) {
+        eventChildId = event.childId;
+      } else if (event is CryEvent) {
+        eventChildId = event.childId;
+      } else if (event is BreastFeedingEvent) {
+        eventChildId = event.childId;
+      }
+
+      if (eventChildId != null && !validChildIds.contains(eventChildId)) {
+        eventsToRemove.add(event);
+      }
+    }
+
+    // Remove orphaned events
+    for (final event in eventsToRemove) {
+      events.remove(event);
+    }
+
+    // Also clean up EventRecord events in the EventsStore
+    final orphanedEventRecords = _eventsStore.items
+        .where((event) => !validChildIds.contains(event.childId))
+        .toList();
+
+    for (final event in orphanedEventRecords) {
+      _eventsStore.remove(event.id);
+    }
+
+    if (eventsToRemove.isNotEmpty || orphanedEventRecords.isNotEmpty) {
+      _saveEvents();
+      // Log cleanup for debugging
+      debugPrint('Cleaned up ${eventsToRemove.length + orphanedEventRecords.length} orphaned events');
+    }
   }
 
+  // Check data consistency across different storage systems
+  void _checkDataConsistency() {
+    final childrenStore = Get.find<ChildrenStore>();
+
+    // Check if active child still exists
+    final activeChildId = childrenStore.activeId.value;
+    if (activeChildId != null) {
+      final activeChild = childrenStore.getChildById(activeChildId);
+      if (activeChild == null && childrenStore.children.isNotEmpty) {
+        // Active child was deleted, set to first available child
+        childrenStore.setActive(childrenStore.children.first.id);
+        debugPrint('Reset active child to first available child');
+      }
+    }
+
+    // Check for duplicate event IDs across different storage systems
+    final allEventIds = <String>{};
+    final duplicateIds = <String>[];
+
+    // Check events in main events list
+    for (final event in events) {
+      String? eventId;
+
+      if (event is EventModel) {
+        eventId = event.id;
+      } else if (event is SleepEvent) {
+        eventId = event.id;
+      } else if (event is CryEvent) {
+        eventId = event.id;
+      } else if (event is BreastFeedingEvent) {
+        eventId = event.id;
+      }
+
+      if (eventId != null) {
+        if (allEventIds.contains(eventId)) {
+          duplicateIds.add(eventId);
+        } else {
+          allEventIds.add(eventId);
+        }
+      }
+    }
+
+    // Check events in EventsStore
+    for (final event in _eventsStore.items) {
+      if (allEventIds.contains(event.id)) {
+        duplicateIds.add(event.id);
+      } else {
+        allEventIds.add(event.id);
+      }
+    }
+
+    if (duplicateIds.isNotEmpty) {
+      debugPrint('Found ${duplicateIds.length} duplicate event IDs: $duplicateIds');
+      // Could implement deduplication logic here if needed
+    }
+
+    // Validate event time consistency
+    _validateEventTimes();
+  }
+
+  // Validate that event times are reasonable
+  void _validateEventTimes() {
+    final now = DateTime.now();
+    final oneYearAgo = now.subtract(const Duration(days: 365));
+    final oneHourFromNow = now.add(const Duration(hours: 1));
+
+    var invalidTimeEvents = 0;
+
+    // Check events in main list
+    for (final event in events) {
+      DateTime? eventTime;
+
+      if (event is EventModel) {
+        eventTime = event.time;
+      } else if (event is SleepEvent) {
+        eventTime = event.fellAsleep;
+      } else if (event is CryEvent) {
+        eventTime = event.time;
+      } else if (event is BreastFeedingEvent) {
+        eventTime = event.startAt;
+      }
+
+      if (eventTime != null) {
+        if (eventTime.isBefore(oneYearAgo) || eventTime.isAfter(oneHourFromNow)) {
+          invalidTimeEvents++;
+        }
+      }
+    }
+
+    // Check EventRecord events
+    for (final event in _eventsStore.items) {
+      if (event.startAt.isBefore(oneYearAgo) || event.startAt.isAfter(oneHourFromNow)) {
+        invalidTimeEvents++;
+      }
+    }
+
+    if (invalidTimeEvents > 0) {
+      debugPrint('Found $invalidTimeEvents events with potentially invalid times');
+    }
+  }
 
 }

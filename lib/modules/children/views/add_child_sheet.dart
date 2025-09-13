@@ -11,7 +11,7 @@ class AddChildSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = Get.put(AddChildController());
     
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.9,
       child: BottomShell(
         title: 'Add child',

@@ -14,7 +14,7 @@ class EditChildSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = Get.put(EditChildController(profile));
     
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.9,
       child: BottomShell(
         title: 'Settings',

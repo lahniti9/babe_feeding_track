@@ -20,7 +20,7 @@ import '../views/activity_sheet.dart';
 import '../views/condition_sheet.dart';
 
 class EventRouter {
-  static void openEventSheet(EventType type) {
+  static void openEventSheet(EventType type, {EventRecord? existingEvent}) {
     Widget? sheet;
     
     switch (type) {
@@ -34,7 +34,7 @@ class EventRouter {
         sheet = const BottleSheet();
         break;
       case EventType.diaper:
-        sheet = const DiaperSheet();
+        sheet = DiaperSheet(existingEvent: existingEvent);
         break;
       case EventType.temperature:
         sheet = const TemperatureSheet();
@@ -73,7 +73,7 @@ class EventRouter {
         sheet = const ActivitySheet();
         break;
       case EventType.condition:
-        sheet = const ConditionSheet();
+        sheet = ConditionSheet(existingEvent: existingEvent);
         break;
       default:
         Get.snackbar(

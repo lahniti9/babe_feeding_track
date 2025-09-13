@@ -13,6 +13,7 @@ class TeamIntroView extends StatelessWidget {
       body: "Great parenting is a team effort. Let's set up your care team so everyone can stay connected and informed about your baby's needs.",
       ctaText: "Let's do it!",
       onCtaTap: () => Get.toNamed(Routes.parentName),
+      showBack: false,
     );
   }
 }

@@ -33,7 +33,7 @@ class EmotionGridView extends StatelessWidget {
                       bottom: AppSpacing.betweenSections,
                     ),
                   ),
-                  EmojiGrid(
+                  Obx(() => EmojiGrid(
                     emojis: const [
                       EmojiItem(emoji: "😊", label: "Happy", value: "happy"),
                       EmojiItem(emoji: "😌", label: "Calm", value: "calm"),
@@ -52,7 +52,7 @@ class EmotionGridView extends StatelessWidget {
                     onSelectionChanged: (value) {
                       controller.saveAnswer('emotion_grid', value);
                     },
-                  ),
+                  )),
                 ],
               ),
             ),

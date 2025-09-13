@@ -27,7 +27,7 @@ class Routes {
   static const String napsPerDay = '/naps-per-day';
   static const String nightSleepPeriod = '/night-sleep-period';
   static const String lastFellAsleep = '/last-fell-asleep';
-  static const String mark3Days = '/mark-3-days';
+
   static const String whatsOnYourSide = '/whats-on-your-side';
   static const String emotionalState = '/emotional-state';
   static const String emotionGrid = '/emotion-grid';
@@ -42,17 +42,16 @@ class Routes {
   static const String learnAboutDev = '/learn-about-dev';
   static const String spurtIntro = '/spurt-intro';
   static const String similarChanges = '/similar-changes';
-  static const String spurtTimeline = '/spurt-timeline';
+
   static const String promiseFingerprint = '/promise-fingerprint';
   static const String youCanDoIt = '/you-can-do-it';
   static const String setup18 = '/setup-18';
   static const String setup59 = '/setup-59';
   static const String setup73 = '/setup-73';
   static const String setup87 = '/setup-87';
-  static const String withWithout = '/with-without';
+
   static const String jumpstart = '/jumpstart';
-  static const String logRecent = '/log-recent';
-  static const String addEventTime = '/add-event-time';
+
   static const String wellDone = '/well-done';
   static const String habit = '/habit';
   static const String alreadyAdded = '/already-added';
