@@ -22,19 +22,20 @@ class EventSheetScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.75, // Limit to 75% of screen height
+        maxHeight: MediaQuery.of(context).size.height * 0.85, // Increased to 85% of screen height
+        minHeight: MediaQuery.of(context).size.height * 0.6,  // Added minimum height
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF151515),
+        color: AppColors.cardBackground,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 24,
+            offset: const Offset(0, -8),
           ),
         ],
       ),
@@ -44,18 +45,18 @@ class EventSheetScaffold extends StatelessWidget {
           // Handle bar
           if (showHandle)
             Container(
-              margin: const EdgeInsets.only(top: 16),
-              width: 48,
-              height: 5,
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
-                color: AppColors.textSecondary.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(3),
+                color: AppColors.coral.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
 
           // Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12), // Reduced padding
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -67,7 +68,7 @@ class EventSheetScaffold extends StatelessWidget {
                         style: AppTextStyles.titleLarge.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: 24,
+                          fontSize: 22, // Reduced from 24 to 22
                         ),
                       ),
                     ),
@@ -80,7 +81,7 @@ class EventSheetScaffold extends StatelessWidget {
                     subtitle!,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
-                      fontSize: 16,
+                      fontSize: 14, // Reduced from 16 to 14
                     ),
                   ),
                 ],
@@ -91,22 +92,22 @@ class EventSheetScaffold extends StatelessWidget {
           // Divider
           Container(
             height: 1,
-            margin: const EdgeInsets.symmetric(horizontal: 24),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  AppColors.border.withValues(alpha: 0.3),
+                  AppColors.coral.withValues(alpha: 0.2),
                   Colors.transparent,
                 ],
               ),
             ),
           ),
 
-          // Content
-          Flexible(
+          // Scrollable Content
+          Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               child: child,
             ),
           ),

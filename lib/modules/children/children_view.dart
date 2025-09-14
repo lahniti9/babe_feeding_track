@@ -25,30 +25,90 @@ class ChildrenView extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
-                // Header card
+                // Enhanced header card
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Children',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF2A2A2A),
+                        const Color(0xFF1A1A1A),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
-                      const SizedBox(height: 12),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.15),
+                                  Colors.white.withValues(alpha: 0.05),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.family_restroom_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Children',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  '${kids.length} ${kids.length == 1 ? 'child' : 'children'}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                       SizedBox(
                         height: 110,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: kids.length + 1,
-                          separatorBuilder: (_, __) => const SizedBox(width: 14),
+                          separatorBuilder: (_, __) => const SizedBox(width: 16),
                           itemBuilder: (_, i) {
                             if (i == kids.length) {
                               return MoreAvatar(onTap: () => _openAddChild());
@@ -69,63 +129,159 @@ class ChildrenView extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Info panel for active child
+                // Enhanced info panel for active child
                 if (active != null)
                   Expanded(
                     child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            title: Text(
-                              active.gender == BabyGender.girl ? 'A girl' : 'A boy',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Today',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.settings_outlined,
-                                color: Colors.white,
-                              ),
-                              onPressed: () => _openEditChild(active),
-                            ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xFF1A1A1A),
+                            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Relatives',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header row
+                            Row(
+                              children: [
+                                // Child info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        active.name,
+                                        style: const TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: active.gender == BabyGender.girl
+                                            ? const Color(0xFFFF8266).withValues(alpha: 0.2)
+                                            : const Color(0xFF3AA3FF).withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: active.gender == BabyGender.girl
+                                              ? const Color(0xFFFF8266)
+                                              : const Color(0xFF3AA3FF),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          active.gender == BabyGender.girl ? 'Girl' : 'Boy',
+                                          style: TextStyle(
+                                            color: active.gender == BabyGender.girl
+                                              ? const Color(0xFFFF8266)
+                                              : const Color(0xFF3AA3FF),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Settings button
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.settings_rounded,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                    onPressed: () => _openEditChild(active),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Age info
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  width: 1,
                                 ),
                               ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.cake_rounded,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Age',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.7),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          active.ageDisplay,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          ListTile(
-                            leading: const Icon(
-                              Icons.circle,
-                              color: Color(0xFF2AC06A),
-                              size: 14,
-                            ),
-                            title: const Text(
-                              'iPhone',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          const Spacer(),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -134,12 +290,7 @@ class ChildrenView extends StatelessWidget {
           ),
         ),
 
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xFFFFA629),
-          onPressed: () { /* your global + action */ },
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+
       );
     });
   }

@@ -21,29 +21,57 @@ class PrimaryPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveColor = enabled
         ? (color ?? AppColors.coral)
-        : const Color(0xFF2E2E2E);
+        : AppColors.cardBackgroundSecondary;
 
     return SizedBox(
       width: double.infinity,
       child: GestureDetector(
         onTap: enabled ? onTap : null,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(
-            color: effectiveColor,
-            borderRadius: BorderRadius.circular(28),
+            gradient: enabled ? LinearGradient(
+              colors: [
+                effectiveColor,
+                effectiveColor.withValues(alpha: 0.8),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ) : null,
+            color: enabled ? null : AppColors.cardBackgroundSecondary,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: enabled
+                ? effectiveColor.withValues(alpha: 0.3)
+                : AppColors.textSecondary.withValues(alpha: 0.2),
+              width: 1,
+            ),
             boxShadow: enabled ? [
               BoxShadow(
-                color: effectiveColor.withValues(alpha: 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                color: effectiveColor.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+                spreadRadius: 0,
+              ),
+              BoxShadow(
+                color: effectiveColor.withValues(alpha: 0.2),
+                blurRadius: 32,
+                offset: const Offset(0, 16),
+                spreadRadius: 0,
               ),
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ] : [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
-            ] : null,
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -51,15 +79,15 @@ class PrimaryPill extends StatelessWidget {
               if (icon != null) ...[
                 Icon(
                   icon,
-                  color: Colors.white,
+                  color: enabled ? Colors.white : AppColors.textSecondary,
                   size: 20,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
               ],
               Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: enabled ? Colors.white : AppColors.textSecondary,
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,

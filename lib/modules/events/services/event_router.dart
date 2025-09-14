@@ -22,7 +22,20 @@ import '../views/condition_sheet.dart';
 class EventRouter {
   static void openEventSheet(EventType type, {EventRecord? existingEvent}) {
     Widget? sheet;
-    
+
+    // Show a message if trying to edit an event type that doesn't support editing yet
+    if (existingEvent != null && !_supportsEditing(type)) {
+      Get.snackbar(
+        'Edit Not Available',
+        'Editing for this event type is not yet implemented. You can delete and recreate the event.',
+        backgroundColor: const Color(0xFF2E2E2E),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 4),
+      );
+    }
+
     switch (type) {
       case EventType.cry:
         sheet = const CrySheet();
@@ -91,6 +104,19 @@ class EventRouter {
       sheet,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      enableDrag: true,
+      isDismissible: true,
     );
+  }
+
+  // Helper method to check if an event type supports editing
+  static bool _supportsEditing(EventType type) {
+    switch (type) {
+      case EventType.diaper:
+      case EventType.condition:
+        return true;
+      default:
+        return false;
+    }
   }
 }

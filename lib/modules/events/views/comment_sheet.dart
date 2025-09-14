@@ -74,7 +74,7 @@ class _CommentSheetState extends State<CommentSheet> {
             height: 5,
             margin: const EdgeInsets.only(top: 16),
             decoration: BoxDecoration(
-              color: AppColors.textSecondary.withValues(alpha: 0.4),
+              color: AppColors.coral.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(3),
             ),
           ),
@@ -83,21 +83,19 @@ class _CommentSheetState extends State<CommentSheet> {
           _buildEnhancedHeader(controller),
 
           // Content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Enhanced text field
-                  _buildEnhancedTextField(controller),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Enhanced text field
+                _buildEnhancedTextField(controller),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  // Enhanced bottom button
-                  _buildEnhancedBottomButton(controller),
-                ],
-              ),
+                // Enhanced bottom button
+                _buildEnhancedBottomButton(controller),
+              ],
             ),
           ),
         ],
@@ -152,25 +150,6 @@ class _CommentSheetState extends State<CommentSheet> {
                       ),
                     ),
                   ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  textController.clear();
-                  controller.clearText();
-                },
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.textSecondary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    widget.existingComment != null ? Icons.delete_outline : Icons.clear,
-                    color: AppColors.textSecondary,
-                    size: 20,
-                  ),
                 ),
               ),
             ],

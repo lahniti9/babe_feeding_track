@@ -59,9 +59,11 @@ class SleepingView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Sleeping duration trends',
-                style: AppTextStyles.h4,
+              Expanded(
+                child: Text(
+                  'Sleep Duration',
+                  style: AppTextStyles.h4,
+                ),
               ),
               SegFilter(
                 options: const ['Day', 'Month', 'Year'],

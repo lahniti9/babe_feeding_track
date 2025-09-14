@@ -7,9 +7,10 @@ import '../../children/services/children_store.dart';
 class SimpleSleepController extends GetxController {
   // Timer state
   final RxBool running = false.obs;
-  final Rx<DateTime?> fellAsleep = Rx<DateTime?>(null);
-  final Rx<DateTime?> wokeUp = Rx<DateTime?>(null);
-  final Rx<Duration> elapsed = Duration.zero.obs;
+  final Rx<DateTime?> sessionStartTime = Rx<DateTime?>(null);
+  final Rx<Duration> totalElapsed = Duration.zero.obs;
+  final Rx<Duration> currentSessionElapsed = Duration.zero.obs;
+  DateTime? currentSessionStart;
   Timer? ticker;
 
   @override
@@ -18,34 +19,55 @@ class SimpleSleepController extends GetxController {
     super.onClose();
   }
 
-  // Start timer
+  // Start or continue timer
   void startTimer() {
     if (running.value) return;
-    
+
     running.value = true;
-    fellAsleep.value = DateTime.now();
-    elapsed.value = Duration.zero;
-    
+
+    // If this is the first time starting, record the session start
+    if (sessionStartTime.value == null) {
+      sessionStartTime.value = DateTime.now();
+    }
+
+    // Record when this current session segment starts
+    currentSessionStart = DateTime.now();
+    currentSessionElapsed.value = Duration.zero;
+
     ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (fellAsleep.value != null) {
-        elapsed.value = DateTime.now().difference(fellAsleep.value!);
+      if (currentSessionStart != null) {
+        currentSessionElapsed.value = DateTime.now().difference(currentSessionStart!);
       }
     });
   }
 
-  // Pause timer
+  // Pause timer (but keep the accumulated time)
   void pauseTimer() {
+    if (!running.value) return;
+
     running.value = false;
     ticker?.cancel();
+
+    // Add current session time to total elapsed time
+    if (currentSessionStart != null) {
+      final sessionDuration = DateTime.now().difference(currentSessionStart!);
+      totalElapsed.value = totalElapsed.value + sessionDuration;
+    }
+
+    currentSessionStart = null;
+    currentSessionElapsed.value = Duration.zero;
   }
 
   // Stop timer and save as SleepEvent
   void stopTimerAndSave() {
-    if (fellAsleep.value == null) return;
+    if (sessionStartTime.value == null) return;
 
-    running.value = false;
-    ticker?.cancel();
-    wokeUp.value = DateTime.now();
+    // If timer is currently running, pause it first to capture the final time
+    if (running.value) {
+      pauseTimer();
+    }
+
+    final wokeUpTime = DateTime.now();
 
     // Create a clean SleepEvent with no tags initially
     final childrenStore = Get.find<ChildrenStore>();
@@ -63,8 +85,8 @@ class SimpleSleepController extends GetxController {
     final sleepEvent = SleepEvent(
       id: 'sleep_${DateTime.now().millisecondsSinceEpoch}',
       childId: activeChildId,
-      fellAsleep: fellAsleep.value!,
-      wokeUp: wokeUp.value!,
+      fellAsleep: sessionStartTime.value!,
+      wokeUp: wokeUpTime,
       comment: null, // No comment initially
       startTags: [], // No start tags initially
       endTags: [], // No end tags initially
@@ -82,35 +104,53 @@ class SimpleSleepController extends GetxController {
 
 
 
-  // Reset timer
+  // Reset timer completely
   void resetTimer() {
     running.value = false;
     ticker?.cancel();
-    fellAsleep.value = null;
-    wokeUp.value = null;
-    elapsed.value = Duration.zero;
+    sessionStartTime.value = null;
+    totalElapsed.value = Duration.zero;
+    currentSessionElapsed.value = Duration.zero;
+    currentSessionStart = null;
   }
 
   // Reset all state
   void _reset() {
     running.value = false;
     ticker?.cancel();
-    fellAsleep.value = null;
-    wokeUp.value = null;
-    elapsed.value = Duration.zero;
+    sessionStartTime.value = null;
+    totalElapsed.value = Duration.zero;
+    currentSessionElapsed.value = Duration.zero;
+    currentSessionStart = null;
   }
 
-
+  // Get total elapsed time (accumulated + current session)
+  Duration get totalElapsedTime {
+    if (running.value && currentSessionStart != null) {
+      return totalElapsed.value + currentSessionElapsed.value;
+    }
+    return totalElapsed.value;
+  }
 
   // Format timer display
   String get timerDisplay {
-    final minutes = elapsed.value.inMinutes;
-    final seconds = elapsed.value.inSeconds % 60;
+    final total = totalElapsedTime;
+    final minutes = total.inMinutes;
+    final seconds = total.inSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  // Check if timer can be stopped
+  // Check if timer can be stopped (has recorded some time)
   bool get canStopTimer {
-    return running.value && fellAsleep.value != null;
+    return sessionStartTime.value != null && totalElapsedTime.inSeconds > 0;
+  }
+
+  // Toggle timer (start if stopped, pause if running)
+  void toggleTimer() {
+    if (running.value) {
+      pauseTimer();
+    } else {
+      startTimer();
+    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import '../../../core/theme/colors.dart';
+import '../../../core/theme/text.dart';
 import '../models/event.dart';
 import '../views/sleep_entry_view.dart';
 import '../views/sleep_exact_view.dart';
@@ -325,15 +327,82 @@ class EventsController extends GetxController {
     _saveEvents();
   }
 
-  // Remove event by id
-  void remove(String id) {
+  // Remove event by id with confirmation
+  void remove(String id, {bool skipConfirmation = false}) {
+    if (skipConfirmation) {
+      _performRemove(id, showSuccessMessage: false);
+      return;
+    }
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.cardBackground,
+        title: Text(
+          'Delete Event',
+          style: AppTextStyles.h3.copyWith(color: Colors.white),
+        ),
+        content: Text(
+          'Are you sure you want to delete this event? This action cannot be undone.',
+          style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back(); // Close dialog
+              _performRemove(id);
+            },
+            child: Text(
+              'Delete',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Perform the actual removal
+  void _performRemove(String id, {bool showSuccessMessage = true}) {
+    // Remove from legacy events list
     events.removeWhere((e) =>
       (e is EventModel && e.id == id) ||
       (e is SleepEvent && e.id == id) ||
       (e is CryEvent && e.id == id) ||
       (e is BreastFeedingEvent && e.id == id)
     );
+
+    // Also remove from EventsStore if it's an EventRecord
+    try {
+      final eventsStore = Get.find<EventsStore>();
+      final eventRecord = eventsStore.items.firstWhereOrNull((e) => e.id == id);
+      if (eventRecord != null) {
+        eventsStore.remove(id);
+      }
+    } catch (e) {
+      // EventsStore might not be available in test environment
+      debugPrint('EventsStore not available: $e');
+    }
+
     _saveEvents();
+
+    // Show success message only if requested and not in test mode
+    if (showSuccessMessage && Get.context != null) {
+      Get.snackbar(
+        'Event Deleted',
+        'The event has been successfully deleted.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.success.withValues(alpha: 0.8),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
 
   // Edit event (opens appropriate sheet)

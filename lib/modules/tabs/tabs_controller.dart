@@ -12,7 +12,7 @@ class TabsController extends GetxController {
   final List<String> tabLabels = [
     'Events',
     'Statistics',
-    'Spurt Calendar',
+    'Spurts',
     'Naji',
     'Settings',
   ];

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import '../../events/models/sleep_event.dart';
 import '../models/stats_models.dart';
-import '../services/stats_aggregator.dart';
+import '../../events/services/events_store.dart';
+import '../../events/models/event_record.dart';
+import '../../events/controllers/events_controller.dart';
 
 class SleepingController extends GetxController {
   final String childId;
-  final _storage = GetStorage();
 
   SleepingController({required this.childId});
 
@@ -29,16 +29,32 @@ class SleepingController extends GetxController {
   void onInit() {
     super.onInit();
     _loadSleepingData();
+
+    // Listen to events store changes
+    try {
+      final eventsStore = Get.find<EventsStore>();
+      eventsStore.items.listen((_) => _loadSleepingData());
+    } catch (e) {
+      debugPrint('EventsStore not available: $e');
+    }
+
+    // Listen to events controller changes for sleep events
+    try {
+      final eventsController = Get.find<EventsController>();
+      eventsController.events.listen((_) => _loadSleepingData());
+    } catch (e) {
+      debugPrint('EventsController not available: $e');
+    }
   }
 
   void _loadSleepingData() {
     _isLoading.value = true;
-    
+
     try {
       _loadDurationData();
       _loadHourlyData();
     } catch (e) {
-      print('Error loading sleeping data: $e');
+      debugPrint('Error loading sleeping data: $e');
     } finally {
       _isLoading.value = false;
     }
@@ -46,41 +62,99 @@ class SleepingController extends GetxController {
 
   void _loadDurationData() {
     final range = _getRangeForPeriod(_durationPeriod.value);
-    
-    // Load sleep events from storage
-    final sleepEventsData = _storage.read('sleep_events') ?? [];
-    final sleepEvents = (sleepEventsData as List)
-        .map((e) => SleepEvent.fromJson(Map<String, dynamic>.from(e)))
+
+    // Get sleep events from EventsStore
+    final eventsStore = Get.find<EventsStore>();
+    final sleepEventRecords = eventsStore.getByChild(childId)
+        .where((e) => e.type == EventType.sleeping)
+        .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
         .toList();
 
-    // Get duration data using the aggregator
-    final durationData = StatsAggregator.sleepDurationByBucket(
-      childId,
-      range,
-      sleepEvents,
-    );
+    // Get sleep events from EventsController
+    final eventsController = Get.find<EventsController>();
+    final sleepEvents = eventsController.events
+        .whereType<SleepEvent>()
+        .where((e) => e.childId == childId)
+        .where((e) => e.fellAsleep.isAfter(range.start) && e.fellAsleep.isBefore(range.end))
+        .toList();
 
-    _durationData.value = durationData;
+    // Group by day and sum durations
+    final durationByDay = <String, double>{};
+
+    // Process EventRecord sleep events
+    for (final event in sleepEventRecords) {
+      final dayKey = DateTimeUtils.bucketKey(event.startAt, range.bucket);
+      final duration = event.endAt != null
+          ? event.endAt!.difference(event.startAt).inMinutes.toDouble()
+          : 0.0;
+      durationByDay[dayKey] = (durationByDay[dayKey] ?? 0.0) + duration;
+    }
+
+    // Process SleepEvent objects
+    for (final event in sleepEvents) {
+      final dayKey = DateTimeUtils.bucketKey(event.fellAsleep, range.bucket);
+      final duration = event.duration.inMinutes.toDouble();
+      durationByDay[dayKey] = (durationByDay[dayKey] ?? 0.0) + duration;
+    }
+
+    _durationData.value = durationByDay.entries
+        .map((e) => Bar(e.key, e.value))
+        .toList()
+      ..sort((a, b) => a.x.toString().compareTo(b.x.toString()));
   }
 
   void _loadHourlyData() {
     final range = _getRangeForPeriod(_hourlyPeriod.value);
-    
-    // Load sleep events from storage
-    final sleepEventsData = _storage.read('sleep_events') ?? [];
-    final sleepEvents = (sleepEventsData as List)
-        .map((e) => SleepEvent.fromJson(Map<String, dynamic>.from(e)))
+
+    // Get sleep events from EventsStore
+    final eventsStore = Get.find<EventsStore>();
+    final sleepEventRecords = eventsStore.getByChild(childId)
+        .where((e) => e.type == EventType.sleeping)
+        .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
         .toList();
 
-    // Get hourly histogram data
-    final hourlyData = StatsAggregator.sleepHistogramByHour(
-      childId,
-      range.start,
-      range.end,
-      sleepEvents,
-    );
+    // Get sleep events from EventsController
+    final eventsController = Get.find<EventsController>();
+    final sleepEvents = eventsController.events
+        .whereType<SleepEvent>()
+        .where((e) => e.childId == childId)
+        .where((e) => e.fellAsleep.isAfter(range.start) && e.fellAsleep.isBefore(range.end))
+        .toList();
 
-    _hourlyData.value = hourlyData;
+    // Create hourly histogram (24 hours)
+    final hourlyMinutes = List<double>.filled(24, 0.0);
+
+    // Process EventRecord sleep events
+    for (final event in sleepEventRecords) {
+      if (event.endAt != null) {
+        _addSleepToHourlyData(event.startAt, event.endAt!, hourlyMinutes);
+      }
+    }
+
+    // Process SleepEvent objects
+    for (final event in sleepEvents) {
+      _addSleepToHourlyData(event.fellAsleep, event.wokeUp, hourlyMinutes);
+    }
+
+    _hourlyData.value = hourlyMinutes
+        .asMap()
+        .entries
+        .map((e) => Bar(e.key.toDouble(), e.value))
+        .toList();
+  }
+
+  void _addSleepToHourlyData(DateTime start, DateTime end, List<double> hourlyMinutes) {
+    // Add sleep duration to each hour it spans
+    var current = start;
+    while (current.isBefore(end)) {
+      final hour = current.hour;
+      final nextHour = DateTime(current.year, current.month, current.day, hour + 1);
+      final endOfThisHour = nextHour.isBefore(end) ? nextHour : end;
+      final minutesInThisHour = endOfThisHour.difference(current).inMinutes.toDouble();
+
+      hourlyMinutes[hour] += minutesInThisHour;
+      current = nextHour;
+    }
   }
 
   void changeDurationPeriod(String period) {

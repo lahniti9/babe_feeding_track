@@ -229,22 +229,65 @@ class EventsView extends StatelessWidget {
 
   Widget _buildEventWidget(EventsController controller, dynamic event) {
     if (event is SleepEvent) {
-      return SleepTimelineEntry(
-        event: event,
-        onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(EventKind.sleeping, existingComment: event.comment),
+      return SwipeActions(
+        model: EventModel(
+          id: event.id,
+          childId: event.childId,
+          kind: EventKind.sleeping,
+          time: event.fellAsleep,
+          endTime: event.wokeUp,
+          title: 'Sleeping',
+          subtitle: _getSleepEventSubtitle(event),
+          comment: event.comment,
+          showPlus: true,
+        ),
+        onEdit: () => controller.edit(event),
+        onRemove: () => controller.remove(event.id),
+        child: SleepTimelineEntry(
+          event: event,
+          onTap: () => controller.edit(event),
+          onPlusTap: () => _openCommentSheet(EventKind.sleeping, existingComment: event.comment),
+        ),
       );
     } else if (event is CryEvent) {
-      return CryTimelineEntry(
-        event: event,
-        onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(EventKind.cry), // CryEvent doesn't have comment field
+      return SwipeActions(
+        model: EventModel(
+          id: event.id,
+          childId: event.childId,
+          kind: EventKind.cry,
+          time: event.time,
+          title: 'Cry',
+          subtitle: _getCryEventSubtitle(event),
+          showPlus: true,
+        ),
+        onEdit: () => controller.edit(event),
+        onRemove: () => controller.remove(event.id),
+        child: CryTimelineEntry(
+          event: event,
+          onTap: () => controller.edit(event),
+          onPlusTap: () => _openCommentSheet(EventKind.cry), // CryEvent doesn't have comment field
+        ),
       );
     } else if (event is BreastFeedingEvent) {
-      return FeedingTimelineEntry(
-        event: event,
-        onTap: () => controller.edit(event),
-        onPlusTap: () => _openCommentSheet(EventKind.feeding, existingComment: event.comment),
+      return SwipeActions(
+        model: EventModel(
+          id: event.id,
+          childId: event.childId,
+          kind: EventKind.feeding,
+          time: event.startAt,
+          endTime: event.startAt.add(event.total),
+          title: 'Breast Feeding',
+          subtitle: _getBreastFeedingEventSubtitle(event),
+          comment: event.comment,
+          showPlus: true,
+        ),
+        onEdit: () => controller.edit(event),
+        onRemove: () => controller.remove(event.id),
+        child: FeedingTimelineEntry(
+          event: event,
+          onTap: () => controller.edit(event),
+          onPlusTap: () => _openCommentSheet(EventKind.feeding, existingComment: event.comment),
+        ),
       );
     } else if (event is EventRecord) {
       final eventKind = controller.getEventKindFromRecord(event);
@@ -453,6 +496,76 @@ class EventsView extends StatelessWidget {
       }
     } catch (e) {
       return 'Baby';
+    }
+  }
+
+  String _getSleepEventSubtitle(SleepEvent event) {
+    try {
+      final childrenStore = Get.find<ChildrenStore>();
+      final child = childrenStore.getChildById(event.childId);
+      final childName = child?.name ?? 'Baby';
+
+      final duration = event.duration;
+      final hours = duration.inHours;
+      final minutes = duration.inMinutes % 60;
+
+      String durationText;
+      if (hours > 0) {
+        durationText = '${hours}h ${minutes}m';
+      } else {
+        durationText = '${minutes}m';
+      }
+
+      return '$childName • $durationText';
+    } catch (e) {
+      return 'Baby • Sleep';
+    }
+  }
+
+  String _getCryEventSubtitle(CryEvent event) {
+    try {
+      final childrenStore = Get.find<ChildrenStore>();
+      final child = childrenStore.getChildById(event.childId);
+      final childName = child?.name ?? 'Baby';
+
+      // Get the first sound or volume descriptor if available
+      String descriptor = '';
+      if (event.sounds.isNotEmpty) {
+        descriptor = event.sounds.first.name;
+      } else if (event.volume.isNotEmpty) {
+        descriptor = event.volume.first.name;
+      }
+
+      return descriptor.isNotEmpty ? '$childName • $descriptor' : childName;
+    } catch (e) {
+      return 'Baby • Cry';
+    }
+  }
+
+  String _getBreastFeedingEventSubtitle(BreastFeedingEvent event) {
+    try {
+      final childrenStore = Get.find<ChildrenStore>();
+      final child = childrenStore.getChildById(event.childId);
+      final childName = child?.name ?? 'Baby';
+
+      final leftMinutes = event.left.inMinutes;
+      final rightMinutes = event.right.inMinutes;
+      final totalMinutes = event.total.inMinutes;
+
+      String feedingInfo;
+      if (leftMinutes > 0 && rightMinutes > 0) {
+        feedingInfo = 'L:${leftMinutes}m R:${rightMinutes}m';
+      } else if (leftMinutes > 0) {
+        feedingInfo = 'Left ${leftMinutes}m';
+      } else if (rightMinutes > 0) {
+        feedingInfo = 'Right ${rightMinutes}m';
+      } else {
+        feedingInfo = '${totalMinutes}m';
+      }
+
+      return '$childName • $feedingInfo';
+    } catch (e) {
+      return 'Baby • Feeding';
     }
   }
 

@@ -224,7 +224,7 @@ class _SegmentButton extends StatelessWidget {
   }
 }
 
-// Avatar picker
+// Avatar picker (camera functionality removed)
 class AvatarPicker extends StatelessWidget {
   final String? value;
   final ValueChanged<String?> onPick;
@@ -238,36 +238,41 @@ class AvatarPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: GestureDetector(
-        onTap: () {
-          // TODO: Implement image picker
-          // For now, just placeholder
-        },
-        child: Container(
-          width: 96,
-          height: 96,
-          decoration: BoxDecoration(
-            color: Colors.grey[800],
-            shape: BoxShape.circle,
+      child: Container(
+        width: 96,
+        height: 96,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.grey[700]!,
+              Colors.grey[800]!,
+            ],
           ),
-          child: value != null
-              ? ClipOval(
-                  child: Image.network(
-                    value!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.camera_alt,
-                      color: Colors.white,
-                      size: 32,
-                    ),
-                  ),
-                )
-              : const Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
-                  size: 32,
-                ),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 2,
+          ),
         ),
+        child: value != null
+            ? ClipOval(
+                child: Image.network(
+                  value!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.person_rounded,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+              )
+            : const Icon(
+                Icons.person_rounded,
+                color: Colors.white,
+                size: 40,
+              ),
       ),
     );
   }

@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
+import '../../../core/theme/colors.dart';
 import '../controllers/cry_controller.dart';
 import '../models/cry_event.dart';
 import '../widgets/modal_shell.dart';
 import '../widgets/multi_select_chips.dart';
+import '../widgets/primary_pill.dart';
 
 class CrySheet extends StatelessWidget {
   const CrySheet({super.key});
@@ -22,13 +24,17 @@ class CrySheet extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFFF8A00),
+            color: const Color(0xFFE14E63).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFE14E63).withValues(alpha: 0.3),
+              width: 1,
+            ),
           ),
           child: Obx(() => Text(
             DateFormat('MMM d, HH:mm').format(controller.time.value),
             style: const TextStyle(
-              color: Colors.white,
+              color: Color(0xFFE14E63),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -109,33 +115,10 @@ class CrySheet extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
 
           // Done button
-          SizedBox(
-            width: double.infinity,
-            child: GestureDetector(
-              onTap: controller.save,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2E2E2E),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'Done',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          PrimaryPill(
+            label: 'Done',
+            icon: Icons.check,
+            onTap: controller.save,
           ),
         ],
       ),
@@ -154,14 +137,14 @@ class CrySheet extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: const Color(0xFF7367F0),
+              color: AppColors.coral,
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               title,
               style: AppTextStyles.captionMedium.copyWith(
-                color: const Color(0xFF7367F0),
+                color: AppColors.coral,
                 fontWeight: FontWeight.w600,
               ),
             ),

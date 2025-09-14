@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/activity_controller.dart';
-import '../widgets/event_sheet_scaffold.dart';
-import '../widgets/time_row.dart';
+import '../widgets/event_sheet.dart';
+import '../widgets/enhanced_time_row.dart';
+import '../widgets/enhanced_chip_group.dart';
 import '../widgets/timer_circle.dart';
-import '../widgets/comment_row.dart';
-import '../widgets/primary_pill.dart';
-import '../../../core/theme/spacing.dart';
 
 class ActivitySheet extends StatelessWidget {
   const ActivitySheet({super.key});
@@ -15,214 +13,106 @@ class ActivitySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(ActivityController());
 
-    return EventSheetScaffold(
+    return Obx(() => EventSheet(
       title: 'Activity',
-      child: Obx(() => Column(
-        children: [
-          TimeRow(
-            value: controller.time.value,
-            onChange: controller.setTime,
+      subtitle: 'Track activity time',
+      icon: Icons.directions_run_rounded,
+      accentColor: const Color(0xFFFF6B35),
+      onSubmit: controller.save,
+      sections: [
+        EnhancedTimeRow(
+          label: 'Start Time',
+          value: controller.time.value,
+          onChange: controller.setTime,
+          icon: Icons.access_time_rounded,
+          accentColor: const Color(0xFFFF6B35),
+        ),
+
+        // Timer section
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFFF6B35).withValues(alpha: 0.05),
+                const Color(0xFFFF6B35).withValues(alpha: 0.02),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFFF6B35).withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          // Timer circle
-          TimerCircle(
-            isRunning: controller.running.value,
-            timeText: controller.timeText,
-            onToggle: controller.toggle,
-            gradientStart: const Color(0xFFFFB03A),
-            gradientEnd: const Color(0xFFFF8A00),
-          ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          _buildTypeChips(controller),
-          
-          _buildIntensityChips(controller),
-          
-          CommentRow(
-            value: controller.note.value,
-            onChanged: controller.setNote,
-          ),
-          
-          const SizedBox(height: AppSpacing.lg),
-          
-          // Bottom controls
-          Row(
+          child: Column(
             children: [
-              // Reset button
-              GestureDetector(
-                onTap: controller.reset,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E2E2E),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.refresh,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.md),
-
-              // Complete button
-              Expanded(
-                child: PrimaryPill(
-                  label: controller.timeText,
-                  icon: Icons.check,
-                  onTap: controller.save,
-                  enabled: controller.elapsed.value > 0,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.md),
-
-              // Bell button
-              GestureDetector(
-                onTap: () {
-                  // TODO: Implement reminder functionality
-                },
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E2E2E),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.notifications_outlined,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      )),
-    );
-  }
-
-  Widget _buildTypeChips(ActivityController controller) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.toys,
-                color: Color(0xFF2AC06A),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'TYPE',
-                style: TextStyle(
-                  color: Color(0xFF2AC06A),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Obx(() => Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              'Tummy time', 'Play mat', 'Reading', 'Music', 
-              'Baby gym', 'Outdoor walk', 'Massage', 'Free play'
-            ].map((option) {
-              final isSelected = controller.typeDisplayName == option;
-              return GestureDetector(
-                onTap: () => controller.setType(option),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF5B5B5B) : const Color(0xFF2E2E2E),
-                    borderRadius: BorderRadius.circular(14),
-                    border: isSelected 
-                      ? Border.all(color: const Color(0xFF5B5B5B).withOpacity(0.5), width: 1)
-                      : null,
-                  ),
-                  child: Text(
-                    option,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF6B35).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.timer_rounded,
+                      color: Color(0xFFFF6B35),
+                      size: 20,
                     ),
                   ),
-                ),
-              );
-            }).toList(),
-          )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIntensityChips(ActivityController controller) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.speed,
-                color: Color(0xFF2AC06A),
-                size: 20,
+                  const SizedBox(width: 16),
+                  const Text(
+                    'TIMER',
+                    style: TextStyle(
+                      color: Color(0xFFFF6B35),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              const Text(
-                'INTENSITY',
-                style: TextStyle(
-                  color: Color(0xFF2AC06A),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
+              const SizedBox(height: 20),
+              TimerCircle(
+                isRunning: controller.running.value,
+                timeText: controller.timeText,
+                onToggle: controller.toggle,
+                gradientStart: const Color(0xFFFF6B35),
+                gradientEnd: const Color(0xFFFF8A00),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Obx(() => Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: ['Low', 'Moderate', 'High'].map((option) {
-              final isSelected = controller.intensity.value.toLowerCase() == option.toLowerCase();
-              return GestureDetector(
-                onTap: () => controller.setIntensity(option),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF5B5B5B) : const Color(0xFF2E2E2E),
-                    borderRadius: BorderRadius.circular(14),
-                    border: isSelected 
-                      ? Border.all(color: const Color(0xFF5B5B5B).withOpacity(0.5), width: 1)
-                      : null,
-                  ),
-                  child: Text(
-                    option,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          )),
-        ],
-      ),
-    );
+        ),
+
+        EnhancedSegmentedControl(
+          label: 'Activity Type',
+          options: const ['Tummy time', 'Play mat', 'Baby gym', 'Outdoor walk', 'Free play'],
+          selected: controller.typeDisplayName,
+          onSelect: controller.setType,
+          icon: Icons.category_rounded,
+          accentColor: const Color(0xFFFF6B35),
+        ),
+
+        EnhancedSegmentedControl(
+          label: 'Intensity',
+          options: const ['Light', 'Moderate', 'Active'],
+          selected: controller.intensity.value.capitalizeFirst ?? 'Moderate',
+          onSelect: controller.setIntensity,
+          icon: Icons.speed_rounded,
+          accentColor: const Color(0xFFFF6B35),
+        ),
+
+        EnhancedCommentRow(
+          label: 'Notes',
+          value: controller.note.value,
+          onChanged: controller.setNote,
+          icon: Icons.note_rounded,
+          accentColor: const Color(0xFFFF6B35),
+          hint: 'Add activity notes...',
+        ),
+      ],
+    ));
   }
 }

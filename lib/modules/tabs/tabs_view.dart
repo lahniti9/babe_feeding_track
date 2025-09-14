@@ -7,7 +7,6 @@ import '../stats/statistics_view.dart';
 import '../spurt/views/spurt_calendar_view.dart';
 import '../children/children_view.dart';
 import '../profile/settings_view.dart';
-import '../profile/profile_controller.dart';
 import '../children/services/children_store.dart';
 import 'tabs_controller.dart';
 
@@ -17,7 +16,6 @@ class TabsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(TabsController());
-    final profileController = Get.find<ProfileController>();
     final childrenStore = Get.find<ChildrenStore>();
 
     return Scaffold(
@@ -56,7 +54,7 @@ class TabsView extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(_getIconData('calendar_month')),
-            label: 'Spurt Calendar',
+            label: 'Spurts',
           ),
           BottomNavigationBarItem(
             icon: Icon(_getIconData('child_care')),

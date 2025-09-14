@@ -18,43 +18,51 @@ class TimeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16), // Reduced from 20 to 16
+      padding: const EdgeInsets.all(14), // Reduced from 16 to 14
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12), // Reduced from 16 to 12
         border: Border.all(
-          color: AppColors.border.withValues(alpha: 0.3),
+          color: AppColors.border.withValues(alpha: 0.4), // Increased opacity
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Icon(
             Icons.access_time,
             color: AppColors.coral,
-            size: 20,
+            size: 18, // Reduced from 20 to 18
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10), // Reduced from 12 to 10
           Text(
             label,
             style: AppTextStyles.bodyMedium.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w500,
+              fontSize: 14, // Reduced font size
             ),
           ),
           const Spacer(),
           GestureDetector(
             onTap: () => _showTimePicker(context),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // Reduced padding
               decoration: BoxDecoration(
                 color: AppColors.coral,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16), // Reduced from 20 to 16
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.coral.withValues(alpha: 0.3),
-                    blurRadius: 8,
+                    blurRadius: 6, // Reduced from 8 to 6
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -66,11 +74,11 @@ class TimeRow extends StatelessWidget {
                     _isToday(value) ? 'Now' : DateFormat('MMM d, HH:mm').format(value),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 13, // Reduced from 14 to 13
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 4), // Reduced from 6 to 4
                   const Icon(
                     Icons.edit,
                     color: Colors.white,

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/bathing_controller.dart';
-import '../widgets/event_sheet_scaffold.dart';
-import '../widgets/time_row.dart';
+import '../widgets/event_sheet.dart';
+import '../widgets/enhanced_time_row.dart';
+import '../widgets/enhanced_chip_group.dart';
 import '../widgets/timer_circle.dart';
-import '../widgets/chip_group_row.dart';
-import '../widgets/primary_pill.dart';
-import '../../../core/theme/spacing.dart';
 
 class BathingSheet extends StatelessWidget {
   const BathingSheet({super.key});
@@ -15,106 +13,99 @@ class BathingSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(BathingController());
 
-    return EventSheetScaffold(
+    return Obx(() => EventSheet(
       title: 'Bathing',
-      child: Obx(() => Column(
-        children: [
-          TimeRow(
-            value: controller.startAt.value,
-            onChange: controller.setStartTime,
+      subtitle: 'Track bath time',
+      icon: Icons.bathtub_rounded,
+      accentColor: const Color(0xFF06B6D4),
+      onSubmit: controller.save,
+      sections: [
+        EnhancedTimeRow(
+          label: 'Start Time',
+          value: controller.startAt.value,
+          onChange: controller.setStartTime,
+          icon: Icons.access_time_rounded,
+          accentColor: const Color(0xFF06B6D4),
+        ),
+
+        // Timer section
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF06B6D4).withValues(alpha: 0.05),
+                const Color(0xFF06B6D4).withValues(alpha: 0.02),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFF06B6D4).withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          // Timer circle
-          TimerCircle(
-            isRunning: controller.isRunning.value,
-            timeText: controller.timeText,
-            onToggle: controller.toggle,
-            gradientStart: const Color(0xFF2AC06A),
-            gradientEnd: const Color(0xFF1E8E3E),
-          ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          ChipGroupRow(
-            label: 'Aids',
-            options: const ['Soap', 'Shampoo', 'Emollient'],
-            selected: controller.aids,
-            multi: true,
-            icon: Icons.bathtub_outlined,
-            iconColor: const Color(0xFF2AC06A),
-          ),
-          
-          ChipGroupRow(
-            label: 'Mood',
-            options: const ['Enjoyed', 'Cried', 'Calm'],
-            selected: controller.mood,
-            multi: true,
-            icon: Icons.sentiment_satisfied,
-            iconColor: const Color(0xFF2AC06A),
-          ),
-          
-          const SizedBox(height: AppSpacing.lg),
-          
-          // Bottom controls
-          Row(
+          child: Column(
             children: [
-              // Reset button
-              GestureDetector(
-                onTap: controller.reset,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E2E2E),
-                    shape: BoxShape.circle,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.timer_rounded,
+                      color: Color(0xFF06B6D4),
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.refresh,
-                    color: Colors.white,
-                    size: 24,
+                  const SizedBox(width: 16),
+                  const Text(
+                    'BATH TIMER',
+                    style: TextStyle(
+                      color: Color(0xFF06B6D4),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      letterSpacing: 1.2,
+                    ),
                   ),
-                ),
+                ],
               ),
-
-              const SizedBox(width: AppSpacing.md),
-
-              // Complete button
-              Expanded(
-                child: PrimaryPill(
-                  label: controller.timeText,
-                  icon: Icons.check,
-                  onTap: controller.save,
-                  enabled: controller.seconds.value > 0,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.md),
-
-              // Bell button
-              GestureDetector(
-                onTap: () {
-                  // TODO: Implement reminder functionality
-                },
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E2E2E),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.notifications_outlined,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
+              const SizedBox(height: 20),
+              TimerCircle(
+                isRunning: controller.isRunning.value,
+                timeText: controller.timeText,
+                onToggle: controller.toggle,
+                gradientStart: const Color(0xFF06B6D4),
+                gradientEnd: const Color(0xFF0891B2),
               ),
             ],
           ),
-        ],
-      )),
-    );
+        ),
+
+        EnhancedChipGroup(
+          label: 'Bath Aids',
+          options: const ['Soap', 'Shampoo', 'Emollient', 'Toys', 'Bubbles'],
+          selected: controller.aids,
+          multiSelect: true,
+          icon: Icons.bathtub_outlined,
+          accentColor: const Color(0xFF06B6D4),
+          onTap: controller.toggleAid,
+        ),
+
+        EnhancedChipGroup(
+          label: 'Mood',
+          options: const ['Enjoyed', 'Cried', 'Calm', 'Playful', 'Relaxed'],
+          selected: controller.mood,
+          multiSelect: true,
+          icon: Icons.sentiment_satisfied_rounded,
+          accentColor: const Color(0xFF06B6D4),
+          onTap: controller.toggleMood,
+        ),
+      ],
+    ));
   }
 }

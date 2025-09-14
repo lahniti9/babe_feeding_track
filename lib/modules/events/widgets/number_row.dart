@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
+import '../../../core/theme/colors.dart';
 
 class NumberRow extends StatelessWidget {
   final String label;
@@ -30,7 +31,7 @@ class NumberRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 16), // Reduced from AppSpacing.lg (20) to 16
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,9 +40,10 @@ class NumberRow extends StatelessWidget {
             style: AppTextStyles.bodyMedium.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w500,
+              fontSize: 14, // Reduced font size
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8), // Reduced from 12 to 8
           
           Row(
             children: [
@@ -49,10 +51,14 @@ class NumberRow extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), // Reduced padding
                   decoration: BoxDecoration(
                     color: const Color(0xFF2E2E2E),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10), // Reduced from 12 to 10
+                    border: Border.all(
+                      color: AppColors.border.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
                   ),
                   child: TextFormField(
                     initialValue: value.toStringAsFixed(decimals),
@@ -62,7 +68,7 @@ class NumberRow extends StatelessWidget {
                     ],
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16, // Reduced from 18 to 16
                       fontWeight: FontWeight.w600,
                     ),
                     decoration: const InputDecoration(
@@ -70,7 +76,7 @@ class NumberRow extends StatelessWidget {
                       hintText: '0',
                       hintStyle: TextStyle(
                         color: Color(0xFF5B5B5B),
-                        fontSize: 18,
+                        fontSize: 16, // Reduced from 18 to 16
                         fontWeight: FontWeight.w600,
                       ),
                     ),

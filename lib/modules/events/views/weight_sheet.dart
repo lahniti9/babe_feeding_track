@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/weight_controller.dart';
 import '../widgets/event_sheet.dart';
-import '../widgets/time_row.dart';
+import '../widgets/enhanced_time_row.dart';
+import '../widgets/enhanced_chip_group.dart';
 import '../widgets/big_number_wheel.dart';
-import '../widgets/segmented_row.dart';
 import '../../../core/theme/spacing.dart';
 
 class WeightSheet extends StatelessWidget {
@@ -16,31 +16,89 @@ class WeightSheet extends StatelessWidget {
 
     return Obx(() => EventSheet(
       title: 'Weight',
+      subtitle: 'Track weight measurements',
+      icon: Icons.monitor_weight_rounded,
+      accentColor: const Color(0xFF10B981),
       onSubmit: controller.save,
       sections: [
-        TimeRow(
+        EnhancedTimeRow(
+          label: 'Time',
           value: controller.time.value,
           onChange: controller.setTime,
+          icon: Icons.access_time_rounded,
+          accentColor: const Color(0xFF10B981),
         ),
-        
-        SegmentedRow(
+
+        EnhancedSegmentedControl(
           label: 'Unit',
-          items: const ['lb/oz', 'kg'],
-          selected: () => controller.unit.value,
+          options: const ['lb/oz', 'kg'],
+          selected: controller.unit.value,
           onSelect: controller.setUnit,
+          icon: Icons.straighten_rounded,
+          accentColor: const Color(0xFF10B981),
         ),
-        
-        if (controller.isMetric.value)
-          BigNumberWheel(
-            value: controller.value.value,
-            unit: 'kg',
-            onChange: controller.setValue,
-            min: 0.0,
-            max: 50.0,
-            decimals: 2,
-          )
-        else
-          _buildPoundsOuncesWheel(controller),
+
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF10B981).withValues(alpha: 0.05),
+                const Color(0xFF10B981).withValues(alpha: 0.02),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFF10B981).withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.monitor_weight_rounded,
+                      color: Color(0xFF10B981),
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Text(
+                    'WEIGHT',
+                    style: TextStyle(
+                      color: Color(0xFF10B981),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              if (controller.isMetric.value)
+                BigNumberWheel(
+                  value: controller.value.value,
+                  unit: 'kg',
+                  onChange: controller.setValue,
+                  min: 0.0,
+                  max: 50.0,
+                  decimals: 2,
+                )
+              else
+                _buildPoundsOuncesWheel(controller),
+            ],
+          ),
+        ),
       ],
     ));
   }

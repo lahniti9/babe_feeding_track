@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../core/theme/colors.dart';
 import '../controllers/sleep_entry_controller.dart';
 import '../models/sleep_event.dart';
+import '../widgets/primary_pill.dart';
 
 class SleepExactView extends StatelessWidget {
   final String childId;
@@ -19,143 +21,565 @@ class SleepExactView extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = Get.put(SleepEntryController(childId: childId, initial: initial));
 
-    return SafeArea(
-      top: false,
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.92,
-        minChildSize: 0.6,
-        maxChildSize: 0.98,
-        builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF191919),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+        minHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.background,
+            AppColors.cardBackground,
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(32),
+          topRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 32,
+            offset: const Offset(0, -12),
           ),
-          child: SingleChildScrollView(
-            controller: controller,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Grabber
-                Center(
-                  child: Container(
-                    width: 44, 
-                    height: 5, 
-                    decoration: BoxDecoration(
-                      color: Colors.white24, 
-                      borderRadius: BorderRadius.circular(3)
-                    )
-                  )
-                ),
-                const SizedBox(height: 16),
+          BoxShadow(
+            color: AppColors.coral.withValues(alpha: 0.1),
+            blurRadius: 64,
+            offset: const Offset(0, -24),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Enhanced handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 16),
+            width: 48,
+            height: 5,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.coral.withValues(alpha: 0.3),
+                  AppColors.coral.withValues(alpha: 0.8),
+                  AppColors.coral.withValues(alpha: 0.3),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
 
-                // Title row
+          // Enhanced header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Column(
+              children: [
                 Row(
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.coral.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.coral.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.bedtime_rounded,
+                        color: AppColors.coral,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Sleeping', 
+                            'Sleeping',
                             style: TextStyle(
-                              fontSize: 22, 
+                              fontSize: 28,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                            )
+                            ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
                           Obx(() => Text(
-                            c.isEdit.value ? 'edit event' : 'add event',
-                            style: const TextStyle(color: Colors.white60)
+                            c.isEdit.value ? 'Edit sleep session' : 'Track sleep time',
+                            style: const TextStyle(
+                              color: Colors.white60,
+                              fontSize: 16,
+                            ),
                           )),
                         ],
                       ),
                     ),
-                    Obx(() => c.isEdit.value
-                        ? IconButton(
-                            icon: const Icon(Icons.delete_outline, color: Colors.white),
-                            onPressed: c.delete,
-                          )
-                        : const SizedBox.shrink()),
                   ],
-                ),
-
-                const Divider(color: Colors.white12),
-                const SizedBox(height: 16),
-
-                // Fell asleep row
-                _TimeRow(
-                  label: 'Fell asleep',
-                  dateTime: c.fellAsleep,
-                  onPick: (dt) => c.setFellAsleepTime(dt),
-                ),
-                const SizedBox(height: 16),
-
-                // Woke up row
-                _TimeRow(
-                  label: 'Woke up',
-                  dateTime: c.wokeUp,
-                  onPick: (dt) => c.setWokeUpTime(dt),
-                ),
-                const SizedBox(height: 16),
-
-                // Comment field + counter
-                _CommentBox(
-                  controller: c,
-                ),
-                const SizedBox(height: 8),
-
-                // START OF SLEEP tags
-                _SectionHeader(icon: Icons.bedtime, label: 'START OF SLEEP'),
-                const SizedBox(height: 8),
-                _SingleSelectChips(
-                  options: kSleepStartTags,
-                  selected: c.startTag,
-                  onToggle: c.toggleStartTag,
-                ),
-
-                const SizedBox(height: 16),
-
-                // END OF SLEEP tags
-                _SectionHeader(icon: Icons.notifications_active_outlined, label: 'END OF SLEEP'),
-                const SizedBox(height: 8),
-                _SingleSelectChips(
-                  options: kSleepEndTags,
-                  selected: c.endTag,
-                  onToggle: c.toggleEndTag,
-                ),
-
-                const SizedBox(height: 16),
-
-                // HOW tags
-                _SectionHeader(icon: Icons.help_outline, label: 'HOW'),
-                const SizedBox(height: 8),
-                _SingleSelectChips(
-                  options: kSleepHowTags,
-                  selected: c.howTag,
-                  onToggle: c.toggleHowTag,
-                ),
-
-                const SizedBox(height: 24),
-
-                // Bottom button
-                _BigPill(
-                  leading: const Icon(Icons.check, color: Colors.white),
-                  label: 'Done',
-                  color: const Color(0xFF2E7D32), // green
-                  onTap: c.save,
                 ),
               ],
             ),
           ),
+
+          // Content - Made scrollable
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Column(
+                children: [
+
+                  // Enhanced time rows
+                  _EnhancedTimeRow(
+                    label: 'Fell asleep',
+                    dateTime: c.fellAsleep,
+                    onPick: (dt) => c.setFellAsleepTime(dt),
+                    icon: Icons.bedtime_rounded,
+                  ),
+                  const SizedBox(height: 16),
+
+                  _EnhancedTimeRow(
+                    label: 'Woke up',
+                    dateTime: c.wokeUp,
+                    onPick: (dt) => c.setWokeUpTime(dt),
+                    icon: Icons.wb_sunny_rounded,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Enhanced comment section
+                  _EnhancedCommentBox(controller: c),
+                  const SizedBox(height: 24),
+
+                  // Enhanced sleep tags sections
+                  _EnhancedSleepSection(
+                    title: 'START OF SLEEP',
+                    icon: Icons.bedtime_rounded,
+                    options: kSleepStartTags,
+                    selected: c.startTag,
+                    onToggle: c.toggleStartTag,
+                    color: const Color(0xFF8B5CF6),
+                  ),
+                  const SizedBox(height: 20),
+
+                  _EnhancedSleepSection(
+                    title: 'END OF SLEEP',
+                    icon: Icons.notifications_active_rounded,
+                    options: kSleepEndTags,
+                    selected: c.endTag,
+                    onToggle: c.toggleEndTag,
+                    color: const Color(0xFF10B981),
+                  ),
+                  const SizedBox(height: 20),
+
+                  _EnhancedSleepSection(
+                    title: 'HOW',
+                    icon: Icons.help_rounded,
+                    options: kSleepHowTags,
+                    selected: c.howTag,
+                    onToggle: c.toggleHowTag,
+                    color: const Color(0xFF3B82F6),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Enhanced done button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: PrimaryPill(
+              label: 'Done',
+              icon: Icons.check_rounded,
+              onTap: () {
+                c.save();
+                Get.back();
+              },
+              enabled: c.valid,
+              color: AppColors.coral,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Enhanced UI components
+class _EnhancedTimeRow extends StatelessWidget {
+  final String label;
+  final Rx<DateTime> dateTime;
+  final Function(DateTime) onPick;
+  final IconData icon;
+
+  const _EnhancedTimeRow({
+    required this.label,
+    required this.dateTime,
+    required this.onPick,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackgroundSecondary,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.coral.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.coral.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.coral,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Obx(() => Text(
+                  DateFormat('MMM d, h:mm a').format(dateTime.value),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _showDateTimePicker(context),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.coral.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.coral.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+              child: const Icon(
+                Icons.edit_rounded,
+                color: AppColors.coral,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDateTimePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Container(
+        height: 320,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white60),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onPick(dateTime.value);
+                  },
+                  child: const Text(
+                    'Done',
+                    style: TextStyle(color: AppColors.coral),
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.dateAndTime,
+                initialDateTime: dateTime.value,
+                onDateTimeChanged: (time) => dateTime.value = time,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// Supporting UI components
+class _EnhancedCommentBox extends StatefulWidget {
+  final SleepEntryController controller;
+
+  const _EnhancedCommentBox({required this.controller});
+
+  @override
+  State<_EnhancedCommentBox> createState() => _EnhancedCommentBoxState();
+}
+
+class _EnhancedCommentBoxState extends State<_EnhancedCommentBox> {
+  late TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.controller.comment.value);
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackgroundSecondary,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.coral.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.coral.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.comment_rounded,
+                  color: AppColors.coral,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'COMMENT',
+                style: TextStyle(
+                  color: AppColors.coral,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _textController,
+            maxLines: 4,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            decoration: const InputDecoration(
+              hintText: 'Here you can write your comment',
+              hintStyle: TextStyle(color: Colors.white60),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+            onChanged: widget.controller.updateComment,
+          ),
+          const SizedBox(height: 12),
+          Obx(() => Text(
+            '${widget.controller.commentCharacterCount} / 300',
+            style: TextStyle(
+              color: widget.controller.commentAtLimit ? Colors.red : Colors.white60,
+              fontSize: 12,
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class _EnhancedSleepSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final List<String> options;
+  final RxnString selected;
+  final Function(String) onToggle;
+  final Color color;
+
+  const _EnhancedSleepSection({
+    required this.title,
+    required this.icon,
+    required this.options,
+    required this.selected,
+    required this.onToggle,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackgroundSecondary,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Obx(() => Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: options.map((option) {
+              final isSelected = selected.value == option;
+              return GestureDetector(
+                onTap: () => onToggle(option),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                      ? color.withValues(alpha: 0.2)
+                      : AppColors.background,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected
+                        ? color
+                        : Colors.white.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected)
+                        Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          child: Icon(
+                            Icons.check_circle_rounded,
+                            color: color,
+                            size: 16,
+                          ),
+                        ),
+                      Text(
+                        option,
+                        style: TextStyle(
+                          color: isSelected ? color : Colors.white70,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+// Supporting UI components (keeping for compatibility)
 class _TimeRow extends StatelessWidget {
   final String label;
   final Rx<DateTime> dateTime;

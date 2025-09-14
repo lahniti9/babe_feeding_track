@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../../../core/theme/colors.dart';
 
@@ -25,7 +24,7 @@ class ChipGroupRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 16), // Reduced from AppSpacing.lg (20) to 16
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,25 +35,26 @@ class ChipGroupRow extends StatelessWidget {
                 Icon(
                   icon,
                   color: iconColor ?? const Color(0xFF7367F0),
-                  size: 20,
+                  size: 18, // Reduced from 20 to 18
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6), // Reduced from 8 to 6
               ],
               Text(
                 label.toUpperCase(),
                 style: AppTextStyles.captionMedium.copyWith(
                   color: iconColor ?? const Color(0xFF7367F0),
                   fontWeight: FontWeight.w600,
+                  fontSize: 12, // Reduced font size
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12), // Reduced from 16 to 12
 
           // Chips
           Obx(() => Wrap(
-            spacing: 10,
-            runSpacing: 12,
+            spacing: 8, // Reduced from 10 to 8
+            runSpacing: 8, // Reduced from 12 to 8
             children: options.map((option) {
               final isSelected = selected.contains(option);
               return GestureDetector(
@@ -62,22 +62,22 @@ class ChipGroupRow extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), // Reduced padding
                   decoration: BoxDecoration(
                     color: isSelected
                       ? AppColors.coral.withValues(alpha: 0.2)
                       : const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16), // Reduced from 20 to 16
                     border: Border.all(
                       color: isSelected
                         ? AppColors.coral
-                        : Colors.transparent,
-                      width: 2,
+                        : const Color(0xFF3A3A3A), // Added subtle border for unselected
+                      width: 1.5, // Reduced from 2 to 1.5
                     ),
                     boxShadow: isSelected ? [
                       BoxShadow(
-                        color: AppColors.coral.withValues(alpha: 0.2),
-                        blurRadius: 8,
+                        color: AppColors.coral.withValues(alpha: 0.3),
+                        blurRadius: 6, // Reduced from 8 to 6
                         offset: const Offset(0, 2),
                       ),
                     ] : null,
@@ -86,7 +86,7 @@ class ChipGroupRow extends StatelessWidget {
                     option,
                     style: TextStyle(
                       color: isSelected ? AppColors.coral : Colors.white,
-                      fontSize: 15,
+                      fontSize: 14, // Reduced from 15 to 14
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     ),
                   ),

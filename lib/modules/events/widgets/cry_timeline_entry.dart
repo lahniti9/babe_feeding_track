@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/text.dart';
 import '../models/cry_event.dart';
+import '../../children/services/children_store.dart';
 
 class CryTimelineEntry extends StatelessWidget {
   final CryEvent event;
@@ -18,9 +20,6 @@ class CryTimelineEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = childNameById(event.childId);
-    final title = '$name was crying';
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -45,7 +44,7 @@ class CryTimelineEntry extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Enhanced timeline indicator
-            _buildEnhancedTimelineIndicator(),
+            _buildTimelineIndicator(),
             const SizedBox(width: 16),
 
             // Content
@@ -58,160 +57,202 @@ class CryTimelineEntry extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          title,
+                          'Crying',
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
                       ),
-                      _buildEnhancedPlusButton(),
+                      _buildPlusButton(),
                     ],
                   ),
 
-                  // Subtitle with child name
+                  // Child name subtitle
                   const SizedBox(height: 4),
                   Text(
-                    name,
+                    _getChildName(),
                     style: AppTextStyles.captionMedium,
                   ),
 
-                  // Detail lines
-                  const SizedBox(height: 8),
-                  _buildDetailLines(),
+                  // Cry details
+                  const SizedBox(height: 12),
+                  _buildCryDetails(),
                 ],
               ),
             ),
 
-            // Time (right-aligned)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  relativeTime(event.time),
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  DateFormat('HH:mm').format(event.time),
-                  style: AppTextStyles.caption.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(width: 16),
+
+            // Time
+            _buildTimeDisplay(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEnhancedTimelineIndicator() {
+  Widget _buildTimelineIndicator() {
     return Container(
-      width: 48,
-      height: 48,
+      width: 12,
+      height: 12,
       decoration: BoxDecoration(
-        color: const Color(0xFFFF6B6B).withValues(alpha: 0.1), // Red for crying
+        color: AppColors.error,
         shape: BoxShape.circle,
         border: Border.all(
-          color: const Color(0xFFFF6B6B).withValues(alpha: 0.3),
-          width: 2,
+          color: AppColors.error.withValues(alpha: 0.3),
+          width: 3,
         ),
-      ),
-      child: const Icon(
-        Icons.sentiment_very_dissatisfied,
-        color: Color(0xFFFF6B6B),
-        size: 24,
       ),
     );
   }
 
-  Widget _buildEnhancedPlusButton() {
+  Widget _buildPlusButton() {
+    if (onPlusTap == null) return const SizedBox.shrink();
+
     return GestureDetector(
       onTap: onPlusTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 24,
+        height: 24,
         decoration: BoxDecoration(
-          color: AppColors.coral.withValues(alpha: 0.1),
+          color: AppColors.primary.withValues(alpha: 0.2),
           shape: BoxShape.circle,
           border: Border.all(
-            color: AppColors.coral.withValues(alpha: 0.3),
+            color: AppColors.primary.withValues(alpha: 0.4),
             width: 1,
           ),
         ),
         child: Icon(
           Icons.add,
-          color: AppColors.coral,
-          size: 18,
+          size: 14,
+          color: AppColors.primary,
         ),
       ),
     );
   }
 
-  Widget _buildDetailLines() {
+  String _getChildName() {
+    try {
+      final childrenStore = Get.find<ChildrenStore>();
+      final child = childrenStore.getChildById(event.childId);
+      return child?.name ?? 'Baby';
+    } catch (e) {
+      return 'Baby';
+    }
+  }
+
+  Widget _buildCryDetails() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (event.sounds.isNotEmpty)
-          _DetailLine('Sounds: ${_joinHuman(event.sounds.map((s) => s.displayName).toList())}'),
-        if (event.volume.isNotEmpty)
-          _DetailLine('Volume: ${_joinHuman(event.volume.map((v) => v.displayName).toList())}'),
-        if (event.rhythm.isNotEmpty)
-          _DetailLine('Rhythm: ${_joinHuman(event.rhythm.map((r) => r.displayName).toList())}'),
-        if (event.duration.isNotEmpty)
-          _DetailLine('Duration: ${_joinHuman(event.duration.map((d) => d.displayName).toList())}'),
-        if (event.behaviour.isNotEmpty)
-          _DetailLine('Behaviour: ${_joinHuman(event.behaviour.map((b) => b.displayName).toList())}'),
+        // Cry characteristics
+        if (event.sounds.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(
+                Icons.volume_up,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Sound: ${event.sounds.first.name}',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        if (event.volume.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(
+                Icons.graphic_eq,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Volume: ${event.volume.first.name}',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        // Tags if available
+        if (_hasTags()) ...[
+          _buildTags(),
+        ],
       ],
     );
   }
 
-  String _joinHuman(List<String> xs) =>
-      xs.length == 1 ? xs.first.toLowerCase()
-      : '${xs.take(xs.length - 1).join(', ').toLowerCase()} and ${xs.last.toLowerCase()}';
-}
+  bool _hasTags() {
+    return event.rhythm.isNotEmpty ||
+           event.duration.isNotEmpty ||
+           event.behaviour.isNotEmpty;
+  }
 
-class _DetailLine extends StatelessWidget {
-  final String text;
+  Widget _buildTags() {
+    final allTags = [
+      ...event.rhythm.map((r) => r.name),
+      ...event.duration.map((d) => d.name),
+      ...event.behaviour.map((b) => b.name),
+    ];
 
-  const _DetailLine(this.text);
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: allTags.map((tag) => _buildTag(tag)).toList(),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 2),
+  Widget _buildTag(String tag) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.error.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.error.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
       child: Text(
-        text,
-        style: AppTextStyles.caption.copyWith(
-          color: AppColors.textSecondary,
+        tag,
+        style: AppTextStyles.captionMedium.copyWith(
+          color: AppColors.error,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
-}
 
-// Helper function to get child name by ID
-String childNameById(String childId) {
-  // TODO: Implement proper child name lookup
-  return 'Baby'; // Placeholder
-}
-
-// Helper function to format relative time
-String relativeTime(DateTime time) {
-  final now = DateTime.now();
-  final difference = now.difference(time);
-  
-  if (difference.inMinutes < 1) {
-    return 'Just now';
-  } else if (difference.inMinutes < 60) {
-    return '${difference.inMinutes}m ago';
-  } else if (difference.inHours < 24) {
-    return '${difference.inHours}h ago';
-  } else {
-    return '${difference.inDays}d ago';
+  Widget _buildTimeDisplay() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          DateFormat('HH:mm').format(event.time),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          DateFormat('MMM d').format(event.time),
+          style: AppTextStyles.captionMedium,
+        ),
+      ],
+    );
   }
 }

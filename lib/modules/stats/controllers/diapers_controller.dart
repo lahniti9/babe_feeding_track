@@ -1,13 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import '../../../data/models/event.dart';
-import '../../events/models/event.dart';
 import '../models/stats_models.dart';
-import '../services/stats_aggregator.dart';
+import '../../events/services/events_store.dart';
+import '../../events/models/event_record.dart';
 
 class DiapersController extends GetxController {
   final String childId;
-  final _storage = GetStorage();
 
   DiapersController({required this.childId});
 
@@ -25,58 +23,43 @@ class DiapersController extends GetxController {
   void onInit() {
     super.onInit();
     _loadDiaperData();
+
+    // Listen to events store changes
+    try {
+      final eventsStore = Get.find<EventsStore>();
+      eventsStore.items.listen((_) => _loadDiaperData());
+    } catch (e) {
+      debugPrint('EventsStore not available: $e');
+    }
   }
 
   void _loadDiaperData() {
     _isLoading.value = true;
-    
+
     try {
       final range = _getRangeForPeriod(_selectedPeriod.value);
-      
-      // Load events from storage
-      final eventsData = _storage.read('events') ?? [];
-      final events = (eventsData as List)
-          .map((e) => Event.fromJson(Map<String, dynamic>.from(e)))
+
+      // Get diaper events from EventsStore
+      final eventsStore = Get.find<EventsStore>();
+      final diaperEvents = eventsStore.getByChild(childId)
+          .where((e) => e.type == EventType.diaper)
+          .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
           .toList();
 
-      // Load EventModel events from storage
-      final eventModelsData = _storage.read('events_v2') ?? [];
-      final eventModels = (eventModelsData as List)
-          .map((e) => EventModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
-
-      // Get diaper count data from old events
-      final oldDiaperData = StatsAggregator.countByBucket(
-        {EventType.diaper},
-        childId,
-        range,
-        events,
-      );
-
-      // Get diaper count data from new events
-      final newDiaperData = StatsAggregator.countEventModelsByBucket(
-        {EventKind.diaper},
-        childId,
-        range,
-        eventModels,
-      );
-
-      // Combine data
-      final combinedData = <String, double>{};
-      for (final bar in oldDiaperData) {
-        combinedData[bar.x.toString()] = (combinedData[bar.x.toString()] ?? 0.0) + bar.y;
-      }
-      for (final bar in newDiaperData) {
-        combinedData[bar.x.toString()] = (combinedData[bar.x.toString()] ?? 0.0) + bar.y;
+      // Group by day and count events
+      final countByDay = <String, double>{};
+      for (final event in diaperEvents) {
+        final dayKey = DateTimeUtils.bucketKey(event.startAt, range.bucket);
+        countByDay[dayKey] = (countByDay[dayKey] ?? 0.0) + 1.0;
       }
 
-      _diaperData.value = combinedData.entries
+      _diaperData.value = countByDay.entries
           .map((e) => Bar(e.key, e.value))
           .toList()
         ..sort((a, b) => a.x.toString().compareTo(b.x.toString()));
 
     } catch (e) {
-      print('Error loading diaper data: $e');
+      debugPrint('Error loading diaper data: $e');
       _diaperData.value = [];
     } finally {
       _isLoading.value = false;

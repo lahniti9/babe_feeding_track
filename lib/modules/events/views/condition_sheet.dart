@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import '../controllers/condition_controller.dart';
 import '../models/event_record.dart';
 import '../widgets/event_sheet.dart';
-import '../widgets/time_row.dart';
-import '../widgets/comment_row.dart';
+import '../widgets/enhanced_time_row.dart';
+import '../widgets/enhanced_chip_group.dart';
 
 class ConditionSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -22,139 +22,47 @@ class ConditionSheet extends StatelessWidget {
 
     return Obx(() => EventSheet(
       title: 'Condition',
+      subtitle: 'Track health and mood',
+      icon: Icons.favorite_rounded,
+      accentColor: const Color(0xFFEC4899),
       onSubmit: controller.save,
       sections: [
-        TimeRow(
+        EnhancedTimeRow(
+          label: 'Time',
           value: controller.time.value,
           onChange: controller.setTime,
+          icon: Icons.access_time_rounded,
+          accentColor: const Color(0xFFEC4899),
         ),
-        
-        _buildMoodChips(controller),
-        
-        _buildSeverityChips(controller),
-        
-        CommentRow(
+
+        EnhancedChipGroup(
+          label: 'Mood',
+          options: const ['Happy', 'Calm', 'Fussy', 'Sleepy', 'Alert'],
+          selected: controller.moods,
+          multiSelect: true,
+          icon: Icons.sentiment_satisfied_rounded,
+          accentColor: const Color(0xFFEC4899),
+          onTap: controller.toggleMood,
+        ),
+
+        EnhancedSegmentedControl(
+          label: 'Severity',
+          options: const ['Mild', 'Moderate', 'Severe'],
+          selected: controller.severity.value.capitalize!,
+          onSelect: controller.setSeverity,
+          icon: Icons.warning_rounded,
+          accentColor: const Color(0xFFEC4899),
+        ),
+
+        EnhancedCommentRow(
+          label: 'Notes',
           value: controller.note.value,
           onChanged: controller.setNote,
+          icon: Icons.note_rounded,
+          accentColor: const Color(0xFFEC4899),
+          hint: 'Add any additional notes...',
         ),
       ],
     ));
-  }
-
-  Widget _buildMoodChips(ConditionController controller) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.sentiment_satisfied,
-                color: Color(0xFF3BB3C4),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'MOOD',
-                style: TextStyle(
-                  color: Color(0xFF3BB3C4),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Obx(() => Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              'Laughing', 'Calm', 'Fussy', 'Crying', 'Anxious', 
-              'Irritable', 'Sleepy', 'Hungry', 'Gassy', 'Colic', 'Teething'
-            ].map((option) {
-              final isSelected = controller.moods.contains(option.toLowerCase());
-              return GestureDetector(
-                onTap: () => controller.toggleMood(option),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF5B5B5B) : const Color(0xFF2E2E2E),
-                    borderRadius: BorderRadius.circular(14),
-                    border: isSelected 
-                      ? Border.all(color: const Color(0xFF5B5B5B).withOpacity(0.5), width: 1)
-                      : null,
-                  ),
-                  child: Text(
-                    option,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSeverityChips(ConditionController controller) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.priority_high,
-                color: Color(0xFF3BB3C4),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'SEVERITY',
-                style: TextStyle(
-                  color: Color(0xFF3BB3C4),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Obx(() => Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: ['Mild', 'Moderate', 'Severe'].map((option) {
-              final isSelected = controller.severity.value.toLowerCase() == option.toLowerCase();
-              return GestureDetector(
-                onTap: () => controller.setSeverity(option),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF5B5B5B) : const Color(0xFF2E2E2E),
-                    borderRadius: BorderRadius.circular(14),
-                    border: isSelected 
-                      ? Border.all(color: const Color(0xFF5B5B5B).withOpacity(0.5), width: 1)
-                      : null,
-                  ),
-                  child: Text(
-                    option,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          )),
-        ],
-      ),
-    );
   }
 }
