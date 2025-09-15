@@ -6,6 +6,7 @@ class ChildProfile {
   BabyGender gender;
   DateTime birthDate;
   String? avatar; // file path / url
+  String? timezone; // timezone name (e.g., 'America/New_York')
 
   ChildProfile({
     required this.id,
@@ -13,6 +14,7 @@ class ChildProfile {
     required this.gender,
     required this.birthDate,
     this.avatar,
+    this.timezone,
   });
 
   // Calculate age in days
@@ -53,6 +55,7 @@ class ChildProfile {
       'gender': gender.name,
       'birthDate': birthDate.toIso8601String(),
       'avatar': avatar,
+      'timezone': timezone,
     };
   }
 
@@ -64,6 +67,7 @@ class ChildProfile {
       gender: BabyGender.values.firstWhere((g) => g.name == json['gender']),
       birthDate: DateTime.parse(json['birthDate']),
       avatar: json['avatar'],
+      timezone: json['timezone'],
     );
   }
 
@@ -74,6 +78,7 @@ class ChildProfile {
     BabyGender? gender,
     DateTime? birthDate,
     String? avatar,
+    String? timezone,
   }) {
     return ChildProfile(
       id: id ?? this.id,
@@ -81,6 +86,7 @@ class ChildProfile {
       gender: gender ?? this.gender,
       birthDate: birthDate ?? this.birthDate,
       avatar: avatar ?? this.avatar,
+      timezone: timezone ?? this.timezone,
     );
   }
 

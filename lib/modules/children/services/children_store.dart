@@ -2,14 +2,19 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/child_profile.dart';
+import '../../statistics/services/timezone_clock.dart';
 
 class ChildrenStore extends GetxService {
   final _storage = GetStorage();
   final children = <ChildProfile>[].obs;
   final activeId = RxnString();
 
-  ChildProfile? get active =>
-      children.firstWhereOrNull((c) => c.id == activeId.value);
+  // Computed getter for active child
+  ChildProfile? get active => children.firstWhereOrNull((c) => c.id == activeId.value);
+
+  // Helper to produce timezone clock from active child
+  TimezoneClock clockFor(ChildProfile? child) =>
+      TimezoneClock.fromName(child?.timezone ?? 'UTC');
 
   @override
   void onInit() {

@@ -8,6 +8,7 @@ class StatsRow extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
   final Color? iconColor;
+  final Widget? trailing;
 
   const StatsRow({
     super.key,
@@ -15,6 +16,7 @@ class StatsRow extends StatelessWidget {
     required this.title,
     required this.onTap,
     this.iconColor,
+    this.trailing,
   });
 
   @override
@@ -51,7 +53,7 @@ class StatsRow extends StatelessWidget {
                     style: AppTextStyles.bodyLarge,
                   ),
                 ),
-                Icon(
+                trailing ?? Icon(
                   Icons.chevron_right,
                   color: AppColors.textSecondary,
                   size: AppSpacing.iconMd,
