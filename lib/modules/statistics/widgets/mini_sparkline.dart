@@ -98,14 +98,14 @@ class TrendIndicator extends StatelessWidget {
         ],
         Icon(
           _getTrendIcon(trend),
-          size: 16,
+          size: 12,
           color: _getTrendColor(trend),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 2),
         Text(
           _getTrendText(trend),
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 10,
             color: _getTrendColor(trend),
             fontWeight: FontWeight.w600,
           ),
@@ -191,12 +191,13 @@ class StatsTileWithSparkline extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Header with icon and sparkline
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -204,65 +205,75 @@ class StatsTileWithSparkline extends StatelessWidget {
                           color.withValues(alpha: 0.1),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(
                       icon,
                       color: color,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                   const Spacer(),
                   MiniSparkline(
                     data: trendData,
                     color: color,
-                    width: 50,
-                    height: 25,
+                    width: 40,
+                    height: 20,
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              
+              const SizedBox(height: 8),
+
               // Title
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
-              
+              const SizedBox(height: 2),
+
               // Value
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                  letterSpacing: 0.3,
+              Flexible(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                    letterSpacing: 0.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(height: 4),
-              
+              const SizedBox(height: 2),
+
               // Subtitle and trend
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.6),
+              Flexible(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.6),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                  TrendIndicator(
-                    data: trendData,
-                    color: color,
-                  ),
-                ],
+                    TrendIndicator(
+                      data: trendData,
+                      color: color,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

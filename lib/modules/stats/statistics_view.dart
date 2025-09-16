@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/theme/spacing.dart';
-import '../../core/theme/colors.dart';
 import '../../core/widgets/bc_scaffold.dart';
 import '../statistics/controllers/stats_home_controller.dart';
+import '../statistics/views/live_sleeping_chart_view.dart';
 import 'views/head_circ_view.dart';
 import 'views/height_view.dart';
 import 'views/weight_view.dart';
 import 'views/health_diary_view.dart';
 import 'views/monthly_overview_view.dart';
 import 'views/feeding_view.dart';
-import 'views/sleeping_view.dart';
 import 'views/diapers_view.dart';
 import 'views/daily_results_view.dart';
 
@@ -28,101 +27,303 @@ class StatisticsView extends StatelessWidget {
         if (!controller.hasChild.value) {
           return _buildNoChildHint();
         }
-        return ListView.separated(
+        return SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          itemCount: 9,
-          separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.lg),
-          itemBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.face,
-                  title: "Head circumference",
-                  subtitle: "Latest measurement",
-                  trailing: _arrowWidget(const Color(0xFF0891B2)),
-                  onTap: () => _navigateToHeadCircumference(controller),
-                  iconColor: const Color(0xFF0891B2), // Cyan - same as headCircumference events
-                );
-              case 1:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.height,
-                  title: "Height",
-                  subtitle: "Latest measurement",
-                  trailing: _arrowWidget(const Color(0xFF7C2D12)),
-                  onTap: () => _navigateToHeight(controller),
-                  iconColor: const Color(0xFF7C2D12), // Brown - same as height events
-                );
-              case 2:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.monitor_weight,
-                  title: "Weight",
-                  subtitle: "Latest measurement",
-                  trailing: _arrowWidget(const Color(0xFF0891B2)),
-                  onTap: () => _navigateToWeight(controller),
-                  iconColor: const Color(0xFF0891B2), // Cyan - same as weight events
-                );
-              case 3:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.restaurant,
-                  title: "Feeding",
-                  subtitle: "Today's total volume",
-                  trailing: _arrowWidget(const Color(0xFF059669)),
-                  onTap: () => _navigateToFeeding(controller),
-                  iconColor: const Color(0xFF059669), // Green - same as feeding/bottle events
-                );
-              case 4:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.bed,
-                  title: "Sleeping",
-                  subtitle: "Today's total time",
-                  trailing: _arrowWidget(const Color(0xFF6B46C1)),
-                  onTap: () => _navigateToSleeping(controller),
-                  iconColor: const Color(0xFF6B46C1), // Purple - same as sleeping events
-                );
-              case 5:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.baby_changing_station,
-                  title: "Diapers",
-                  subtitle: "Today's changes",
-                  trailing: _arrowWidget(const Color(0xFFDC2626)),
-                  onTap: () => _navigateToDiapers(controller),
-                  iconColor: const Color(0xFFDC2626), // Red - same as diaper events
-                );
-              case 6:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.health_and_safety,
-                  title: "Health diary",
-                  subtitle: "Medications & checkups",
-                  trailing: _arrowWidget(const Color(0xFF3B82F6)),
-                  onTap: () => _navigateToHealthDiary(controller),
-                  iconColor: const Color(0xFF3B82F6), // Blue - same as doctor events
-                );
-              case 7:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.calendar_view_month,
-                  title: "Monthly Overview",
-                  subtitle: "Active tracking days",
-                  trailing: _arrowWidget(const Color(0xFFDB2777)),
-                  onTap: () => _navigateToMonthlyOverview(controller),
-                  iconColor: const Color(0xFFDB2777), // Pink - same as activity events
-                );
-              case 8:
-                return _buildEnhancedStatsRow(
-                  icon: Icons.pie_chart,
-                  title: "Daily Results",
-                  subtitle: "Comprehensive analysis",
-                  trailing: _arrowWidget(const Color(0xFFF59E0B)),
-                  onTap: () => _navigateToDailyResults(controller),
-                  iconColor: const Color(0xFFF59E0B), // Amber - same as condition events
-                );
-              default:
-                return const SizedBox.shrink();
-            }
-          },
+          child: Column(
+            children: [
+              // Growth Metrics Section
+              _buildSectionHeader('Growth & Development'),
+              const SizedBox(height: AppSpacing.md),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                childAspectRatio: 1.4,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                children: [
+                  _buildHeadCircumferenceTile(controller),
+                  _buildHeightTile(controller),
+                  _buildWeightTile(controller),
+                  _buildHealthDiaryTile(controller),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Daily Activities Section
+              _buildSectionHeader('Daily Activities'),
+              const SizedBox(height: AppSpacing.md),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                childAspectRatio: 1.4,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                children: [
+                  _buildFeedingTile(controller),
+                  _buildSleepingTile(controller),
+                  _buildDiapersTile(controller),
+                  _buildDailyResultsTile(controller),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Analysis Section
+              _buildSectionHeader('Analysis'),
+              const SizedBox(height: AppSpacing.md),
+              _buildMonthlyOverviewTile(controller),
+
+              const SizedBox(height: AppSpacing.xl),
+            ],
+          ),
         );
       }),
     );
   }
+
+  // Section header
+  Widget _buildSectionHeader(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+
+  // Compact statistics tiles
+  Widget _buildCompactStatsTile({
+    required String title,
+    required String value,
+    String? unit,
+    required String subtitle,
+    required Color color,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF111217),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: color.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: color,
+                      size: 16,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.trending_up,
+                    color: color.withValues(alpha: 0.6),
+                    size: 14,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Title
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+
+              // Value
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                    ),
+                  ),
+                  if (unit != null) ...[
+                    const SizedBox(width: 2),
+                    Text(
+                      unit,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: color.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 2),
+
+              // Subtitle
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeadCircumferenceTile(StatsHomeController controller) {
+    return _buildCompactStatsTile(
+      title: 'Head Circumference',
+      value: controller.lastHeadCm.value?.toStringAsFixed(1) ?? '--',
+      unit: 'cm',
+      subtitle: 'Latest measurement',
+      color: const Color(0xFF0891B2),
+      icon: Icons.face,
+      onTap: () => _navigateToHeadCircumference(controller),
+    );
+  }
+
+  Widget _buildHeightTile(StatsHomeController controller) {
+    return _buildCompactStatsTile(
+      title: 'Height',
+      value: controller.lastHeightCm.value?.toStringAsFixed(1) ?? '--',
+      unit: 'cm',
+      subtitle: 'Latest measurement',
+      color: const Color(0xFF7C2D12),
+      icon: Icons.height,
+      onTap: () => _navigateToHeight(controller),
+    );
+  }
+
+  Widget _buildWeightTile(StatsHomeController controller) {
+    return _buildCompactStatsTile(
+      title: 'Weight',
+      value: controller.lastWeightKg.value?.toStringAsFixed(1) ?? '--',
+      unit: 'kg',
+      subtitle: 'Latest measurement',
+      color: const Color(0xFF0891B2),
+      icon: Icons.monitor_weight,
+      onTap: () => _navigateToWeight(controller),
+    );
+  }
+
+  Widget _buildHealthDiaryTile(StatsHomeController controller) {
+    return _buildCompactStatsTile(
+      title: 'Health Diary',
+      value: '${controller.monthlyActiveDays.value}',
+      unit: 'days',
+      subtitle: 'Active this month',
+      color: const Color(0xFF3B82F6),
+      icon: Icons.health_and_safety,
+      onTap: () => _navigateToHealthDiary(controller),
+    );
+  }
+
+  Widget _buildFeedingTile(StatsHomeController controller) {
+    return _buildCompactStatsTile(
+      title: 'Feeding',
+      value: '${controller.todayFeedVolumeMl.value.toInt()}',
+      unit: 'ml',
+      subtitle: 'Today\'s volume',
+      color: const Color(0xFF059669),
+      icon: Icons.restaurant,
+      onTap: () => _navigateToFeeding(controller),
+    );
+  }
+
+  Widget _buildSleepingTile(StatsHomeController controller) {
+    final hours = controller.todaySleepMinutes.value / 60;
+    return _buildCompactStatsTile(
+      title: 'Sleeping',
+      value: hours.toStringAsFixed(1),
+      unit: 'h',
+      subtitle: 'Today\'s total',
+      color: const Color(0xFF6B46C1),
+      icon: Icons.bed,
+      onTap: () => _navigateToSleeping(controller),
+    );
+  }
+
+  Widget _buildDiapersTile(StatsHomeController controller) {
+    final total = controller.todayWet.value + controller.todayPoop.value + controller.todayMixed.value;
+    return _buildCompactStatsTile(
+      title: 'Diapers',
+      value: '$total',
+      subtitle: 'Today\'s changes',
+      color: const Color(0xFFDC2626),
+      icon: Icons.baby_changing_station,
+      onTap: () => _navigateToDiapers(controller),
+    );
+  }
+
+  Widget _buildDailyResultsTile(StatsHomeController controller) {
+    return _buildCompactStatsTile(
+      title: 'Daily Results',
+      value: '${controller.monthlyActiveDays.value}',
+      subtitle: 'Analysis ready',
+      color: const Color(0xFFF59E0B),
+      icon: Icons.pie_chart,
+      onTap: () => _navigateToDailyResults(controller),
+    );
+  }
+
+  Widget _buildMonthlyOverviewTile(StatsHomeController controller) {
+    return SizedBox(
+      width: double.infinity,
+      child: _buildCompactStatsTile(
+        title: 'Monthly Overview',
+        value: '${controller.monthlyActiveDays.value}',
+        unit: 'days',
+        subtitle: 'Active tracking',
+        color: const Color(0xFFDB2777),
+        icon: Icons.calendar_view_month,
+        onTap: () => _navigateToMonthlyOverview(controller),
+      ),
+    );
+  }
+
+
 
   // Helper widgets
   Widget _buildNoChildHint() {
@@ -162,123 +363,7 @@ class StatisticsView extends StatelessWidget {
 
 
 
-  Widget _arrowWidget(Color color) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Icon(
-        Icons.chevron_right,
-        color: color.withValues(alpha: 0.8),
-        size: 20,
-      ),
-    );
-  }
 
-  // Enhanced UI Components
-  Widget _buildEnhancedStatsRow({
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    required Widget trailing,
-    required VoidCallback onTap,
-    required Color iconColor,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-           
-            boxShadow: [
-              BoxShadow(
-                color: iconColor.withValues(alpha: 0.1),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          iconColor.withValues(alpha: 0.2),
-                          iconColor.withValues(alpha: 0.1),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: iconColor.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: iconColor,
-                      size: 26,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withValues(alpha: 0.7),
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              trailing,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   // Navigation methods
   void _navigateToHeadCircumference(StatsHomeController controller) {
@@ -346,7 +431,7 @@ class StatisticsView extends StatelessWidget {
 
   void _navigateToSleeping(StatsHomeController controller) {
     if (controller.currentChildId.value != null) {
-      Get.to(() => SleepingView(childId: controller.currentChildId.value!));
+      Get.to(() => const LiveSleepingChartView());
     } else {
       Get.snackbar("Error", "No active child selected");
     }

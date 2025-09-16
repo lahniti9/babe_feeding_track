@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/colors.dart';
+import '../../../core/theme/text.dart';
 
 class MoreAvatar extends StatelessWidget {
   final VoidCallback onTap;
@@ -20,25 +22,24 @@ class MoreAvatar extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.grey[600]!,
+                color: AppColors.coral.withValues(alpha: 0.5),
                 width: 2,
                 style: BorderStyle.solid,
               ),
-              color: Colors.transparent,
+              color: AppColors.coral.withValues(alpha: 0.1),
             ),
-            child: const Icon(
-              Icons.add,
-              color: Colors.grey,
+            child: Icon(
+              Icons.add_rounded,
+              color: AppColors.coral,
               size: 32,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'More',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          Text(
+            'Add Child',
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.coral,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

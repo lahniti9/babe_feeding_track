@@ -9,6 +9,7 @@ import 'routes/app_routes.dart';
 import 'modules/children/services/children_store.dart';
 import 'modules/events/services/events_store.dart';
 import 'modules/events/services/repository_binding.dart';
+import 'modules/statistics/services/timezone_clock.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,8 @@ void main() async {
   // Initialize timezone data
   tz.initializeTimeZones();
 
-  // Initialize stores
+  // Initialize core services
+  Get.put(TimezoneClock.local(), permanent: true);
   Get.put(ChildrenStore());
   Get.put(EventsStore());
 

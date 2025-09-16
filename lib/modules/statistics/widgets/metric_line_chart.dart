@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 
-/// Modern line chart for growth metrics (Height/Weight/Head Circumference)
-/// Features: DateTime axis, trackball, annotations, smooth animations
+/// Premium line chart for growth metrics with touch interactions
+/// Features: DateTime axis, trackball, annotations, haptics, zoom/pan
 class MetricLineChart extends StatelessWidget {
   final List<MapEntry<DateTime, double>> points;
   final String yUnit; // 'cm', 'kg', etc.
   final String title;
   final Color color;
   final bool showLatestAnnotation;
+  final bool enableZoom;
+  final bool enablePan;
+  final Function(DateTime date, double value)? onPointTap;
+  final Function(DateTime date, double value)? onPointLongPress;
 
   const MetricLineChart({
     super.key,
@@ -19,6 +24,10 @@ class MetricLineChart extends StatelessWidget {
     required this.title,
     required this.color,
     this.showLatestAnnotation = true,
+    this.enableZoom = false,
+    this.enablePan = false,
+    this.onPointTap,
+    this.onPointLongPress,
   });
 
   @override
@@ -86,29 +95,49 @@ class MetricLineChart extends StatelessWidget {
                 ),
               ),
               
-              // Trackball for precise values
+              // Premium trackball with haptic feedback
               trackballBehavior: TrackballBehavior(
                 enable: true,
                 activationMode: ActivationMode.singleTap,
+                shouldAlwaysShow: false,
+                hideDelay: 3000,
                 tooltipSettings: InteractiveTooltip(
                   enable: true,
-                  color: color.withValues(alpha: 0.9),
+                  color: const Color(0xFF1F2937),
                   textStyle: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
                   ),
+                  borderColor: color,
+                  borderWidth: 2,
+                  borderRadius: 8,
+                  format: 'point.x: point.y $yUnit',
                 ),
                 lineColor: color.withValues(alpha: 0.8),
                 lineWidth: 2,
+                lineDashArray: const [4, 4],
                 markerSettings: TrackballMarkerSettings(
                   markerVisibility: TrackballVisibilityMode.visible,
                   color: color,
                   borderColor: Colors.white,
-                  borderWidth: 2,
-                  width: 8,
-                  height: 8,
+                  borderWidth: 3,
+                  width: 12,
+                  height: 12,
+                  shape: DataMarkerType.circle,
                 ),
+              ),
+
+              // Zoom and pan behavior
+              zoomPanBehavior: ZoomPanBehavior(
+                enablePinching: enableZoom,
+                enablePanning: enablePan,
+                enableDoubleTapZooming: enableZoom,
+                enableMouseWheelZooming: false,
+                enableSelectionZooming: false,
+                zoomMode: ZoomMode.x,
+                maximumZoomLevel: 0.8,
               ),
               
               // Data series
@@ -124,11 +153,22 @@ class MetricLineChart extends StatelessWidget {
                     color: color,
                     borderColor: Colors.white,
                     borderWidth: 2,
-                    width: 6,
-                    height: 6,
+                    width: 8,
+                    height: 8,
+                    shape: DataMarkerType.circle,
                   ),
                   animationDuration: 1000,
                   enableTooltip: true,
+                  onPointTap: onPointTap != null ? (pointInteractionDetails) {
+                    HapticFeedback.selectionClick();
+                    final point = points[pointInteractionDetails.pointIndex!];
+                    onPointTap!(point.key, point.value);
+                  } : null,
+                  onPointLongPress: onPointLongPress != null ? (pointInteractionDetails) {
+                    HapticFeedback.lightImpact();
+                    final point = points[pointInteractionDetails.pointIndex!];
+                    onPointLongPress!(point.key, point.value);
+                  } : null,
                 ),
               ],
               

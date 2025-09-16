@@ -7,7 +7,6 @@ import 'seg_filter.dart';
 class ChartScaffold extends StatelessWidget {
   final String title;
   final Widget body;
-  final bool showLock;
   final Widget? bottomFilter;
   final List<String>? filterOptions;
   final String? selectedFilter;
@@ -17,7 +16,6 @@ class ChartScaffold extends StatelessWidget {
     super.key,
     required this.title,
     required this.body,
-    this.showLock = false,
     this.bottomFilter,
     this.filterOptions,
     this.selectedFilter,
@@ -57,14 +55,7 @@ class ChartScaffold extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  if (showLock)
-                    Icon(
-                      Icons.lock_outline,
-                      color: AppColors.textSecondary,
-                      size: 20,
-                    )
-                  else
-                    const SizedBox(width: 20),
+                  const SizedBox(width: 20),
                 ],
               ),
             ),

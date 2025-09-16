@@ -166,12 +166,12 @@ class FeedingController extends GetxController {
 
   void openFullReport() {
     Get.snackbar(
-      'Premium Feature',
-      'Full feeding report is available with premium subscription',
-      backgroundColor: Colors.amber.withValues(alpha: 0.2),
-      colorText: Colors.amber,
+      'Full Report',
+      'Detailed feeding analysis and patterns',
+      backgroundColor: Colors.green.withValues(alpha: 0.2),
+      colorText: Colors.green,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
   }
 

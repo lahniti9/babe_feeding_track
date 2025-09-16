@@ -166,12 +166,7 @@ class HealthDiaryView extends StatelessWidget {
           icon: Icons.description,
           title: 'Report for the doctor',
           subtitle: 'Generate health report',
-          trailing: const Icon(
-            Icons.lock_outline,
-            color: Colors.grey,
-            size: 20,
-          ),
-          onTap: () => _showPremiumFeature(),
+          onTap: () => _generateHealthReport(),
         ),
       ],
     );
@@ -252,13 +247,14 @@ class HealthDiaryView extends StatelessWidget {
     );
   }
 
-  void _showPremiumFeature() {
+  void _generateHealthReport() {
     Get.snackbar(
-      'Premium Feature',
-      'Doctor reports are available with premium subscription',
-      backgroundColor: Colors.orange.withValues(alpha: 0.2),
-      colorText: Colors.orange,
+      'Health Report',
+      'Generating comprehensive health report for your doctor',
+      backgroundColor: Colors.blue.withValues(alpha: 0.2),
+      colorText: Colors.blue,
       snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
     );
   }
 }

@@ -78,14 +78,14 @@ class WeightController extends GetxController {
   }
 
   void openFullReport() {
-    // Show paywall or navigate to full report
+    // Navigate to full report - app is completely free
     Get.snackbar(
-      'Premium Feature',
-      'Full weight report is available with premium subscription',
-      backgroundColor: Colors.orange.withValues(alpha: 0.2),
-      colorText: Colors.orange,
+      'Full Report',
+      'Detailed weight analysis and trends',
+      backgroundColor: Colors.blue.withValues(alpha: 0.2),
+      colorText: Colors.blue,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
   }
 

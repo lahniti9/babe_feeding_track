@@ -152,12 +152,12 @@ class MonthlyOverviewController extends GetxController {
 
   void openFullReport() {
     Get.snackbar(
-      'Premium Feature',
-      'Full monthly report is available with premium subscription',
-      backgroundColor: Colors.green.withValues(alpha: 0.2),
-      colorText: Colors.green,
+      'Full Report',
+      'Detailed monthly overview and insights',
+      backgroundColor: Colors.teal.withValues(alpha: 0.2),
+      colorText: Colors.teal,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
   }
 }

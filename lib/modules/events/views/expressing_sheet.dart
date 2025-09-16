@@ -69,32 +69,10 @@ class ExpressingSheet extends StatelessWidget {
               // Complete button
               Expanded(
                 child: PrimaryPill(
-                  label: controller.timeText,
+                  label: 'Done',
                   icon: Icons.check,
                   onTap: controller.completeFlow,
                   enabled: controller.elapsed.value > 0,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.md),
-
-              // Bell button
-              GestureDetector(
-                onTap: () {
-                  // TODO: Implement reminder functionality
-                },
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E2E2E),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.notifications_outlined,
-                    color: Colors.white,
-                    size: 24,
-                  ),
                 ),
               ),
             ],
@@ -142,7 +120,7 @@ class ExpressingSheet extends StatelessWidget {
                     color: isSelected ? const Color(0xFF5B5B5B) : const Color(0xFF2E2E2E),
                     borderRadius: BorderRadius.circular(14),
                     border: isSelected
-                      ? Border.all(color: const Color(0xFF5B5B5B).withOpacity(0.5), width: 1)
+                      ? Border.all(color: const Color(0xFF5B5B5B).withValues(alpha: 0.5), width: 1)
                       : null,
                   ),
                   child: Text(
@@ -199,7 +177,7 @@ class ExpressingSheet extends StatelessWidget {
                     color: isSelected ? const Color(0xFF5B5B5B) : const Color(0xFF2E2E2E),
                     borderRadius: BorderRadius.circular(14),
                     border: isSelected
-                      ? Border.all(color: const Color(0xFF5B5B5B).withOpacity(0.5), width: 1)
+                      ? Border.all(color: const Color(0xFF5B5B5B).withValues(alpha: 0.5), width: 1)
                       : null,
                   ),
                   child: Text(

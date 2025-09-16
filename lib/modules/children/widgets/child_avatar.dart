@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/colors.dart';
+import '../../../core/theme/text.dart';
 import '../models/child_profile.dart';
 
 class ChildAvatar extends StatelessWidget {
@@ -29,9 +31,18 @@ class ChildAvatar extends StatelessWidget {
               shape: BoxShape.circle,
               border: active
                   ? Border.all(
-                      color: Colors.white,
+                      color: AppColors.coral,
                       width: 3,
                     )
+                  : null,
+              boxShadow: active
+                  ? [
+                      BoxShadow(
+                        color: AppColors.coral.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
                   : null,
             ),
             child: Container(
@@ -39,12 +50,12 @@ class ChildAvatar extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: active
                     ? Border.all(
-                        color: const Color(0xFF2A2A2A),
+                        color: Colors.white,
                         width: 2,
                       )
                     : null,
                 color: profile.gender == BabyGender.girl
-                    ? const Color(0xFFFF8266)
+                    ? AppColors.coral
                     : const Color(0xFF3AA3FF),
               ),
               child: profile.avatar != null
@@ -61,10 +72,9 @@ class ChildAvatar extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             profile.name,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            style: AppTextStyles.caption.copyWith(
+              color: active ? AppColors.coral : AppColors.textPrimary,
+              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

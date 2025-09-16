@@ -241,7 +241,6 @@ class EventsView extends StatelessWidget {
           comment: event.comment,
           showPlus: true,
         ),
-        onEdit: () => controller.edit(event),
         onRemove: () => controller.remove(event.id),
         child: SleepTimelineEntry(
           event: event,
@@ -260,7 +259,6 @@ class EventsView extends StatelessWidget {
           subtitle: _getCryEventSubtitle(event),
           showPlus: true,
         ),
-        onEdit: () => controller.edit(event),
         onRemove: () => controller.remove(event.id),
         child: CryTimelineEntry(
           event: event,
@@ -281,7 +279,6 @@ class EventsView extends StatelessWidget {
           comment: event.comment,
           showPlus: true,
         ),
-        onEdit: () => controller.edit(event),
         onRemove: () => controller.remove(event.id),
         child: FeedingTimelineEntry(
           event: event,
@@ -295,7 +292,6 @@ class EventsView extends StatelessWidget {
     } else if (event is EventModel) {
       return SwipeActions(
         model: event,
-        onEdit: () => controller.edit(event),
         onRemove: () => controller.remove(event.id),
         child: TimelineEntry(
           model: event,
@@ -320,7 +316,6 @@ class EventsView extends StatelessWidget {
         comment: event.comment,
         showPlus: true,
       ),
-      onEdit: () => controller.edit(event),
       onRemove: () => controller.remove(event.id),
       child: EventRecordTimelineEntry(
         event: event,

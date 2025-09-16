@@ -169,12 +169,12 @@ class SleepingController extends GetxController {
 
   void openFullReport() {
     Get.snackbar(
-      'Premium Feature',
-      'Full sleep report is available with premium subscription',
+      'Full Report',
+      'Detailed sleep analysis and patterns',
       backgroundColor: Colors.purple.withValues(alpha: 0.2),
       colorText: Colors.purple,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
   }
 
