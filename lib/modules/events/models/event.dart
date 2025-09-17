@@ -13,7 +13,6 @@ enum EventKind {
   food,
   weight,
   height,
-  headCircumference,
   medicine,
   temperature,
   doctor,
@@ -35,14 +34,12 @@ extension EventKindExtension on EventKind {
         return 'Diaper';
       case EventKind.condition:
         return 'Condition';
+      case EventKind.cry:
+        return 'Cry';
       case EventKind.weight:
         return 'Weight';
       case EventKind.height:
         return 'Height';
-      case EventKind.headCircumference:
-        return 'Head circumference';
-      case EventKind.cry:
-        return 'Cry';
       case EventKind.feeding:
         return 'Feeding';
       case EventKind.expressing:

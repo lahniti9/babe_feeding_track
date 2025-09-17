@@ -8,11 +8,6 @@ class StatsHomeController extends GetxController {
   String? get currentChildId => _childrenStore.activeId.value;
 
   // Navigation methods for each stats section
-  void navigateToHeadCircumference() {
-    if (currentChildId == null) return;
-    Get.toNamed('/stats/head-circumference', arguments: {'childId': currentChildId});
-  }
-
   void navigateToHeight() {
     if (currentChildId == null) return;
     Get.toNamed('/stats/height', arguments: {'childId': currentChildId});

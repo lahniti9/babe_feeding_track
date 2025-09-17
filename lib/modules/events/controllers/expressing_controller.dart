@@ -7,13 +7,40 @@ import '../services/events_store.dart';
 import '../views/expressing_volume_sheet.dart';
 import '../../children/services/children_store.dart';
 
+enum ExpressingSide { left, right, both }
+enum ExpressingMethod { manual, electric }
+
+extension ExpressingSideExtension on ExpressingSide {
+  String get displayName {
+    switch (this) {
+      case ExpressingSide.left:
+        return 'Left';
+      case ExpressingSide.right:
+        return 'Right';
+      case ExpressingSide.both:
+        return 'Both';
+    }
+  }
+}
+
+extension ExpressingMethodExtension on ExpressingMethod {
+  String get displayName {
+    switch (this) {
+      case ExpressingMethod.manual:
+        return 'Manual';
+      case ExpressingMethod.electric:
+        return 'Electric';
+    }
+  }
+}
+
 class ExpressingController extends GetxController with WidgetsBindingObserver {
   final time = DateTime.now().obs;
   final elapsed = 0.obs;
   final running = false.obs;
   
-  final side = 'both'.obs;
-  final method = 'electric'.obs;
+  final side = Rx<ExpressingSide>(ExpressingSide.both);
+  final method = Rx<ExpressingMethod>(ExpressingMethod.electric);
   
   // Volume step
   final volume = 0.obs;
@@ -53,12 +80,12 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
     running.value = false;
   }
 
-  void setSide(String newSide) {
-    side.value = newSide.toLowerCase();
+  void setSide(ExpressingSide newSide) {
+    side.value = newSide;
   }
 
-  void setMethod(String newMethod) {
-    method.value = newMethod.toLowerCase();
+  void setMethod(ExpressingMethod newMethod) {
+    method.value = newMethod;
   }
 
   void setTime(DateTime newTime) {
@@ -105,8 +132,8 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
 
     final data = {
       'seconds': elapsed.value,
-      'side': side.value,
-      'method': method.value,
+      'side': side.value.name,
+      'method': method.value.name,
       if (withVolume) 'volume': volume.value,
       if (withVolume) 'unit': unit.value,
     };

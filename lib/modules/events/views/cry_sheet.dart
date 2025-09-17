@@ -7,15 +7,24 @@ import '../../../core/theme/colors.dart';
 import '../controllers/cry_controller.dart';
 import '../models/cry_event.dart';
 import '../widgets/modal_shell.dart';
-import '../widgets/multi_select_chips.dart';
+import '../widgets/single_select_chips.dart';
 import '../widgets/primary_pill.dart';
 
 class CrySheet extends StatelessWidget {
-  const CrySheet({super.key});
+  final CryEvent? existingEvent;
+
+  const CrySheet({super.key, this.existingEvent});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(CryController());
+
+    // If we have an existing event, set up the controller for editing
+    if (existingEvent != null) {
+      controller.editEvent(existingEvent!);
+    } else {
+      controller.reset();
+    }
 
     return ModalShell(
       title: 'Cry',
@@ -48,71 +57,76 @@ class CrySheet extends StatelessWidget {
           _buildSection(
             icon: Icons.volume_up,
             title: 'SOUNDS',
-            child: MultiSelectChips<CrySound>(
+            child: SingleSelectChips<CrySound>(
               options: CrySound.values,
-              selectedSet: controller.sounds,
-              onTap: controller.toggleSound,
+              selected: controller.selectedSound,
+              onTap: controller.selectSound,
               getDisplayName: (sound) => sound.displayName,
+              accentColor: AppColors.coral,
             ),
           ),
 
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
 
           // Volume section
           _buildSection(
             icon: Icons.graphic_eq,
             title: 'VOLUME',
-            child: MultiSelectChips<CryVolume>(
+            child: SingleSelectChips<CryVolume>(
               options: CryVolume.values,
-              selectedSet: controller.volumes,
-              onTap: controller.toggleVolume,
+              selected: controller.selectedVolume,
+              onTap: controller.selectVolume,
               getDisplayName: (volume) => volume.displayName,
+              accentColor: AppColors.coral,
             ),
           ),
 
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
 
           // Rhythm section
           _buildSection(
             icon: Icons.waves,
             title: 'RHYTHM',
-            child: MultiSelectChips<CryRhythm>(
+            child: SingleSelectChips<CryRhythm>(
               options: CryRhythm.values,
-              selectedSet: controller.rhythms,
-              onTap: controller.toggleRhythm,
+              selected: controller.selectedRhythm,
+              onTap: controller.selectRhythm,
               getDisplayName: (rhythm) => rhythm.displayName,
+              accentColor: AppColors.coral,
             ),
           ),
 
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
 
           // Duration section
           _buildSection(
             icon: Icons.timer,
             title: 'DURATION',
-            child: MultiSelectChips<CryDuration>(
+            child: SingleSelectChips<CryDuration>(
               options: CryDuration.values,
-              selectedSet: controller.durations,
-              onTap: controller.toggleDuration,
+              selected: controller.selectedDuration,
+              onTap: controller.selectDuration,
               getDisplayName: (duration) => duration.displayName,
+              accentColor: AppColors.coral,
             ),
           ),
 
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xl),
 
           // Behaviour section
           _buildSection(
             icon: Icons.face,
             title: 'BEHAVIOUR',
-            child: MultiSelectChips<CryBehaviour>(
+            child: SingleSelectChips<CryBehaviour>(
               options: CryBehaviour.values,
-              selectedSet: controller.behaviours,
-              onTap: controller.toggleBehaviour,
+              selected: controller.selectedBehaviour,
+              onTap: controller.selectBehaviour,
               getDisplayName: (behaviour) => behaviour.displayName,
+              accentColor: AppColors.coral,
             ),
           ),
 
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.xxxl),
 
           // Done button
           PrimaryPill(

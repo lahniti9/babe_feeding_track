@@ -10,9 +10,14 @@ class BottleController extends GetxController {
   final volume = 0.0.obs; // in oz or ml
   final unit = 'oz'.obs;
 
+  // Edit mode
+  final isEditMode = false.obs;
+  String? editingEventId;
+
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
     final activeChildId = childrenStore.getValidActiveChildId();
+    final eventsStore = Get.find<EventsStore>();
 
     if (activeChildId == null) {
       Get.snackbar(
@@ -23,8 +28,8 @@ class BottleController extends GetxController {
       return;
     }
 
-    await Get.find<EventsStore>().add(EventRecord(
-      id: const Uuid().v4(),
+    final eventRecord = EventRecord(
+      id: editingEventId ?? const Uuid().v4(),
       childId: activeChildId,
       type: EventType.feedingBottle,
       startAt: time.value,
@@ -33,8 +38,18 @@ class BottleController extends GetxController {
         'volume': volume.value,
         'unit': unit.value,
       },
-    ));
+    );
+
+    if (isEditMode.value && editingEventId != null) {
+      // Update existing event
+      await eventsStore.update(eventRecord);
+    } else {
+      // Create new event
+      await eventsStore.add(eventRecord);
+    }
+
     Get.back();
+    _reset();
   }
 
   void setFeedType(String type) {
@@ -47,5 +62,28 @@ class BottleController extends GetxController {
 
   void setUnit(String newUnit) {
     unit.value = newUnit;
+  }
+
+  // Edit existing event
+  void editEvent(EventRecord event) {
+    isEditMode.value = true;
+    editingEventId = event.id;
+    time.value = event.startAt;
+
+    // Parse data from event
+    final data = event.data;
+    feedType.value = data['feedType'] ?? 'formula';
+    volume.value = (data['volume'] ?? 0.0).toDouble();
+    unit.value = data['unit'] ?? 'oz';
+  }
+
+  // Reset state
+  void _reset() {
+    isEditMode.value = false;
+    editingEventId = null;
+    time.value = DateTime.now();
+    feedType.value = 'formula';
+    volume.value = 0.0;
+    unit.value = 'oz';
   }
 }

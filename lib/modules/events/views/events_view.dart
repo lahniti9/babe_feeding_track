@@ -11,7 +11,6 @@ import '../widgets/timeline_separator.dart';
 import '../widgets/timeline_container.dart';
 import '../widgets/swipe_actions.dart';
 import '../widgets/sleep_timeline_entry.dart';
-import '../widgets/cry_timeline_entry.dart';
 import '../widgets/feeding_timeline_entry.dart';
 import '../widgets/event_record_timeline_entry.dart';
 import '../models/event.dart';
@@ -282,24 +281,22 @@ class EventsView extends StatelessWidget {
         ),
       );
     } else if (event is CryEvent) {
-      return SwipeActions(
-        model: EventModel(
-          id: event.id,
-          childId: event.childId,
-          kind: EventKind.cry,
-          time: event.time,
-          title: 'Cry',
-          subtitle: _getCryEventSubtitle(event),
-          comment: event.comment,
-          showPlus: true,
-        ),
-        onRemove: () => controller.remove(event.id),
-        child: CryTimelineEntry(
-          event: event,
-          onTap: () => controller.edit(event),
-          onPlusTap: () => _openCommentSheet(EventKind.cry, existingComment: event.comment),
-        ),
+      // Convert CryEvent to EventRecord for consistent design
+      final eventRecord = EventRecord(
+        id: event.id,
+        childId: event.childId,
+        type: EventType.cry,
+        startAt: event.time,
+        data: {
+          'sounds': event.sounds.map((s) => s.displayName).toList(),
+          'volume': event.volume.map((v) => v.displayName).toList(),
+          'rhythm': event.rhythm.map((r) => r.displayName).toList(),
+          'duration': event.duration.map((d) => d.displayName).toList(),
+          'behaviour': event.behaviour.map((b) => b.displayName).toList(),
+        },
+        comment: event.comment,
       );
+      return _buildEventRecordWidget(eventRecord, EventKind.cry, controller);
     } else if (event is BreastFeedingEvent) {
       return SwipeActions(
         model: EventModel(
@@ -324,12 +321,17 @@ class EventsView extends StatelessWidget {
       final eventKind = controller.getEventKindFromRecord(event);
       return _buildEventRecordWidget(event, eventKind, controller);
     } else if (event is EventModel) {
+      // Check if this event type should be non-clickable
+      final isNonClickable = event.kind == EventKind.bathing ||
+                            event.kind == EventKind.walking ||
+                            event.kind == EventKind.activity;
+
       return SwipeActions(
         model: event,
         onRemove: () => controller.remove(event.id),
         child: TimelineEntry(
           model: event,
-          onTap: () => controller.edit(event),
+          onTap: isNonClickable ? null : () => controller.edit(event),
           onPlusTap: () => _openCommentSheet(event.kind, existingComment: event.comment), // Always show plus button
         ),
       );
@@ -338,6 +340,11 @@ class EventsView extends StatelessWidget {
   }
 
   Widget _buildEventRecordWidget(EventRecord event, EventKind eventKind, EventsController controller) {
+    // Check if this event type should be non-clickable
+    final isNonClickable = event.type == EventType.bathing ||
+                          event.type == EventType.walking ||
+                          event.type == EventType.activity;
+
     return SwipeActions(
       model: EventModel(
         id: event.id,
@@ -353,7 +360,7 @@ class EventsView extends StatelessWidget {
       onRemove: () => controller.remove(event.id),
       child: EventRecordTimelineEntry(
         event: event,
-        onTap: () => controller.edit(event),
+        onTap: isNonClickable ? null : () => controller.edit(event),
         onPlusTap: () => _openCommentSheet(eventKind, existingComment: event.comment),
       ),
     );
@@ -410,10 +417,6 @@ class EventsView extends StatelessWidget {
         final valueCm = event.data['valueCm'] as num? ?? 0;
         final unit = event.data['unit'] as String? ?? 'cm';
         return 'Height • $valueCm $unit';
-      case EventType.headCircumference:
-        final valueCm = event.data['valueCm'] as num? ?? 0;
-        final unit = event.data['unit'] as String? ?? 'cm';
-        return 'Head circumference • $valueCm $unit';
       case EventType.medicine:
         final name = event.data['name'] as String? ?? 'Medicine';
         final dose = event.data['dose'] as num? ?? 0;
@@ -548,26 +551,6 @@ class EventsView extends StatelessWidget {
       return '$childName • $durationText';
     } catch (e) {
       return 'Baby • Sleep';
-    }
-  }
-
-  String _getCryEventSubtitle(CryEvent event) {
-    try {
-      final childrenStore = Get.find<ChildrenStore>();
-      final child = childrenStore.getChildById(event.childId);
-      final childName = child?.name ?? 'Baby';
-
-      // Get the first sound or volume descriptor if available
-      String descriptor = '';
-      if (event.sounds.isNotEmpty) {
-        descriptor = event.sounds.first.name;
-      } else if (event.volume.isNotEmpty) {
-        descriptor = event.volume.first.name;
-      }
-
-      return descriptor.isNotEmpty ? '$childName • $descriptor' : childName;
-    } catch (e) {
-      return 'Baby • Cry';
     }
   }
 

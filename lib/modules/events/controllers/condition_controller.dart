@@ -6,7 +6,7 @@ import '../../children/services/children_store.dart';
 
 class ConditionController extends GetxController {
   final time = DateTime.now().obs;
-  final moods = <String>{}.obs;
+  final mood = 'happy'.obs; // Changed from moods set to single mood
   final severity = 'mild'.obs;
   final note = ''.obs;
 
@@ -26,21 +26,22 @@ class ConditionController extends GetxController {
     // Parse data from event
     final data = event.data;
 
-    if (data['moods'] != null) {
-      moods.clear();
-      moods.addAll(List<String>.from(data['moods']));
+    // Handle both old format (moods array) and new format (single mood)
+    if (data['mood'] != null) {
+      mood.value = data['mood'];
+    } else if (data['moods'] != null && data['moods'].isNotEmpty) {
+      // For backward compatibility, take the first mood from the old format
+      mood.value = List<String>.from(data['moods']).first;
     }
 
     severity.value = data['severity'] ?? 'mild';
-    note.value = data['note'] ?? '';
+
+    // Load note from data or comment field (prefer comment field as it's the main storage)
+    note.value = event.comment ?? data['note'] ?? '';
   }
 
-  void toggleMood(String mood) {
-    if (moods.contains(mood.toLowerCase())) {
-      moods.remove(mood.toLowerCase());
-    } else {
-      moods.add(mood.toLowerCase());
-    }
+  void setMood(String newMood) {
+    mood.value = newMood.toLowerCase();
   }
 
   void setSeverity(String newSeverity) {
@@ -73,7 +74,7 @@ class ConditionController extends GetxController {
       type: EventType.condition,
       startAt: time.value,
       data: {
-        'moods': moods.toList(),
+        'mood': mood.value,
         'severity': severity.value,
         'note': noteText,
       },
@@ -89,14 +90,14 @@ class ConditionController extends GetxController {
     }
 
     Get.back();
-    _reset();
+    reset();
   }
 
-  void _reset() {
+  void reset() {
     isEditMode.value = false;
     editingEventId = null;
     time.value = DateTime.now();
-    moods.clear();
+    mood.value = 'happy';
     severity.value = 'mild';
     note.value = '';
   }

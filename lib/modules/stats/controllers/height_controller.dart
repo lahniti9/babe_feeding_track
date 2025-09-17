@@ -44,9 +44,11 @@ class HeightController extends GetxController {
 
       // Get height events from EventsStore
       final eventsStore = Get.find<EventsStore>();
-      final heightEvents = eventsStore.getByChild(childId)
+      final allEvents = eventsStore.getByChild(childId);
+      final heightEvents = allEvents
           .where((e) => e.type == EventType.height)
-          .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
+          .where((e) => e.startAt.isAfter(range.start.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(range.end.add(const Duration(microseconds: 1))))
           .toList();
 
       // Convert to Point objects for chart display
@@ -81,11 +83,9 @@ class HeightController extends GetxController {
       case 'Week':
         return StatsRange.lastWeek();
       case 'Month':
-        return StatsRange.last3Months();
-      case 'Year':
-        return StatsRange.lastYear();
+        return StatsRange.lastMonth();
       default:
-        return StatsRange.last3Months();
+        return StatsRange.lastMonth();
     }
   }
 }

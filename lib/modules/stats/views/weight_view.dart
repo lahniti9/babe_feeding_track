@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 import '../widgets/chart_scaffold.dart';
 import '../widgets/empty_chart.dart';
 import '../controllers/weight_controller.dart';
@@ -28,7 +29,7 @@ class WeightView extends StatelessWidget {
                       label: 'Weight',
                     )
                   : _buildChart(controller),
-          filterOptions: const ['Week', 'Month', 'Year'],
+          filterOptions: const ['Week', 'Month'],
           selectedFilter: controller.selectedPeriod.value,
           onFilterChanged: controller.changePeriod,
         ));
@@ -44,6 +45,10 @@ class WeightView extends StatelessWidget {
           majorGridLines: const MajorGridLines(width: 0),
           axisLine: const AxisLine(width: 0),
           labelStyle: const TextStyle(color: Colors.grey),
+          minimum: _getMinimumDate(controller),
+          maximum: DateTime.now(),
+          intervalType: _getIntervalType(controller),
+          dateFormat: _getDateFormat(controller),
         ),
         primaryYAxis: NumericAxis(
           title: AxisTitle(
@@ -87,5 +92,38 @@ class WeightView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  DateTime _getMinimumDate(WeightController controller) {
+    switch (controller.selectedPeriod.value) {
+      case 'Week':
+        return DateTime.now().subtract(const Duration(days: 7));
+      case 'Month':
+        return DateTime.now().subtract(const Duration(days: 30));
+      default:
+        return DateTime.now().subtract(const Duration(days: 30));
+    }
+  }
+
+  DateTimeIntervalType _getIntervalType(WeightController controller) {
+    switch (controller.selectedPeriod.value) {
+      case 'Week':
+        return DateTimeIntervalType.days;
+      case 'Month':
+        return DateTimeIntervalType.days;
+      default:
+        return DateTimeIntervalType.days;
+    }
+  }
+
+  DateFormat _getDateFormat(WeightController controller) {
+    switch (controller.selectedPeriod.value) {
+      case 'Week':
+        return DateFormat('MMM dd');
+      case 'Month':
+        return DateFormat('MMM dd');
+      default:
+        return DateFormat('MMM dd');
+    }
   }
 }

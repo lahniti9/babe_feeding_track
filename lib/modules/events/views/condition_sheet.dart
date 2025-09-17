@@ -13,6 +13,8 @@ class ConditionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure we get a fresh controller instance
+    Get.delete<ConditionController>();
     final controller = Get.put(ConditionController());
 
     // If editing an existing event, populate the controller
@@ -35,14 +37,13 @@ class ConditionSheet extends StatelessWidget {
           accentColor: const Color(0xFFEC4899),
         ),
 
-        EnhancedChipGroup(
+        EnhancedSegmentedControl(
           label: 'Mood',
           options: const ['Happy', 'Calm', 'Fussy', 'Sleepy', 'Alert'],
-          selected: controller.moods,
-          multiSelect: true,
+          selected: controller.mood.value.capitalize!,
+          onSelect: controller.setMood,
           icon: Icons.sentiment_satisfied_rounded,
           accentColor: const Color(0xFFEC4899),
-          onTap: controller.toggleMood,
         ),
 
         EnhancedSegmentedControl(

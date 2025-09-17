@@ -20,7 +20,8 @@ class StatsRange {
 
   factory StatsRange.lastMonth() {
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month - 1, now.day);
+    // Calculate 30 days ago to avoid month boundary issues
+    final start = now.subtract(const Duration(days: 30));
     return StatsRange(start: start, end: now, bucket: Bucket.day);
   }
 

@@ -95,6 +95,41 @@ class GenderRow extends StatelessWidget {
   }
 }
 
+// Nullable gender selector row for add child form
+class NullableGenderRow extends StatelessWidget {
+  final BabyGender? value;
+  final ValueChanged<BabyGender> onChanged;
+
+  const NullableGenderRow({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _GenderChip(
+            gender: BabyGender.girl,
+            selected: value == BabyGender.girl,
+            onTap: () => onChanged(BabyGender.girl),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _GenderChip(
+            gender: BabyGender.boy,
+            selected: value == BabyGender.boy,
+            onTap: () => onChanged(BabyGender.boy),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _GenderChip extends StatelessWidget {
   final BabyGender gender;
   final bool selected;

@@ -1,81 +1,63 @@
-import 'package:get/get.dart';
 import '../models/event_record.dart';
 import 'base/measure_event_controller.dart';
 
 class WeightController extends MeasureEventController {
-  final pounds = 0.obs;
-  final ounces = 0.obs;
-  final isMetric = false.obs;
-
   @override
   EventType get eventType => EventType.weight;
 
   @override
-  List<String> get unitOptions => ['lb/oz', 'kg'];
+  List<String> get unitOptions => ['kg'];
 
   @override
-  String get defaultUnit => 'lb/oz';
+  String get defaultUnit => 'kg';
 
   @override
   double? get minValue => 0.0;
 
   @override
-  double? get maxValue => isMetric.value ? 50.0 : 110.0;
+  double? get maxValue => 50.0;
 
   @override
-  int get decimals => isMetric.value ? 2 : 0;
+  int get decimals => 2;
 
   @override
   Map<String, dynamic> get additionalData {
-    if (isMetric.value) {
-      return {
-        'valueKg': value.value,
-        'displayUnit': 'kg',
-      };
-    } else {
-      return {
-        'valueKg': _poundsOuncesToKg(pounds.value, ounces.value),
-        'displayUnit': 'lb/oz',
-        'pounds': pounds.value,
-        'ounces': ounces.value,
-      };
-    }
+    return {
+      'valueKg': value.value,
+      'displayUnit': 'kg',
+    };
   }
 
-  @override
-  void setUnit(String newUnit) {
-    super.setUnit(newUnit);
-    isMetric.value = newUnit == 'kg';
-    if (isMetric.value) {
-      // Convert from lb/oz to kg
-      value.value = _poundsOuncesToKg(pounds.value, ounces.value);
-    } else {
-      // Convert from kg to lb/oz
-      final totalOunces = (value.value * 35.274).round();
-      pounds.value = totalOunces ~/ 16;
-      ounces.value = totalOunces % 16;
-    }
+  // Edit an existing weight event
+  void editEvent(EventRecord event) {
+    print('WeightController.editEvent called');
+    print('Event data: ${event.data}');
+
+    editingEventId = event.id;
+    time.value = event.startAt;
+
+    // Load data from event
+    final data = event.data;
+    value.value = data['value'] as double? ?? 0.0;
+    unit.value = data['unit'] as String? ?? 'kg';
+
+    // Load comment if available
+    comment.value = event.comment ?? '';
+
+    print('Setting value to: ${value.value} kg');
+    print('Setting comment to: "${comment.value}"');
   }
 
-  void setPounds(int newPounds) {
-    pounds.value = newPounds;
-    value.value = _poundsOuncesToKg(pounds.value, ounces.value);
-  }
-
-  void setOunces(int newOunces) {
-    ounces.value = newOunces;
-    value.value = _poundsOuncesToKg(pounds.value, ounces.value);
-  }
-
-  double _poundsOuncesToKg(int lbs, int oz) {
-    return (lbs * 16 + oz) * 0.0283495;
+  // Reset controller to default state
+  void reset() {
+    editingEventId = null;
+    time.value = DateTime.now();
+    value.value = 0.0;
+    unit.value = 'kg';
+    comment.value = '';
   }
 
   String get displayText {
-    if (isMetric.value) {
-      return '${value.value.toStringAsFixed(2)} kg';
-    } else {
-      return '${pounds.value} lb ${ounces.value} oz';
-    }
+    return '${value.value.toStringAsFixed(2)} kg';
   }
 }

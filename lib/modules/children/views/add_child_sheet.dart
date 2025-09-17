@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controllers/add_child_controller.dart';
-import '../models/child_profile.dart';
 import '../widgets/shared_components.dart';
 import '../utils/helpers.dart';
 
@@ -46,8 +46,8 @@ class AddChildSheet extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                GenderRow(
-                  value: c.gender.value ?? BabyGender.girl,
+                NullableGenderRow(
+                  value: c.gender.value,
                   onChanged: (g) => c.gender.value = g,
                 ),
               ],
@@ -101,17 +101,68 @@ class AddChildSheet extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            DateRow(
-              label: 'Date of birth',
-              value: c.birth.value,
-              onTap: () async {
-                final d = await pickDate(context, c.birth.value);
-                if (d != null) c.birth.value = d;
-              },
+            // Date of birth with required indicator
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Date of birth',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      '*',
+                      style: TextStyle(
+                        color: Color(0xFFFF6B6B),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final d = await pickDate(context, c.birth.value);
+                    if (d != null) c.birth.value = d;
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey[600]!),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          DateFormat('MMM d, yyyy').format(c.birth.value),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Icon(
+                          Icons.calendar_today,
+                          color: Colors.grey[400],
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             const Spacer(),
             PrimaryBottomButton(
-              label: c.canSubmit ? 'Add Child' : 'Please fill required fields',
+              label: c.submitButtonText,
               color: c.canSubmit ? const Color(0xFF10B981) : const Color(0xFF6B7280),
               enabled: c.canSubmit,
               onTap: c.submit,

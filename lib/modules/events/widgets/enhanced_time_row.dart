@@ -200,7 +200,7 @@ class EnhancedTimeRow extends StatelessWidget {
   }
 }
 
-class EnhancedCommentRow extends StatelessWidget {
+class EnhancedCommentRow extends StatefulWidget {
   final String label;
   final String value;
   final Function(String) onChanged;
@@ -219,8 +219,36 @@ class EnhancedCommentRow extends StatelessWidget {
   });
 
   @override
+  State<EnhancedCommentRow> createState() => _EnhancedCommentRowState();
+}
+
+class _EnhancedCommentRowState extends State<EnhancedCommentRow> {
+  late TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.value);
+  }
+
+  @override
+  void didUpdateWidget(EnhancedCommentRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update the text controller when the value changes
+    if (oldWidget.value != widget.value) {
+      _textController.text = widget.value;
+    }
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final effectiveAccentColor = accentColor ?? AppColors.coral;
+    final effectiveAccentColor = widget.accentColor ?? AppColors.coral;
     
     return Container(
       padding: const EdgeInsets.all(20),
@@ -245,7 +273,7 @@ class EnhancedCommentRow extends StatelessWidget {
           // Header with icon and label
           Row(
             children: [
-              if (icon != null) ...[
+              if (widget.icon != null) ...[
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -253,7 +281,7 @@ class EnhancedCommentRow extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
-                    icon,
+                    widget.icon,
                     color: effectiveAccentColor,
                     size: 20,
                   ),
@@ -262,7 +290,7 @@ class EnhancedCommentRow extends StatelessWidget {
               ],
               Expanded(
                 child: Text(
-                  label.toUpperCase(),
+                  widget.label.toUpperCase(),
                   style: AppTextStyles.captionMedium.copyWith(
                     color: effectiveAccentColor,
                     fontWeight: FontWeight.w700,
@@ -286,13 +314,14 @@ class EnhancedCommentRow extends StatelessWidget {
               ),
             ),
             child: TextField(
-              onChanged: onChanged,
+              controller: _textController,
+              onChanged: widget.onChanged,
               maxLines: 3,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.white,
               ),
               decoration: InputDecoration(
-                hintText: hint ?? 'Add a note...',
+                hintText: widget.hint ?? 'Add a note...',
                 hintStyle: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),

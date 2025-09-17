@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/stats_models.dart';
-import '../../events/services/events_store.dart';
+import '../../events/repositories/event_repository.dart';
 import '../../events/models/event_record.dart';
 import '../../events/controllers/events_controller.dart';
 import '../../events/models/breast_feeding_event.dart';
@@ -32,12 +32,13 @@ class FeedingController extends GetxController {
     super.onInit();
     _loadFeedingData();
 
-    // Listen to events store changes
+    // Listen to repository changes
     try {
-      final eventsStore = Get.find<EventsStore>();
-      eventsStore.items.listen((_) => _loadFeedingData());
+      final repository = Get.find<EventRepository>();
+      repository.watch(childId: childId, types: {EventType.feedingBottle, EventType.feedingBreast})
+          .listen((_) => _loadFeedingData());
     } catch (e) {
-      debugPrint('EventsStore not available: $e');
+      debugPrint('EventRepository not available: $e');
     }
 
     // Listen to events controller changes for breast feeding
@@ -49,13 +50,13 @@ class FeedingController extends GetxController {
     }
   }
 
-  void _loadFeedingData() {
+  Future<void> _loadFeedingData() async {
     _isLoading.value = true;
 
     try {
-      _loadVolumeData();
-      _loadCountData();
-      _loadBreastFeedingData();
+      await _loadVolumeData();
+      await _loadCountData();
+      await _loadBreastFeedingData();
     } catch (e) {
       debugPrint('Error loading feeding data: $e');
     } finally {
@@ -63,93 +64,115 @@ class FeedingController extends GetxController {
     }
   }
 
-  void _loadVolumeData() {
+  Future<void> _loadVolumeData() async {
     final range = _getRangeForPeriod(_volumePeriod.value);
 
-    // Get bottle feeding events from EventsStore
-    final eventsStore = Get.find<EventsStore>();
-    final bottleEvents = eventsStore.getByChild(childId)
-        .where((e) => e.type == EventType.feedingBottle)
-        .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
-        .toList();
+    try {
+      // Get bottle feeding events from Repository
+      final repository = Get.find<EventRepository>();
+      final bottleEvents = await repository.watch(
+        childId: childId,
+        types: {EventType.feedingBottle},
+        from: range.start,
+        to: range.end,
+      ).first;
 
-    // Group by day and sum volumes
-    final volumeByDay = <String, double>{};
-    for (final event in bottleEvents) {
-      final dayKey = _getDayKey(event.startAt, range);
-      final volume = event.data['volume'] as num? ?? 0;
-      volumeByDay[dayKey] = (volumeByDay[dayKey] ?? 0.0) + volume.toDouble();
+      // Group by day and sum volumes
+      final volumeByDay = <String, double>{};
+      for (final event in bottleEvents) {
+        final dayKey = _getDayKey(event.startAt, range);
+        final volume = event.data['volume'] as num? ?? 0;
+        volumeByDay[dayKey] = (volumeByDay[dayKey] ?? 0.0) + volume.toDouble();
+      }
+
+      _volumeData.value = volumeByDay.entries
+          .map((e) => Bar(e.key, e.value))
+          .toList()
+        ..sort((a, b) => a.x.toString().compareTo(b.x.toString()));
+    } catch (e) {
+      debugPrint('Error loading volume data: $e');
+      _volumeData.value = [];
     }
-
-    _volumeData.value = volumeByDay.entries
-        .map((e) => Bar(e.key, e.value))
-        .toList()
-      ..sort((a, b) => a.x.toString().compareTo(b.x.toString()));
   }
 
-  void _loadCountData() {
+  Future<void> _loadCountData() async {
     final range = _getRangeForPeriod(_countPeriod.value);
 
-    // Get bottle feeding events from EventsStore
-    final eventsStore = Get.find<EventsStore>();
-    final bottleEvents = eventsStore.getByChild(childId)
-        .where((e) => e.type == EventType.feedingBottle)
-        .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
-        .toList();
+    try {
+      // Get bottle feeding events from Repository
+      final repository = Get.find<EventRepository>();
+      final bottleEvents = await repository.watch(
+        childId: childId,
+        types: {EventType.feedingBottle},
+        from: range.start,
+        to: range.end,
+      ).first;
 
-    // Group by day and count events
-    final countByDay = <String, double>{};
-    for (final event in bottleEvents) {
-      final dayKey = _getDayKey(event.startAt, range);
-      countByDay[dayKey] = (countByDay[dayKey] ?? 0.0) + 1.0;
+      // Group by day and count events
+      final countByDay = <String, double>{};
+      for (final event in bottleEvents) {
+        final dayKey = _getDayKey(event.startAt, range);
+        countByDay[dayKey] = (countByDay[dayKey] ?? 0.0) + 1.0;
+      }
+
+      _countData.value = countByDay.entries
+          .map((e) => Bar(e.key, e.value))
+          .toList()
+        ..sort((a, b) => a.x.toString().compareTo(b.x.toString()));
+    } catch (e) {
+      debugPrint('Error loading count data: $e');
+      _countData.value = [];
     }
-
-    _countData.value = countByDay.entries
-        .map((e) => Bar(e.key, e.value))
-        .toList()
-      ..sort((a, b) => a.x.toString().compareTo(b.x.toString()));
   }
 
-  void _loadBreastFeedingData() {
+  Future<void> _loadBreastFeedingData() async {
     final range = StatsRange.currentMonth();
 
-    // Get breast feeding events from EventsStore
-    final eventsStore = Get.find<EventsStore>();
-    final breastEvents = eventsStore.getByChild(childId)
-        .where((e) => e.type == EventType.feedingBreast)
-        .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
-        .toList();
+    try {
+      // Get breast feeding events from Repository
+      final repository = Get.find<EventRepository>();
+      final breastEvents = await repository.watch(
+        childId: childId,
+        types: {EventType.feedingBreast},
+        from: range.start,
+        to: range.end,
+      ).first;
 
-    // Also get from EventsController for BreastFeedingEvent objects
-    final eventsController = Get.find<EventsController>();
-    final breastFeedingEvents = eventsController.events
-        .whereType<BreastFeedingEvent>()
-        .where((e) => e.childId == childId)
-        .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
-        .toList();
+      // Also get from EventsController for BreastFeedingEvent objects
+      final eventsController = Get.find<EventsController>();
+      final breastFeedingEvents = eventsController.events
+          .whereType<BreastFeedingEvent>()
+          .where((e) => e.childId == childId)
+          .where((e) => e.startAt.isAfter(range.start.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(range.end.add(const Duration(microseconds: 1))))
+          .toList();
 
-    // Count by side from EventRecord data
-    int leftCount = 0;
-    int rightCount = 0;
+      // Count by side from EventRecord data
+      int leftCount = 0;
+      int rightCount = 0;
 
-    for (final event in breastEvents) {
-      final side = event.data['side'] as String?;
-      if (side == 'left') leftCount++;
-      if (side == 'right') rightCount++;
-    }
+      for (final event in breastEvents) {
+        final side = event.data['side'] as String?;
+        if (side == 'left') leftCount++;
+        if (side == 'right') rightCount++;
+      }
 
-    // Count from BreastFeedingEvent objects (count sessions with left/right duration)
-    for (final event in breastFeedingEvents) {
-      if (event.left.inSeconds > 0) leftCount++;
-      if (event.right.inSeconds > 0) rightCount++;
-    }
+      // Count from BreastFeedingEvent objects (count sessions with left/right duration)
+      for (final event in breastFeedingEvents) {
+        if (event.left.inSeconds > 0) leftCount++;
+        if (event.right.inSeconds > 0) rightCount++;
+      }
 
-    if (leftCount > 0 || rightCount > 0) {
-      _breastFeedingData.value = [
-        Bar('Left', leftCount.toDouble()),
-        Bar('Right', rightCount.toDouble()),
-      ];
-    } else {
+      if (leftCount > 0 || rightCount > 0) {
+        _breastFeedingData.value = [
+          Bar('Left', leftCount.toDouble()),
+          Bar('Right', rightCount.toDouble()),
+        ];
+      } else {
+        _breastFeedingData.value = [];
+      }
+    } catch (e) {
+      debugPrint('Error loading breast feeding data: $e');
       _breastFeedingData.value = [];
     }
   }

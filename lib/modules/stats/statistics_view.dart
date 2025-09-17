@@ -4,14 +4,11 @@ import '../../core/theme/spacing.dart';
 import '../../core/widgets/bc_scaffold.dart';
 import '../statistics/controllers/stats_home_controller.dart';
 import '../statistics/views/live_sleeping_chart_view.dart';
-import 'views/head_circ_view.dart';
 import 'views/height_view.dart';
 import 'views/weight_view.dart';
-import 'views/health_diary_view.dart';
 import 'views/monthly_overview_view.dart';
 import 'views/feeding_view.dart';
 import 'views/diapers_view.dart';
-import 'views/daily_results_view.dart';
 
 class StatisticsView extends StatelessWidget {
   const StatisticsView({super.key});
@@ -42,10 +39,8 @@ class StatisticsView extends StatelessWidget {
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
                 children: [
-                  _buildHeadCircumferenceTile(controller),
                   _buildHeightTile(controller),
                   _buildWeightTile(controller),
-                  _buildHealthDiaryTile(controller),
                 ],
               ),
 
@@ -65,7 +60,6 @@ class StatisticsView extends StatelessWidget {
                   _buildFeedingTile(controller),
                   _buildSleepingTile(controller),
                   _buildDiapersTile(controller),
-                  _buildDailyResultsTile(controller),
                 ],
               ),
 
@@ -212,18 +206,6 @@ class StatisticsView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeadCircumferenceTile(StatsHomeController controller) {
-    return _buildCompactStatsTile(
-      title: 'Head Circumference',
-      value: controller.lastHeadCm.value?.toStringAsFixed(1) ?? '--',
-      unit: 'cm',
-      subtitle: 'Latest measurement',
-      color: const Color(0xFF0891B2),
-      icon: Icons.face,
-      onTap: () => _navigateToHeadCircumference(controller),
-    );
-  }
-
   Widget _buildHeightTile(StatsHomeController controller) {
     return _buildCompactStatsTile(
       title: 'Height',
@@ -245,18 +227,6 @@ class StatisticsView extends StatelessWidget {
       color: const Color(0xFF0891B2),
       icon: Icons.monitor_weight,
       onTap: () => _navigateToWeight(controller),
-    );
-  }
-
-  Widget _buildHealthDiaryTile(StatsHomeController controller) {
-    return _buildCompactStatsTile(
-      title: 'Health Diary',
-      value: '${controller.monthlyActiveDays.value}',
-      unit: 'days',
-      subtitle: 'Active this month',
-      color: const Color(0xFF3B82F6),
-      icon: Icons.health_and_safety,
-      onTap: () => _navigateToHealthDiary(controller),
     );
   }
 
@@ -294,17 +264,6 @@ class StatisticsView extends StatelessWidget {
       color: const Color(0xFFDC2626),
       icon: Icons.baby_changing_station,
       onTap: () => _navigateToDiapers(controller),
-    );
-  }
-
-  Widget _buildDailyResultsTile(StatsHomeController controller) {
-    return _buildCompactStatsTile(
-      title: 'Daily Results',
-      value: '${controller.monthlyActiveDays.value}',
-      subtitle: 'Analysis ready',
-      color: const Color(0xFFF59E0B),
-      icon: Icons.pie_chart,
-      onTap: () => _navigateToDailyResults(controller),
     );
   }
 
@@ -366,19 +325,6 @@ class StatisticsView extends StatelessWidget {
 
 
   // Navigation methods
-  void _navigateToHeadCircumference(StatsHomeController controller) {
-    if (controller.currentChildId.value != null) {
-      Get.to(() => HeadCircView(childId: controller.currentChildId.value!));
-    } else {
-      Get.snackbar(
-        "No Child Selected",
-        "Please add a child first or complete the onboarding process",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
-    }
-  }
-
   void _navigateToHeight(StatsHomeController controller) {
     if (controller.currentChildId.value != null) {
       Get.to(() => HeightView(childId: controller.currentChildId.value!));
@@ -402,14 +348,6 @@ class StatisticsView extends StatelessWidget {
         backgroundColor: Colors.orange,
         colorText: Colors.white,
       );
-    }
-  }
-
-  void _navigateToHealthDiary(StatsHomeController controller) {
-    if (controller.currentChildId.value != null) {
-      Get.to(() => HealthDiaryView(childId: controller.currentChildId.value!));
-    } else {
-      Get.snackbar("Error", "No active child selected");
     }
   }
 
@@ -445,11 +383,4 @@ class StatisticsView extends StatelessWidget {
     }
   }
 
-  void _navigateToDailyResults(StatsHomeController controller) {
-    if (controller.currentChildId.value != null) {
-      Get.to(() => DailyResultsView(childId: controller.currentChildId.value!));
-    } else {
-      Get.snackbar("Error", "No active child selected");
-    }
-  }
 }

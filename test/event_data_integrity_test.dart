@@ -103,7 +103,8 @@ void main() {
 
       // Test JSON deserialization
       final recreatedEvent = EventRecord.fromJson(json);
-      expect(recreatedEvent.id, event.id);
+      expect(recreatedEvent, isNotNull);
+      expect(recreatedEvent!.id, event.id);
       expect(recreatedEvent.childId, event.childId);
       expect(recreatedEvent.type, event.type);
       expect(recreatedEvent.data['kind'], event.data['kind']);

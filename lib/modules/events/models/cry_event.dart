@@ -57,6 +57,30 @@ class CryEvent {
     this.comment,
   });
 
+  CryEvent copyWith({
+    String? id,
+    String? childId,
+    DateTime? time,
+    Set<CrySound>? sounds,
+    Set<CryVolume>? volume,
+    Set<CryRhythm>? rhythm,
+    Set<CryDuration>? duration,
+    Set<CryBehaviour>? behaviour,
+    String? comment,
+  }) {
+    return CryEvent(
+      id: id ?? this.id,
+      childId: childId ?? this.childId,
+      time: time ?? this.time,
+      sounds: sounds ?? this.sounds,
+      volume: volume ?? this.volume,
+      rhythm: rhythm ?? this.rhythm,
+      duration: duration ?? this.duration,
+      behaviour: behaviour ?? this.behaviour,
+      comment: comment ?? this.comment,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'childId': childId,
@@ -79,28 +103,6 @@ class CryEvent {
     duration: (json['duration'] as List).map((e) => CryDuration.values.byName(e)).toSet(),
     behaviour: (json['behaviour'] as List).map((e) => CryBehaviour.values.byName(e)).toSet(),
     comment: json['comment'],
-  );
-
-  CryEvent copyWith({
-    String? id,
-    String? childId,
-    DateTime? time,
-    Set<CrySound>? sounds,
-    Set<CryVolume>? volume,
-    Set<CryRhythm>? rhythm,
-    Set<CryDuration>? duration,
-    Set<CryBehaviour>? behaviour,
-    String? comment,
-  }) => CryEvent(
-    id: id ?? this.id,
-    childId: childId ?? this.childId,
-    time: time ?? this.time,
-    sounds: sounds ?? this.sounds,
-    volume: volume ?? this.volume,
-    rhythm: rhythm ?? this.rhythm,
-    duration: duration ?? this.duration,
-    behaviour: behaviour ?? this.behaviour,
-    comment: comment ?? this.comment,
   );
 }
 

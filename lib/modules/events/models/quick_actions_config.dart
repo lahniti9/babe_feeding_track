@@ -46,17 +46,17 @@ const quickActions = <QuickAction>[
   ),
 
   QuickAction(
-    kind: EventKind.condition, 
-    label: 'Condition', 
-    icon: Icons.emoji_emotions_outlined, 
-    bgColor: _teal, 
+    kind: EventKind.condition,
+    label: 'Condition',
+    icon: Icons.emoji_emotions_outlined,
+    bgColor: _teal,
     roles: allRoles
   ),
   QuickAction(
     kind: EventKind.cry,
     label: 'Cry',
-    icon: Icons.sick_outlined,
-    bgColor: _teal,
+    icon: Icons.sentiment_very_dissatisfied,
+    bgColor: _coral,
     roles: allRoles
   ),
   QuickAction(
@@ -96,17 +96,10 @@ const quickActions = <QuickAction>[
     roles: allRoles
   ),
   QuickAction(
-    kind: EventKind.height, 
-    label: 'Height', 
-    icon: Icons.straighten, 
-    bgColor: _blue, 
-    roles: allRoles
-  ),
-  QuickAction(
-    kind: EventKind.headCircumference, 
-    label: 'Head circumf…', 
-    icon: Icons.child_care, 
-    bgColor: _blue, 
+    kind: EventKind.height,
+    label: 'Height',
+    icon: Icons.straighten,
+    bgColor: _blue,
     roles: allRoles
   ),
 

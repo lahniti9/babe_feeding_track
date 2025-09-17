@@ -8,7 +8,6 @@ enum EventType {
   walking,
   weight,
   height,
-  headCircumference,
   milestone,
   note,
 }
@@ -55,8 +54,6 @@ class Event {
         return 'Weight';
       case EventType.height:
         return 'Height';
-      case EventType.headCircumference:
-        return 'Head Circumference';
       case EventType.milestone:
         return 'Milestone';
       case EventType.note:
@@ -85,8 +82,6 @@ class Event {
         return 'monitor_weight';
       case EventType.height:
         return 'height';
-      case EventType.headCircumference:
-        return 'face';
       case EventType.milestone:
         return 'star';
       case EventType.note:

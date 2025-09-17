@@ -161,7 +161,8 @@ void main() {
       expect(json['data']['temperature'], equals('warm'));
       
       final recreatedEvent = EventRecord.fromJson(json);
-      expect(recreatedEvent.id, equals(testEvent.id));
+      expect(recreatedEvent, isNotNull);
+      expect(recreatedEvent!.id, equals(testEvent.id));
       expect(recreatedEvent.childId, equals(testEvent.childId));
       expect(recreatedEvent.type, equals(testEvent.type));
       expect(recreatedEvent.data['volume'], equals(120));

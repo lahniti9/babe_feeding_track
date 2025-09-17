@@ -148,7 +148,6 @@ class ExpressingVolumeSheet extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () {
                     Get.back(result: controller.volume.value);
-                    controller.save(withVolume: true);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),

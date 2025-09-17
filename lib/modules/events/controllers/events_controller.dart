@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -50,8 +51,8 @@ class EventsController extends GetxController {
     _eventsStore = Get.find<EventsStore>();
     _loadEvents();
 
-    // Listen to EventsStore changes
-    ever(_eventsStore.items, (_) => _loadEvents());
+    // Listen to EventsStore changes with debouncing to prevent infinite loops
+    _setupEventStoreListener();
 
     // Clean up orphaned events and check data consistency on initialization
     _cleanupOrphanedEvents();
@@ -105,7 +106,6 @@ class EventsController extends GetxController {
   EventKind _getEventKind(dynamic event) {
     if (event is EventModel) return event.kind;
     if (event is SleepEvent) return EventKind.sleeping;
-    if (event is CryEvent) return EventKind.cry;
     if (event is BreastFeedingEvent) return EventKind.feeding;
     if (event is EventRecord) {
       // Map EventRecord types to EventKind
@@ -142,8 +142,6 @@ class EventsController extends GetxController {
           return EventKind.weight;
         case EventType.height:
           return EventKind.height;
-        case EventType.headCircumference:
-          return EventKind.headCircumference;
         case EventType.expressing:
           return EventKind.expressing;
         case EventType.spitUp:
@@ -198,6 +196,29 @@ class EventsController extends GetxController {
   int getTodayEventCount() {
     final todayEvents = groupedEvents['Today'] ?? [];
     return todayEvents.length;
+  }
+
+  // Setup EventsStore listener with debouncing
+  void _setupEventStoreListener() {
+    Timer? debounceTimer;
+
+    ever(_eventsStore.items, (_) {
+      // Cancel previous timer if it exists
+      debounceTimer?.cancel();
+
+      // Set a new timer with a small delay
+      debounceTimer = Timer(const Duration(milliseconds: 50), () {
+        _loadEvents();
+        events.refresh();
+      });
+    });
+  }
+
+  // Refresh events from all sources
+  void refreshEvents() {
+    _loadEvents();
+    // Force reactive update
+    events.refresh();
   }
 
   // Load events from storage
@@ -329,6 +350,16 @@ class EventsController extends GetxController {
     _saveEvents();
   }
 
+  // Update cry event
+  void updateCryEvent(CryEvent updatedEvent) {
+    final idx = events.indexWhere((e) => e is CryEvent && e.id == updatedEvent.id);
+    if (idx != -1) {
+      events[idx] = updatedEvent;
+      _saveEvents();
+      events.refresh();
+    }
+  }
+
   // Add feeding event
   void addFeedingEvent(BreastFeedingEvent feedingEvent) {
     final newEvents = <dynamic>[feedingEvent, ...events];
@@ -340,7 +371,7 @@ class EventsController extends GetxController {
   // Remove event by id with confirmation
   void remove(String id, {bool skipConfirmation = false}) {
     if (skipConfirmation) {
-      _performRemove(id, showSuccessMessage: false);
+      _performRemove(id);
       return;
     }
 
@@ -379,7 +410,7 @@ class EventsController extends GetxController {
   }
 
   // Perform the actual removal
-  void _performRemove(String id, {bool showSuccessMessage = true}) {
+  void _performRemove(String id) {
     // Remove from legacy events list
     events.removeWhere((e) =>
       (e is EventModel && e.id == id) ||
@@ -401,18 +432,6 @@ class EventsController extends GetxController {
     }
 
     _saveEvents();
-
-    // Show success message only if requested and not in test mode
-    if (showSuccessMessage && Get.context != null) {
-      Get.snackbar(
-        'Event Deleted',
-        'The event has been successfully deleted.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.success.withValues(alpha: 0.8),
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-      );
-    }
   }
 
   // Edit event (opens appropriate sheet)
@@ -428,19 +447,46 @@ class EventsController extends GetxController {
     }
 
     if (event is CryEvent) {
-      // For cry events, open the cry sheet
-      EventRouter.openEventSheet(EventType.cry);
+      // Convert CryEvent to EventRecord and use EventRouter for consistent editing
+      final eventRecord = EventRecord(
+        id: event.id,
+        childId: event.childId,
+        type: EventType.cry,
+        startAt: event.time,
+        data: {
+          'sounds': event.sounds.map((s) => s.displayName).toList(),
+          'volume': event.volume.map((v) => v.displayName).toList(),
+          'rhythm': event.rhythm.map((r) => r.displayName).toList(),
+          'duration': event.duration.map((d) => d.displayName).toList(),
+          'behaviour': event.behaviour.map((b) => b.displayName).toList(),
+        },
+        comment: event.comment,
+      );
+      EventRouter.openEventSheet(EventType.cry, existingEvent: eventRecord);
       return;
     }
 
     if (event is BreastFeedingEvent) {
-      // For breast feeding events, open the feeding sheet
-      EventRouter.openEventSheet(EventType.feedingBreast);
+      // Feeding events are not editable - do nothing when clicked
       return;
     }
 
     if (event is EventRecord) {
-      // For EventRecord, use EventRouter to open the appropriate sheet with existing data
+      // Check if this is an expressing event - they are not editable
+      if (event.type == EventType.expressing) {
+        // Expressing events are not editable - do nothing when clicked
+        return;
+      }
+
+      // Check if this is a bathing, walking, or activity event - they are not editable
+      if (event.type == EventType.bathing ||
+          event.type == EventType.walking ||
+          event.type == EventType.activity) {
+        // Bathing, walking, and activity events are not editable - do nothing when clicked
+        return;
+      }
+
+      // For other EventRecord types, use EventRouter to open the appropriate sheet with existing data
       EventRouter.openEventSheet(event.type, existingEvent: event);
       return;
     }
@@ -456,7 +502,9 @@ class EventsController extends GetxController {
           );
           break;
         case EventKind.bedtimeRoutine:
-          Get.find<BedtimeRoutineController>().editEvent(event);
+          // Ensure controller exists and set it up for editing
+          final controller = Get.put(BedtimeRoutineController());
+          controller.editEvent(event);
           Get.bottomSheet(
             const BedtimeRoutineView(),
             isScrollControlled: true,
@@ -464,15 +512,14 @@ class EventsController extends GetxController {
           );
           break;
         case EventKind.bottle:
-          Get.find<BottleEntryController>().editEvent(event);
+          // Ensure controller exists and set it up for editing
+          final controller = Get.put(BottleEntryController());
+          controller.editEvent(event);
           Get.bottomSheet(
             const BottleEntryView(),
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
           );
-          break;
-        case EventKind.cry:
-          EventRouter.openEventSheet(EventType.cry);
           break;
         case EventKind.feeding:
           EventRouter.openEventSheet(EventType.feedingBreast);
@@ -482,6 +529,9 @@ class EventsController extends GetxController {
           break;
         case EventKind.condition:
           EventRouter.openEventSheet(EventType.condition);
+          break;
+        case EventKind.cry:
+          EventRouter.openEventSheet(EventType.cry);
           break;
         case EventKind.expressing:
           EventRouter.openEventSheet(EventType.expressing);
@@ -498,9 +548,6 @@ class EventsController extends GetxController {
         case EventKind.height:
           EventRouter.openEventSheet(EventType.height);
           break;
-        case EventKind.headCircumference:
-          EventRouter.openEventSheet(EventType.headCircumference);
-          break;
         case EventKind.medicine:
           EventRouter.openEventSheet(EventType.medicine);
           break;
@@ -511,13 +558,13 @@ class EventsController extends GetxController {
           EventRouter.openEventSheet(EventType.doctor);
           break;
         case EventKind.bathing:
-          EventRouter.openEventSheet(EventType.bathing);
+          // Bathing events are not editable - do nothing when clicked
           break;
         case EventKind.walking:
-          EventRouter.openEventSheet(EventType.walking);
+          // Walking events are not editable - do nothing when clicked
           break;
         case EventKind.activity:
-          EventRouter.openEventSheet(EventType.activity);
+          // Activity events are not editable - do nothing when clicked
           break;
       }
     }
@@ -636,7 +683,9 @@ class EventsController extends GetxController {
         );
         break;
       case EventKind.bedtimeRoutine:
-        Get.put(BedtimeRoutineController());
+        // Create a fresh controller for new bedtime routine
+        final controller = Get.put(BedtimeRoutineController());
+        controller.reset(); // Ensure it's in create mode, not edit mode
         Get.bottomSheet(
           const BedtimeRoutineView(),
           isScrollControlled: true,
@@ -676,9 +725,6 @@ class EventsController extends GetxController {
         break;
       case EventKind.height:
         EventRouter.openEventSheet(EventType.height);
-        break;
-      case EventKind.headCircumference:
-        EventRouter.openEventSheet(EventType.headCircumference);
         break;
       case EventKind.medicine:
         EventRouter.openEventSheet(EventType.medicine);

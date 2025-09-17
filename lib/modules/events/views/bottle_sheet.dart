@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/bottle_controller.dart';
+import '../models/event_record.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
 import '../widgets/number_row.dart';
 
 class BottleSheet extends StatelessWidget {
-  const BottleSheet({super.key});
+  final EventRecord? existingEvent;
+
+  const BottleSheet({super.key, this.existingEvent});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(BottleController());
+
+    // If editing an existing event, populate the controller
+    if (existingEvent != null) {
+      controller.editEvent(existingEvent!);
+    }
 
     return Obx(() => EventSheet(
       title: 'Bottle',

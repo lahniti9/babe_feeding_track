@@ -42,30 +42,53 @@ class WeightController extends GetxController {
       // Get range based on selected period
       final range = _getRangeForPeriod(_selectedPeriod.value);
 
-      // Get weight events from EventsStore
-      final eventsStore = Get.find<EventsStore>();
-      final weightEvents = eventsStore.getByChild(childId)
-          .where((e) => e.type == EventType.weight)
-          .where((e) => e.startAt.isAfter(range.start) && e.startAt.isBefore(range.end))
-          .toList();
-
-      // Convert to Point objects for chart display
-      final measurements = weightEvents.map((e) {
-        final valueKg = e.data['valueKg'] as num? ?? 0;
-        // Convert kg to grams for consistency with chart expectations
-        return Point(e.startAt, valueKg.toDouble() * 1000);
-      }).toList();
-
-      // Sort by date
-      measurements.sort((a, b) => a.x.compareTo(b.x));
-      _measurements.value = measurements;
+      // Use EventsStore directly since it's working reliably
+      _loadFromEventsStore(range);
 
     } catch (e) {
-      debugPrint('Error loading weight measurements: $e');
+      debugPrint('Error setting up weight measurements: $e');
       _measurements.value = [];
-    } finally {
       _isLoading.value = false;
     }
+  }
+
+  void _loadFromEventsStore(StatsRange range) {
+    try {
+      final eventsStore = Get.find<EventsStore>();
+
+      final allEvents = eventsStore.getByChild(childId);
+      final weightEvents = allEvents
+          .where((e) => e.type == EventType.weight)
+          .where((e) => e.startAt.isAfter(range.start.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(range.end.add(const Duration(microseconds: 1))))
+          .toList();
+
+      _processWeightEvents(weightEvents);
+    } catch (e) {
+      debugPrint('EventsStore failed: $e');
+      _measurements.value = [];
+      _isLoading.value = false;
+    }
+  }
+
+  void _processWeightEvents(List<EventRecord> weightEvents) {
+    // Convert to Point objects for chart display
+    final measurements = <Point>[];
+    for (final event in weightEvents) {
+      // Try multiple possible keys for weight value
+      final valueKg = (event.data['valueKg'] as num?) ??
+                     (event.data['value'] as num?) ?? 0;
+
+      if (valueKg > 0) {
+        // Convert kg to grams for consistency with chart expectations
+        measurements.add(Point(event.startAt, valueKg.toDouble() * 1000));
+      }
+    }
+
+    // Sort by date
+    measurements.sort((a, b) => a.x.compareTo(b.x));
+    _measurements.value = measurements;
+    _isLoading.value = false;
   }
 
   void changePeriod(String period) {
@@ -94,11 +117,9 @@ class WeightController extends GetxController {
       case 'Week':
         return StatsRange.lastWeek();
       case 'Month':
-        return StatsRange.last3Months();
-      case 'Year':
-        return StatsRange.lastYear();
+        return StatsRange.lastMonth();
       default:
-        return StatsRange.last3Months();
+        return StatsRange.lastMonth();
     }
   }
 }

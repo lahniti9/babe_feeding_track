@@ -10,6 +10,9 @@ abstract class MeasureEventController extends GetxController {
   final unit = ''.obs;
   final comment = ''.obs;
 
+  // Track if we're editing an existing event
+  String? editingEventId;
+
   // Abstract properties to be implemented by subclasses
   EventType get eventType;
   List<String> get unitOptions;
@@ -46,6 +49,7 @@ abstract class MeasureEventController extends GetxController {
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
     final activeChildId = childrenStore.getValidActiveChildId();
+    final eventsStore = Get.find<EventsStore>();
 
     if (activeChildId == null) {
       Get.snackbar(
@@ -65,14 +69,22 @@ abstract class MeasureEventController extends GetxController {
     // Add comment if not empty
     final commentText = comment.value.trim();
 
-    await Get.find<EventsStore>().add(EventRecord(
-      id: const Uuid().v4(),
+    final eventRecord = EventRecord(
+      id: editingEventId ?? const Uuid().v4(),
       childId: activeChildId,
       type: eventType,
       startAt: time.value,
       data: data,
       comment: commentText.isEmpty ? null : commentText,
-    ));
+    );
+
+    if (editingEventId != null) {
+      // Update existing event
+      await eventsStore.update(eventRecord);
+    } else {
+      // Create new event
+      await eventsStore.add(eventRecord);
+    }
 
     Get.back();
   }

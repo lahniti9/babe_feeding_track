@@ -267,8 +267,6 @@ class EventRecordTimelineEntry extends StatelessWidget {
         return 'Weight measurement';
       case EventType.height:
         return 'Height measurement';
-      case EventType.headCircumference:
-        return 'Head circumference';
       case EventType.expressing:
         return 'Breast milk expressing';
       case EventType.food:
@@ -321,9 +319,18 @@ class EventRecordTimelineEntry extends StatelessWidget {
         break;
 
       case EventType.cry:
+        final sounds = event.data['sounds'] as List? ?? [];
+        final volume = event.data['volume'] as List? ?? [];
         final rhythm = event.data['rhythm'] as List? ?? [];
         final duration = event.data['duration'] as List? ?? [];
         final behaviour = event.data['behaviour'] as List? ?? [];
+
+        if (sounds.isNotEmpty) {
+          details.add('Sound: ${sounds.join(', ').toLowerCase()}');
+        }
+        if (volume.isNotEmpty) {
+          details.add('Volume: ${volume.join(', ').toLowerCase()}');
+        }
         if (rhythm.isNotEmpty) {
           details.add('Rhythm: ${rhythm.join(', ').toLowerCase()}');
         }
@@ -357,19 +364,24 @@ class EventRecordTimelineEntry extends StatelessWidget {
           details.add('Consistency: ${consistency.join(', ').toLowerCase()}');
         }
         break;
-        
+
+
       case EventType.condition:
+        // Handle both old format (moods array) and new format (single mood)
+        final mood = event.data['mood'] as String? ?? '';
         final moods = event.data['moods'] as List? ?? [];
         final severity = event.data['severity'] as String? ?? '';
-        final note = event.data['note'] as String? ?? '';
-        if (moods.isNotEmpty) {
-          details.add('Moods: ${moods.join(', ').toLowerCase()}');
+
+        // Display mood (prefer new single mood format)
+        if (mood.isNotEmpty) {
+          details.add('Mood: ${mood.toLowerCase()}');
+        } else if (moods.isNotEmpty) {
+          // Backward compatibility for old format
+          details.add('Mood: ${moods.first.toString().toLowerCase()}');
         }
+
         if (severity.isNotEmpty) {
           details.add('Severity: $severity');
-        }
-        if (note.isNotEmpty) {
-          details.add('Note: $note');
         }
         break;
         
@@ -387,10 +399,10 @@ class EventRecordTimelineEntry extends StatelessWidget {
         
       case EventType.temperature:
         final value = event.data['value'] as num? ?? 0;
-        final unit = event.data['unit'] as String? ?? '°F';
+        final unit = event.data['unit'] as String? ?? '°C';
         final method = event.data['method'] as List? ?? [];
         final condition = event.data['condition'] as List? ?? [];
-        details.add('Temperature: $value$unit');
+        details.add('Temperature: ${value.toStringAsFixed(1)}$unit');
         if (method.isNotEmpty) {
           details.add('Method: ${method.join(', ').toLowerCase()}');
         }
@@ -414,25 +426,18 @@ class EventRecordTimelineEntry extends StatelessWidget {
       case EventType.height:
         final valueCm = event.data['valueCm'] as num? ?? 0;
         final unit = event.data['unit'] as String? ?? 'cm';
-        details.add('Height: $valueCm $unit');
-        break;
-        
-      case EventType.headCircumference:
-        final valueCm = event.data['valueCm'] as num? ?? 0;
-        final unit = event.data['unit'] as String? ?? 'cm';
-        final display = event.data['display'] as Map<String, dynamic>? ?? {};
+        final display = event.data['display'] as Map<String, dynamic>?;
 
-        if (display.isNotEmpty) {
-          final cm = display['cm'] as num? ?? 0;
-          final inches = display['in'] as num? ?? 0;
-          if (unit == 'cm') {
-            details.add('Circumference: ${cm.toStringAsFixed(1)} cm');
-          } else {
-            details.add('Circumference: ${inches.toStringAsFixed(1)} in');
-          }
+        String displayText;
+        if (unit == 'cm') {
+          final cmValue = display?['cm'] as num? ?? valueCm;
+          displayText = '${cmValue.toStringAsFixed(1)} cm';
         } else {
-          details.add('Circumference: $valueCm $unit');
+          final inValue = display?['in'] as num? ?? (valueCm / 2.54);
+          displayText = '${inValue.toStringAsFixed(1)} in';
         }
+
+        details.add('Height: $displayText');
         break;
 
       case EventType.expressing:
@@ -573,7 +578,6 @@ class EventRecordTimelineEntry extends StatelessWidget {
         return const Color(0xFFEF4444);
       case EventType.weight:
       case EventType.height:
-      case EventType.headCircumference:
         return const Color(0xFF0891B2);
       case EventType.expressing:
         return const Color(0xFF8B5CF6);
@@ -616,8 +620,6 @@ class EventRecordTimelineEntry extends StatelessWidget {
         return Icons.scale;
       case EventType.height:
         return Icons.height;
-      case EventType.headCircumference:
-        return Icons.circle_outlined;
       case EventType.expressing:
         return Icons.water_drop;
       case EventType.food:

@@ -7,8 +7,7 @@ I have updated the statistics screen to use the **exact same colors** as the eve
 ## 🎯 **Color Mapping from Events Screen**
 
 ### **Growth & Development**
-- **🔵 Head Circumference**: `Color(0xFF0891B2)` - Cyan (same as headCircumference events)
-- **🟤 Height**: `Color(0xFF7C2D12)` - Brown (same as height events)  
+- **🟤 Height**: `Color(0xFF7C2D12)` - Brown (same as height events)
 - **🔵 Weight**: `Color(0xFF0891B2)` - Cyan (same as weight events)
 
 ### **Daily Activities**

@@ -200,8 +200,10 @@ class ChildrenView extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.lg),
       itemBuilder: (_, i) {
         final child = kids[i];
-        final isActive = child.id == store.activeId.value;
-        return _buildChildCard(child, isActive, store);
+        return Obx(() {
+          final isActive = child.id == store.activeId.value;
+          return _buildChildCard(child, isActive, store);
+        });
       },
     );
   }

@@ -29,9 +29,6 @@ class StatsAggregator {
         case EventType.height:
           value = e.detail['cm'] as double? ?? 0.0;
           break;
-        case EventType.headCircumference:
-          value = e.detail['cm'] as double? ?? 0.0;
-          break;
         default:
           value = 0.0;
       }
@@ -287,7 +284,6 @@ class StatsAggregator {
         }
         break;
       case EventKind.height:
-      case EventKind.headCircumference:
         // Extract cm from "45.2 cm" or inches from "18 in"
         if (subtitle.contains('cm')) {
           final match = RegExp(r'(\d+\.?\d*)\s*cm').firstMatch(subtitle);

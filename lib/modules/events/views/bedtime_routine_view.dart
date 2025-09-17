@@ -13,8 +13,12 @@ class BedtimeRoutineView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(BedtimeRoutineController());
-    
+
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.85, // Increased to 75%
+        minHeight: MediaQuery.of(context).size.height * 0.55, // Increased minimum to 55%
+      ),
       decoration: const BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -269,8 +273,8 @@ class BedtimeRoutineView extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
             decoration: BoxDecoration(
-              color: controller.isValid 
-                  ? AppColors.success 
+              color: controller.isValid
+                  ? AppColors.coral
                   : AppColors.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(24),
             ),

@@ -189,9 +189,6 @@ class LegacyEventAdapter extends GetxService {
       case EventKind.height:
         type = EventType.height;
         break;
-      case EventKind.headCircumference:
-        type = EventType.headCircumference;
-        break;
       case EventKind.medicine:
         type = EventType.medicine;
         break;
@@ -246,12 +243,13 @@ class LegacyEventAdapter extends GetxService {
       type: EventType.cry,
       startAt: event.time,
       data: {
-        'sounds': event.sounds.map((s) => s.name).toList(),
-        'volume': event.volume.map((v) => v.name).toList(),
-        'rhythm': event.rhythm.map((r) => r.name).toList(),
-        'duration': event.duration.map((d) => d.name).toList(),
-        'behaviour': event.behaviour.map((b) => b.name).toList(),
+        'sounds': event.sounds.map((s) => s.displayName).toList(),
+        'volume': event.volume.map((v) => v.displayName).toList(),
+        'rhythm': event.rhythm.map((r) => r.displayName).toList(),
+        'duration': event.duration.map((d) => d.displayName).toList(),
+        'behaviour': event.behaviour.map((b) => b.displayName).toList(),
       },
+      comment: event.comment,
     );
   }
 
@@ -299,7 +297,7 @@ class LegacyEventAdapter extends GetxService {
         }
       }
     }
-    
+
     // Count CryEvent events
     for (final event in _cryEvents) {
       if (event.childId == childId) {
@@ -308,7 +306,7 @@ class LegacyEventAdapter extends GetxService {
         }
       }
     }
-    
+
     // Count BreastFeedingEvent events
     for (final event in _feedingEvents) {
       if (event.childId == childId) {

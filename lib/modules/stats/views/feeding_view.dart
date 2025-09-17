@@ -64,7 +64,7 @@ class FeedingView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Feeding volume trends',
+                'Feeding volume ',
                 style: AppTextStyles.h4,
               ),
               SegFilter(

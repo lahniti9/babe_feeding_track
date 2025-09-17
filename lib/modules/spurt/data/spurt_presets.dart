@@ -1,18 +1,132 @@
 import 'package:flutter/material.dart';
 import '../models/spurt_models.dart';
 
-// Wonder Weeks data following the established model
+/// Wonder Weeks – Leaps + lead-in "fussy" windows (paraphrased, concise)
+/// Leaps: 5, 8, 12, 19, 26, 37, 46, 55
+/// Lead-ins: 4, 7, 9, 11, 15–18, 24–25, 35–36, 43–45, 52–54
 const Map<int, SpurtWeek> kSpurtWeeks = {
-  // === Lead-in to Leap 4 (Events) ===
+  // ──────────────────────────────
+  // Leap 1 (Changing Sensations) ⟶ ~5 weeks
+  4: SpurtWeek(
+    type: SpurtType.fussy,
+    title: "Fussy phase (pre-Leap 1)",
+    behavior: [
+      "More clingy/startly; wants contact",
+      "Sleep and feeds feel less predictable",
+    ],
+    tips: [
+      "Feeding: quiet, low-stim feeds",
+      "Sleep: short soothing, swaddle/white noise",
+      "Communication: soft voice, skin-to-skin",
+    ],
+  ),
+  5: SpurtWeek(
+    type: SpurtType.leap,
+    title: "Leap 1 – Changing sensations",
+    behavior: [
+      "More alert to light/sound/touch",
+      "May fuss during transitions",
+    ],
+    skills: [
+      "Longer eye contact; brief smiles",
+      "Slightly longer awake windows",
+    ],
+    tips: [
+      "Feeding: watch cues; smaller, frequent feeds",
+      "Sleep: calm wind-downs; expect short naps",
+      "Communication: face-to-face, gentle talk",
+    ],
+  ),
+
+  // ──────────────────────────────
+  // Leap 2 (Patterns) ⟶ ~8 weeks
+  7: SpurtWeek(
+    type: SpurtType.fussy,
+    title: "Fussy phase (pre-Leap 2)",
+    behavior: [
+      "Wants to be held more; catnaps",
+      "Overstimulation shows faster",
+    ],
+    tips: [
+      "Feeding: reduce distractions",
+      "Sleep: earlier nap when drowsy",
+      "Communication: simple, repeatable play",
+    ],
+  ),
+  8: SpurtWeek(
+    type: SpurtType.leap,
+    title: "Leap 2 – Patterns",
+    behavior: [
+      "Tracks simple patterns/rhythms",
+      "More engaged, then suddenly fussy",
+    ],
+    skills: [
+      "Stares at stripes/dots; coos more",
+      "Beginnings of 'social' smile",
+    ],
+    tips: [
+      "Feeding: pause/burp when gaze wanders",
+      "Sleep: short wake→sleep routines",
+      "Play: high-contrast patterns, songs",
+    ],
+  ),
+  9: SpurtWeek(
+    type: SpurtType.fussy,
+    title: "Fussy phase tails off",
+    behavior: [
+      "Evenings may still be cranky",
+      "Needs help switching off",
+    ],
+    tips: [
+      "Keep bedtime consistent",
+      "Slow transitions; dark, quiet room",
+    ],
+  ),
+
+  // ──────────────────────────────
+  // Leap 3 (Smooth Transitions) ⟶ ~12 weeks
+  11: SpurtWeek(
+    type: SpurtType.fussy,
+    title: "Fussy phase (pre-Leap 3)",
+    behavior: [
+      "Frustrates with sudden changes",
+      "Short naps return",
+    ],
+    tips: [
+      "Feeding: feed on cues; cluster feeds OK",
+      "Sleep: protect first nap; contact nap if needed",
+      "Communication: narrate changes in pace",
+    ],
+  ),
+  12: SpurtWeek(
+    type: SpurtType.leap,
+    title: "Leap 3 – Smooth transitions",
+    behavior: [
+      "Notices gradual changes (light, sound, movement)",
+      "May protest when pace shifts",
+    ],
+    skills: [
+      "Smoother head/eye control",
+      "More coo chains; hand discovery",
+    ],
+    tips: [
+      "Feeding: calm setting; responsive breaks",
+      "Sleep: rhythmic wind-down; predictable order",
+      "Play: slow peekaboo, gentle motion",
+    ],
+  ),
+
+  // ──────────────────────────────
+  // Leap 4 (Events) ⟶ ~19 weeks
   15: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase (pre-Leap 4)",
     behavior: [
-      "May be clingier and startle more easily",
-      "Daytime naps wobble; more evening fussiness",
+      "Clingier; startles easily",
+      "Day naps wobble; evening fuss",
     ],
     tips: [
-      "Keep routines simple; extra contact/soothing",
+      "Keep routines simple; extra soothing",
       "Dim lights, white noise, slow transitions",
     ],
   ),
@@ -20,11 +134,11 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     type: SpurtType.fussy,
     title: "Fussy phase continues",
     behavior: [
-      "Wants to be held more; appetite may shift",
-      "Tires faster with busy environments",
+      "Wants to be held; appetite shifts",
+      "Tires quickly in busy places",
     ],
     tips: [
-      "Lower stimulation; take calm outdoor walks",
+      "Lower stimulation; short outdoor walks",
       "Offer feeds responsively; protect sleep",
     ],
   ),
@@ -32,23 +146,23 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     type: SpurtType.fussy,
     title: "Fussy phase (approaching Leap 4)",
     behavior: [
-      "More protest at put-downs; short catnaps",
-      "Notices changes in pace, light, and sound",
+      "Protests put-downs; catnaps",
+      "Notices changes in pace/light/sound",
     ],
     tips: [
       "Predictable wind-down before sleep",
-      "Use rhythmic motion (rock/sway) if needed",
+      "Use rhythmic motion if needed",
     ],
   ),
   18: SpurtWeek(
     type: SpurtType.fussy,
     title: "Stormy days before Leap 4",
     behavior: [
-      "Cranky evenings; wants familiar faces",
+      "Cranky evenings; prefers familiar faces",
       "Easily overstimulated during play",
     ],
     tips: [
-      "Shorter play windows; face-to-face time",
+      "Short, calm play; face-to-face time",
       "Keep bedtime consistent",
     ],
   ),
@@ -56,42 +170,43 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     type: SpurtType.leap,
     title: "Leap 4 – Events",
     behavior: [
-      "Becomes more sensitive to surroundings",
-      "May react to tone/voice, position or light",
+      "Combines sights/sounds into 'events'",
+      "More distractible, bigger emotions",
     ],
     skills: [
-      "First deliberate responses; hand-to-mouth",
-      "Begins to combine sights/sounds into 'events'",
+      "First deliberate grabs; hand-to-mouth",
+      "Tracks cause→effect in short bursts",
     ],
     tips: [
       "Feeding: quiet, low-distraction feeds",
-      "Sleep: expect changes; keep routine steady",
-      "Communication: narrate simple actions (\"now we change\", \"now we pick up\")",
+      "Sleep: expect changes; stick to routine",
+      "Communication: narrate actions (\"now we change…\")",
     ],
   ),
 
-  // === Lead-in to Leap 5 (Relationships) ===
+  // ──────────────────────────────
+  // Leap 5 (Relationships) ⟶ ~26 weeks
   24: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase (pre-Leap 5)",
     behavior: [
-      "New clinginess, prefers primary carers",
-      "More alert to distance from you",
+      "New clinginess; prefers primary carers",
+      "Alert to distance from you",
     ],
     tips: [
-      "Play peekaboo; describe comings & goings",
-      "Offer extra reassurance at bedtime",
+      "Peekaboo; describe comings & goings",
+      "Extra reassurance at bedtime",
     ],
   ),
   25: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase continues",
     behavior: [
-      "Protests when you leave the room",
-      "Shorter tolerance for strangers/crowds",
+      "Protests when you leave",
+      "Lower tolerance for strangers/crowds",
     ],
     tips: [
-      "Use goodbye rituals; brief separations",
+      "Goodbye rituals; brief separations",
       "Babywearing for transitions",
     ],
   ),
@@ -103,8 +218,8 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
       "Watches where objects/people go",
     ],
     skills: [
-      "Tracks relationships (object/person distance)",
-      "Experiments with cause/effect more",
+      "Tracks relationships in space",
+      "Explores cause/effect more boldly",
     ],
     tips: [
       "Feeding: feed on cues; distractions rise",
@@ -113,28 +228,29 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     ],
   ),
 
-  // === Lead-in to Leap 6 (Categories) ===
+  // ──────────────────────────────
+  // Leap 6 (Categories) ⟶ ~37 weeks
   35: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase (pre-Leap 6)",
     behavior: [
-      "More curious but frustrated quickly",
+      "Very curious; frustrates quickly",
       "Wants the 'right' object/texture",
     ],
     tips: [
-      "Rotate a few toys; avoid overstocks",
-      "Slow, floor-based play blocks",
+      "Rotate a few toys; avoid overstimulation",
+      "Short, floor-based play blocks",
     ],
   ),
   36: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase continues",
     behavior: [
-      "Resistance at diaper/clothes changes",
-      "Naps shift with busy brains",
+      "Resists diaper/clothes changes",
+      "Naps shift with busy brain",
     ],
     tips: [
-      "Narrate steps; offer choices ('this or that')",
+      "Narrate steps; offer small choices",
       "Protect sleepy cues; earlier nap if needed",
     ],
   ),
@@ -146,23 +262,24 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
       "Examines details; compares objects",
     ],
     skills: [
-      "Begins sorting/building preferences",
-      "Imitates actions more accurately",
+      "Simple sorting; stronger imitation",
+      "Early \"favorites\" (toys, textures)",
     ],
     tips: [
-      "Feeding: let baby explore safe textures",
-      "Sleep: mental practice can disrupt—stay calm/consistent",
-      "Play: simple sorting cups, baskets, fabric squares",
+      "Feeding: safe texture exploration",
+      "Sleep: mental practice can disrupt—stay steady",
+      "Play: cups to sort, baskets to fill/empty",
     ],
   ),
 
-  // === Lead-in to Leap 7 (Sequences) ===
+  // ──────────────────────────────
+  // Leap 7 (Sequences) ⟶ ~46 weeks
   43: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase (pre-Leap 7)",
     behavior: [
-      "Gets frustrated when steps don't work",
-      "Wants to repeat routines 'just so'",
+      "Frustrated when steps don't work",
+      "Wants routines 'just so'",
     ],
     tips: [
       "Keep predictable daily sequences",
@@ -173,32 +290,32 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     type: SpurtType.fussy,
     title: "Fussy phase continues",
     behavior: [
-      "More intent focus, then sudden fuss",
+      "Intent focus, then sudden fuss",
       "Protests transitions mid-activity",
     ],
     tips: [
       "Use 'first-then' language",
-      "Offer a small job during routines",
+      "Offer a tiny job during routines",
     ],
   ),
   45: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase (nearly Leap 7)",
     behavior: [
-      "Clinginess at bedtime/naps",
-      "Wants familiar sequence of events",
+      "Clingy at bedtime/naps",
+      "Wants same order nightly",
     ],
     tips: [
-      "Unhurried wind-downs; same order nightly",
-      "Invite participation (hand the diaper, hold the sock)",
+      "Unhurried wind-downs; same order",
+      "Invite participation (hand diaper, hold sock)",
     ],
   ),
   46: SpurtWeek(
     type: SpurtType.leap,
     title: "Leap 7 – Sequences",
     behavior: [
-      "Understands simple step-by-step patterns",
-      "Tries to combine actions (stack, place, fit)",
+      "Understands step-by-step patterns",
+      "Combines actions (stack/place/fit)",
     ],
     skills: [
       "Copies multi-step routines",
@@ -207,20 +324,21 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     tips: [
       "Feeding: predictable mealtime steps",
       "Sleep: repeatable pre-sleep sequence",
-      "Play: stacking rings, simple insert puzzles",
+      "Play: stacking rings, inset puzzles",
     ],
   ),
 
-  // === Lead-in to Leap 8 (Programs) ===
+  // ──────────────────────────────
+  // Leap 8 (Programs) ⟶ ~55 weeks
   52: SpurtWeek(
     type: SpurtType.fussy,
     title: "Fussy phase (pre-Leap 8)",
     behavior: [
-      "Bigger emotions; testing limits",
+      "Bigger feelings; tests limits",
       "Wants to do things 'own way'",
     ],
     tips: [
-      "Offer choices, simple boundaries",
+      "Offer choices with clear boundaries",
       "Name feelings; keep routines solid",
     ],
   ),
@@ -228,23 +346,23 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     type: SpurtType.fussy,
     title: "Fussy phase continues",
     behavior: [
-      "Frequent 'do it myself' moments",
-      "Sleep may dip with mobility/practice",
+      "Many 'do-it-myself' moments",
+      "Sleep dips with new mobility/practice",
     ],
     tips: [
       "Allow safe independence; scaffold steps",
-      "Extra fresh air and gross-motor play",
+      "Extra outdoor gross-motor play",
     ],
   ),
   54: SpurtWeek(
     type: SpurtType.fussy,
     title: "Stormy days before Leap 8",
     behavior: [
-      "Push–pull behavior (clingy ↔ independent)",
-      "Protests limits more loudly",
+      "Push–pull (clingy ↔ independent)",
+      "Louder protests at limits",
     ],
     tips: [
-      "Consistent boundaries; warm tone",
+      "Be consistent and warm",
       "Reset with movement and outside time",
     ],
   ),
@@ -252,17 +370,17 @@ const Map<int, SpurtWeek> kSpurtWeeks = {
     type: SpurtType.leap,
     title: "Leap 8 – Programs",
     behavior: [
-      "Strings steps into little 'programs'",
-      "Attempts to solve simple problems",
+      "Strings sequences into little 'programs'",
+      "Starts solving simple problems",
     ],
     skills: [
       "Imitates chores; two-step requests",
-      "Longer attention for purposeful play",
+      "More purposeful, longer attention",
     ],
     tips: [
       "Feeding: involve in tiny tasks (wipe, place cup)",
       "Sleep: routine + clear cues = smoother nights",
-      "Play: pretend play starter kits, simple chores",
+      "Play: early pretend; simple 'helping' jobs",
     ],
   ),
 };

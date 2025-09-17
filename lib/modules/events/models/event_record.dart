@@ -15,7 +15,6 @@ enum EventType {
   activity,
   weight,
   height,
-  headCircumference,
   expressing,
   spitUp,
 }
@@ -49,15 +48,26 @@ class EventRecord {
     'comment': comment,
   };
 
-  factory EventRecord.fromJson(Map<String, dynamic> json) => EventRecord(
-    id: json['id'],
-    childId: json['childId'],
-    type: EventType.values.byName(json['type']),
-    startAt: DateTime.parse(json['startAt']),
-    endAt: json['endAt'] != null ? DateTime.parse(json['endAt']) : null,
-    data: Map<String, dynamic>.from(json['data'] ?? {}),
-    comment: json['comment'],
-  );
+  static EventRecord? fromJson(Map<String, dynamic> json) {
+    // Handle removed event types gracefully
+    EventType? eventType;
+    try {
+      eventType = EventType.values.byName(json['type']);
+    } catch (e) {
+      // Skip events with removed types (like headCircumference)
+      return null;
+    }
+
+    return EventRecord(
+      id: json['id'],
+      childId: json['childId'],
+      type: eventType,
+      startAt: DateTime.parse(json['startAt']),
+      endAt: json['endAt'] != null ? DateTime.parse(json['endAt']) : null,
+      data: Map<String, dynamic>.from(json['data'] ?? {}),
+      comment: json['comment'],
+    );
+  }
 
   EventRecord copyWith({
     String? id,
@@ -100,7 +110,6 @@ extension EventTypeExtension on EventType {
       case EventType.activity: return 'Activity';
       case EventType.weight: return 'Weight';
       case EventType.height: return 'Height';
-      case EventType.headCircumference: return 'Head Circumference';
       case EventType.expressing: return 'Expressing';
       case EventType.spitUp: return 'Spit-up';
     }

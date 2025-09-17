@@ -78,11 +78,15 @@ class EventsStore extends GetxService {
     final eventsData = _storage.read('event_records');
     if (eventsData != null) {
       final eventsList = List<Map<String, dynamic>>.from(eventsData);
-      final events = eventsList.map((json) => EventRecord.fromJson(json)).toList();
-      
+      final events = eventsList
+          .map((json) => EventRecord.fromJson(json))
+          .where((event) => event != null)
+          .cast<EventRecord>()
+          .toList();
+
       // Sort by startAt (newest first)
       events.sort((a, b) => b.startAt.compareTo(a.startAt));
-      
+
       items.clear();
       items.addAll(events);
     }

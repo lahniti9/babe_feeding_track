@@ -2,26 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/medicine_controller.dart';
 import '../widgets/event_sheet.dart';
-import '../widgets/time_row.dart';
+import '../widgets/enhanced_time_row.dart';
 import '../widgets/number_row.dart';
 import '../widgets/chip_group_row.dart';
+import '../models/event_record.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 
 class MedicineSheet extends StatelessWidget {
-  const MedicineSheet({super.key});
+  final EventRecord? existingEvent;
+
+  const MedicineSheet({super.key, this.existingEvent});
 
   @override
   Widget build(BuildContext context) {
+    // Ensure we get a fresh controller instance
+    Get.delete<MedicineController>();
     final controller = Get.put(MedicineController());
+
+    // If editing an existing event, populate the controller
+    if (existingEvent != null) {
+      controller.editEvent(existingEvent!);
+    }
 
     return Obx(() => EventSheet(
       title: 'Medicine',
+      subtitle: 'Track medication doses',
+      icon: Icons.medication_rounded,
+      accentColor: const Color(0xFF3BB3C4),
       onSubmit: controller.save,
       sections: [
-        TimeRow(
+        EnhancedTimeRow(
+          label: 'Time',
           value: controller.time.value,
           onChange: controller.setTime,
+          icon: Icons.access_time_rounded,
+          accentColor: const Color(0xFF3BB3C4),
         ),
         
         // Medicine name input
@@ -108,10 +124,12 @@ class MedicineSheet extends StatelessWidget {
         ),
         
         if (controller.reminderEnabled.value)
-          TimeRow(
+          EnhancedTimeRow(
             label: 'Reminder Time',
             value: controller.reminderTime.value,
             onChange: controller.setReminderTime,
+            icon: Icons.alarm_rounded,
+            accentColor: const Color(0xFF3BB3C4),
           ),
       ],
     ));

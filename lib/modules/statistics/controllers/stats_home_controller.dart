@@ -18,7 +18,6 @@ class StatsHomeController extends GetxController {
 
   // ====== LIVE SUMMARY FIELDS FOR TILES ======
   // Measurements (last values):
-  final lastHeadCm = RxnDouble();
   final lastHeightCm = RxnDouble();
   final lastWeightKg = RxnDouble();
 
@@ -68,24 +67,17 @@ class StatsHomeController extends GetxController {
     final monthStart = DateTime(now.year, now.month, 1);
     final monthEnd = DateTime(now.year, now.month + 1, 1);
 
-    // ---- HEAD CIRCUMFERENCE ----
-    _subs.add(_repo.watch(childId: child.id, types: {EventType.headCircumference})
-        .listen((evts) {
-      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'cm', clock: c);
-      lastHeadCm.value = m.values.isEmpty ? null : m.values.last;
-    }));
-
     // ---- HEIGHT ----
     _subs.add(_repo.watch(childId: child.id, types: {EventType.height})
         .listen((evts) {
-      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'cm', clock: c);
+      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'valueCm', clock: c);
       lastHeightCm.value = m.values.isEmpty ? null : m.values.last;
     }));
 
     // ---- WEIGHT ---- (store SI internally: kg)
     _subs.add(_repo.watch(childId: child.id, types: {EventType.weight})
         .listen((evts) {
-      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'kg', clock: c);
+      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'valueKg', clock: c);
       lastWeightKg.value = m.values.isEmpty ? null : m.values.last;
     }));
 
@@ -175,11 +167,6 @@ class StatsHomeController extends GetxController {
   }
 
   // Computed getters for UI display
-  String get lastHeadCmDisplay {
-    final value = lastHeadCm.value;
-    return value != null ? '${value.toStringAsFixed(1)} cm' : '—';
-  }
-
   String get lastHeightCmDisplay {
     final value = lastHeightCm.value;
     return value != null ? '${value.toStringAsFixed(1)} cm' : '—';

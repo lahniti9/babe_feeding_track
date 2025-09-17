@@ -51,7 +51,7 @@ final Map<EventType, TimelineBuilder> timelineBuilders = {
         event,
         icon: Icons.thermostat,
         iconColor: const Color(0xFF3BB3C4),
-        title: 'Temp $value $unit$methodText',
+        title: 'Temp ${value.toStringAsFixed(1)}$unit$methodText',
         subtitle: childName,
       ),
       onTap: () {}, // TODO: Implement edit
@@ -218,51 +218,23 @@ final Map<EventType, TimelineBuilder> timelineBuilders = {
   EventType.height: (event, childName) {
     final valueCm = event.data['valueCm'] as num? ?? 0;
     final unit = event.data['unit'] as String? ?? 'cm';
-    final display = event.data['display'] as Map?;
+    final display = event.data['display'] as Map<String, dynamic>?;
 
     String displayText;
     if (unit == 'cm') {
-      displayText = '${valueCm.toStringAsFixed(1)} cm';
-    } else if (display != null) {
-      final inches = display['in'] as num? ?? 0;
-      displayText = '${inches.toStringAsFixed(1)} in';
+      final cmValue = display?['cm'] as num? ?? valueCm;
+      displayText = '${cmValue.toStringAsFixed(1)} cm';
     } else {
-      displayText = '${valueCm.toStringAsFixed(1)} cm';
+      final inValue = display?['in'] as num? ?? (valueCm / 2.54);
+      displayText = '${inValue.toStringAsFixed(1)} in';
     }
 
     return TimelineEntry(
       model: _createEventModel(
         event,
         icon: Icons.straighten,
-        iconColor: const Color(0xFF6F86FF),
+        iconColor: const Color(0xFF7C2D12),
         title: 'Height $displayText',
-        subtitle: childName,
-      ),
-      onTap: () {},
-    );
-  },
-
-  EventType.headCircumference: (event, childName) {
-    final valueCm = event.data['valueCm'] as num? ?? 0;
-    final unit = event.data['unit'] as String? ?? 'cm';
-    final display = event.data['display'] as Map?;
-
-    String displayText;
-    if (unit == 'cm') {
-      displayText = '${valueCm.toStringAsFixed(1)} cm';
-    } else if (display != null) {
-      final inches = display['in'] as num? ?? 0;
-      displayText = '${inches.toStringAsFixed(1)} in';
-    } else {
-      displayText = '${valueCm.toStringAsFixed(1)} cm';
-    }
-
-    return TimelineEntry(
-      model: _createEventModel(
-        event,
-        icon: Icons.child_care,
-        iconColor: const Color(0xFF6F86FF),
-        title: 'Head circumference $displayText',
         subtitle: childName,
       ),
       onTap: () {},
@@ -335,9 +307,6 @@ EventModel _createEventModel(EventRecord event, {
       break;
     case EventType.height:
       kind = EventKind.height;
-      break;
-    case EventType.headCircumference:
-      kind = EventKind.headCircumference;
       break;
     case EventType.medicine:
       kind = EventKind.medicine;

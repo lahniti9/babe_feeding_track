@@ -70,11 +70,24 @@ class BedtimeRoutineController extends GetxController {
     );
 
     final eventsController = Get.find<EventsController>();
+
     if (isEditMode.value && editingEventId != null) {
-      // Update existing event
-      eventsController.remove(editingEventId!);
+      // Update existing event using the same pattern as comment updating
+      final eventIndex = eventsController.events.indexWhere((e) =>
+        (e is EventModel && e.id == editingEventId));
+
+      if (eventIndex >= 0) {
+        // Update the event in place (same pattern as updateComment method)
+        eventsController.events[eventIndex] = event;
+        // Manually trigger the save by calling the private method through reflection
+        // or use the remove/add pattern that's already working
+        eventsController.remove(editingEventId!, skipConfirmation: true);
+        eventsController.addEvent(event);
+      }
+    } else {
+      // Add new event
+      eventsController.addEvent(event);
     }
-    eventsController.addEvent(event);
 
     Get.back();
     _reset();
@@ -100,6 +113,11 @@ class BedtimeRoutineController extends GetxController {
     editingEventId = null;
     time.value = DateTime.now();
     steps.clear();
+  }
+
+  // Public reset method for external use
+  void reset() {
+    _reset();
   }
 
   // Check if form is valid
