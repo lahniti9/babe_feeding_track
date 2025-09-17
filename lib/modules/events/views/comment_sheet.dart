@@ -174,78 +174,74 @@ class _CommentSheetState extends State<CommentSheet> {
   }
 
   Widget _buildEnhancedTextField(CommentController controller) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Label
-          Text(
-            'Your comment',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label
+        Text(
+          'Your comment',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Enhanced text field
+        Container(
+          height: 120, // Fixed height instead of Expanded
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.border.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: TextField(
+            controller: textController,
+            maxLines: null,
             style: AppTextStyles.bodyMedium.copyWith(
               color: Colors.white,
-              fontWeight: FontWeight.w600,
+              height: 1.5,
             ),
-          ),
-          const SizedBox(height: 12),
-
-          // Enhanced text field
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.border.withValues(alpha: 0.3),
-                  width: 1,
-                ),
-              ),
-              child: TextField(
-                controller: textController,
-                maxLines: null,
-                expands: true,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
-                  height: 1.5,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Share your thoughts, observations, or notes about this event...',
-                  hintStyle: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                    height: 1.5,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                // onChanged is handled by textController.addListener() in initState
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Enhanced character counter
-          Row(
-            children: [
-              Icon(
-                Icons.edit_note,
+            decoration: InputDecoration(
+              hintText: 'Share your thoughts, observations, or notes about this event...',
+              hintStyle: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
-                size: 16,
+                height: 1.5,
               ),
-              const SizedBox(width: 6),
-              Obx(() => Text(
-                '${controller.characterCount} / ${CommentController.maxCharacters} characters',
-                style: AppTextStyles.caption.copyWith(
-                  color: controller.isAtLimit
-                      ? AppColors.coral
-                      : AppColors.textSecondary,
-                  fontWeight: controller.isAtLimit ? FontWeight.w600 : FontWeight.normal,
-                ),
-              )),
-            ],
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+            // onChanged is handled by textController.addListener() in initState
           ),
-        ],
-      ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Enhanced character counter
+        Row(
+          children: [
+            Icon(
+              Icons.edit_note,
+              color: AppColors.textSecondary,
+              size: 16,
+            ),
+            const SizedBox(width: 6),
+            Obx(() => Text(
+              '${controller.characterCount} / ${CommentController.maxCharacters} characters',
+              style: AppTextStyles.caption.copyWith(
+                color: controller.isAtLimit
+                    ? AppColors.coral
+                    : AppColors.textSecondary,
+                fontWeight: controller.isAtLimit ? FontWeight.w600 : FontWeight.normal,
+              ),
+            )),
+          ],
+        ),
+      ],
     );
   }
 

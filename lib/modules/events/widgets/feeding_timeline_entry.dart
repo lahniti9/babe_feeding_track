@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../models/breast_feeding_event.dart';
 import '../../children/services/children_store.dart';
+import 'timeline_container.dart';
 
 class FeedingTimelineEntry extends StatelessWidget {
   final BreastFeedingEvent event;
@@ -20,39 +22,49 @@ class FeedingTimelineEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppColors.border.withValues(alpha: 0.1),
-            width: 1,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Timeline indicator with connecting line
+        TimelineIndicator(
+          backgroundColor: Colors.green.withValues(alpha: 0.1),
+          borderColor: Colors.green,
+          isActive: true,
+          child: const Icon(
+            Icons.child_care,
+            color: Colors.green,
+            size: 24,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Enhanced timeline indicator
-            _buildTimelineIndicator(),
-            const SizedBox(width: 16),
 
-            // Content
-            Expanded(
+        const SizedBox(width: AppSpacing.lg),
+
+        // Event content card
+        Expanded(
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                border: Border.all(
+                  color: Colors.green.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title row with plus button
+                  // Title row with plus button and time
                   Row(
                     children: [
                       Expanded(
@@ -60,58 +72,44 @@ class FeedingTimelineEntry extends StatelessWidget {
                           'Breast Feeding',
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
+                      _buildTimeDisplay(),
+                      const SizedBox(width: AppSpacing.sm),
                       _buildPlusButton(),
                     ],
                   ),
 
                   // Child name subtitle
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     _getChildName(),
-                    style: AppTextStyles.captionMedium,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
 
                   // Feeding details
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.sm),
                   _buildFeedingDetails(),
 
                   // Comment display
                   if (event.comment != null && event.comment!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.sm),
                     _buildCommentDisplay(),
                   ],
                 ],
               ),
             ),
-
-            const SizedBox(width: 16),
-
-            // Time
-            _buildTimeDisplay(),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildTimelineIndicator() {
-    return Container(
-      width: 12,
-      height: 12,
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.3),
-          width: 3,
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildPlusButton() {
     if (onPlusTap == null) return const SizedBox.shrink();
@@ -220,22 +218,37 @@ class FeedingTimelineEntry extends StatelessWidget {
   }
 
   Widget _buildTimeDisplay() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          DateFormat('HH:mm').format(event.startAt),
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+    final timeFormat = DateFormat('HH:mm');
+    String timeText = timeFormat.format(event.startAt);
+
+    // Add total duration
+    final totalDuration = event.total;
+    if (totalDuration.inHours > 0) {
+      timeText += ' (${totalDuration.inHours}h ${totalDuration.inMinutes % 60}m)';
+    } else {
+      timeText += ' (${totalDuration.inMinutes}m)';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.sm),
+        border: Border.all(
+          color: Colors.green.withValues(alpha: 0.3),
+          width: 1,
         ),
-        const SizedBox(height: 2),
-        Text(
-          DateFormat('MMM d').format(event.startAt),
-          style: AppTextStyles.captionMedium,
+      ),
+      child: Text(
+        timeText,
+        style: AppTextStyles.caption.copyWith(
+          color: Colors.green,
+          fontWeight: FontWeight.w600,
         ),
-      ],
+      ),
     );
   }
 

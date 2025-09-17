@@ -9,6 +9,7 @@ class HeadCircController extends GetxController {
   final unit = 'cm'.obs;
   final cm = 41.0.obs;
   final inches = 16.1.obs;
+  final comment = ''.obs;
 
   void setTime(DateTime newTime) {
     time.value = newTime;
@@ -60,6 +61,9 @@ class HeadCircController extends GetxController {
       return;
     }
 
+    // Add comment if not empty
+    final commentText = comment.value.trim();
+
     await Get.find<EventsStore>().add(EventRecord(
       id: const Uuid().v4(),
       childId: activeChildId,
@@ -73,8 +77,13 @@ class HeadCircController extends GetxController {
           'in': inches.value,
         },
       },
+      comment: commentText.isEmpty ? null : commentText,
     ));
-    
+
     Get.back();
+  }
+
+  void setComment(String newComment) {
+    comment.value = newComment;
   }
 }

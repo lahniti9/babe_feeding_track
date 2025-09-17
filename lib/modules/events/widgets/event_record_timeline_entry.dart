@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../models/event_record.dart';
 import '../../children/services/children_store.dart';
+import 'timeline_container.dart';
 
 class EventRecordTimelineEntry extends StatelessWidget {
   final EventRecord event;
@@ -20,39 +22,49 @@ class EventRecordTimelineEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppColors.border.withOpacity(0.1),
-            width: 1,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Timeline indicator with connecting line
+        TimelineIndicator(
+          backgroundColor: _getEventColor().withValues(alpha: 0.1),
+          borderColor: _getEventColor(),
+          isActive: true,
+          child: Icon(
+            _getEventIcon(),
+            color: _getEventColor(),
+            size: 24,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Enhanced timeline indicator
-            _buildTimelineIndicator(),
-            const SizedBox(width: 16),
 
-            // Content
-            Expanded(
+        const SizedBox(width: AppSpacing.lg),
+
+        // Event content card
+        Expanded(
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                border: Border.all(
+                  color: _getEventColor().withValues(alpha: 0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title row with plus button
+                  // Title row with plus button and time
                   Row(
                     children: [
                       Expanded(
@@ -60,84 +72,65 @@ class EventRecordTimelineEntry extends StatelessWidget {
                           _getEventTitle(),
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
+                      _buildTimeDisplay(),
+                      const SizedBox(width: AppSpacing.sm),
                       _buildPlusButton(),
                     ],
                   ),
-                  
+
                   // Child name subtitle
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     _getChildName(),
-                    style: AppTextStyles.captionMedium,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
 
                   // Event details
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.sm),
                   _buildEventDetails(),
 
                   // Comment display
                   if (event.comment != null && event.comment!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.sm),
                     _buildCommentDisplay(),
                   ],
                 ],
               ),
             ),
-            
-            const SizedBox(width: 16),
-            
-            // Time
-            _buildTimeDisplay(),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildTimelineIndicator() {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: _getEventColor().withOpacity(0.1),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: _getEventColor().withOpacity(0.3),
-          width: 2,
-        ),
-      ),
-      child: Icon(
-        _getEventIcon(),
-        color: _getEventColor(),
-        size: 24,
-      ),
-    );
-  }
+
 
   Widget _buildPlusButton() {
     if (onPlusTap == null) return const SizedBox.shrink();
-    
+
     return GestureDetector(
       onTap: onPlusTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 24,
+        height: 24,
         decoration: BoxDecoration(
-          color: AppColors.coral.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.2),
           shape: BoxShape.circle,
           border: Border.all(
-            color: AppColors.coral.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.4),
             width: 1,
           ),
         ),
-        child: const Icon(
+        child: Icon(
           Icons.add,
-          color: AppColors.coral,
-          size: 16,
+          size: 14,
+          color: AppColors.primary,
         ),
       ),
     );
@@ -181,27 +174,26 @@ class EventRecordTimelineEntry extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.background.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.coral.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.border.withOpacity(0.1),
+          color: AppColors.coral.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             Icons.chat_bubble_outline,
+            color: AppColors.coral,
             size: 16,
-            color: AppColors.textSecondary.withOpacity(0.7),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               event.comment!,
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondary,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: Colors.white,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -214,26 +206,53 @@ class EventRecordTimelineEntry extends StatelessWidget {
   Widget _buildTimeDisplay() {
     final timeFormat = DateFormat('HH:mm');
     String timeText = timeFormat.format(event.startAt);
-    
-    // Add duration if available
+
+    // Add duration if available (more compact)
     if (event.endAt != null) {
       final duration = event.endAt!.difference(event.startAt);
       if (duration.inHours > 0) {
-        timeText += '\n${duration.inHours}h ${duration.inMinutes % 60}m';
+        timeText += ' (${duration.inHours}h ${duration.inMinutes % 60}m)';
       } else if (duration.inMinutes > 0) {
-        timeText += '\n${duration.inMinutes}m';
+        timeText += ' (${duration.inMinutes}m)';
       }
     }
-    
-    return Text(
-      timeText,
-      style: AppTextStyles.caption,
-      textAlign: TextAlign.right,
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: _getEventColor().withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.sm),
+        border: Border.all(
+          color: _getEventColor().withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        timeText,
+        style: AppTextStyles.caption.copyWith(
+          color: _getEventColor(),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 
   String _getEventTitle() {
     switch (event.type) {
+      case EventType.sleeping:
+        return 'Sleeping';
+      case EventType.bedtimeRoutine:
+        return 'Bedtime routine';
+      case EventType.cry:
+        return 'Crying';
+      case EventType.feedingBreast:
+        return 'Breast feeding';
+      case EventType.feedingBottle:
+        final feedType = event.data['feedType'] as String? ?? 'formula';
+        return feedType == 'formula' ? 'Formula feeding' : 'Bottle feeding';
       case EventType.diaper:
         final kind = event.data['kind'] as String? ?? 'diaper';
         return '${kind.substring(0, 1).toUpperCase()}${kind.substring(1)} diaper';
@@ -264,13 +283,8 @@ class EventRecordTimelineEntry extends StatelessWidget {
       case EventType.activity:
         final type = event.data['type'] as String? ?? 'Activity';
         return type.substring(0, 1).toUpperCase() + type.substring(1);
-      case EventType.feedingBottle:
-        final feedType = event.data['feedType'] as String? ?? 'formula';
-        return feedType == 'formula' ? 'Formula feeding' : 'Bottle feeding';
       case EventType.spitUp:
         return 'Spit-up';
-      default:
-        return event.type.name.substring(0, 1).toUpperCase() + event.type.name.substring(1);
     }
   }
 
@@ -288,6 +302,51 @@ class EventRecordTimelineEntry extends StatelessWidget {
     final details = <String>[];
 
     switch (event.type) {
+      case EventType.sleeping:
+        if (event.endAt != null) {
+          final duration = event.endAt!.difference(event.startAt);
+          if (duration.inHours > 0) {
+            details.add('Duration: ${duration.inHours}h ${duration.inMinutes % 60}m');
+          } else {
+            details.add('Duration: ${duration.inMinutes}m');
+          }
+        }
+        break;
+
+      case EventType.bedtimeRoutine:
+        final activities = event.data['activities'] as List? ?? [];
+        if (activities.isNotEmpty) {
+          details.add('Activities: ${activities.join(', ').toLowerCase()}');
+        }
+        break;
+
+      case EventType.cry:
+        final rhythm = event.data['rhythm'] as List? ?? [];
+        final duration = event.data['duration'] as List? ?? [];
+        final behaviour = event.data['behaviour'] as List? ?? [];
+        if (rhythm.isNotEmpty) {
+          details.add('Rhythm: ${rhythm.join(', ').toLowerCase()}');
+        }
+        if (duration.isNotEmpty) {
+          details.add('Duration: ${duration.join(', ').toLowerCase()}');
+        }
+        if (behaviour.isNotEmpty) {
+          details.add('Behaviour: ${behaviour.join(', ').toLowerCase()}');
+        }
+        break;
+
+      case EventType.feedingBreast:
+        final leftMinutes = event.data['leftMinutes'] as int? ?? 0;
+        final rightMinutes = event.data['rightMinutes'] as int? ?? 0;
+        final totalMinutes = leftMinutes + rightMinutes;
+        if (totalMinutes > 0) {
+          details.add('Total: ${totalMinutes}m');
+          if (leftMinutes > 0 || rightMinutes > 0) {
+            details.add('Left: ${leftMinutes}m • Right: ${rightMinutes}m');
+          }
+        }
+        break;
+
       case EventType.diaper:
         final colors = event.data['color'] as List? ?? [];
         final consistency = event.data['consistency'] as List? ?? [];
@@ -487,10 +546,6 @@ class EventRecordTimelineEntry extends StatelessWidget {
           details.add('Note: $note');
         }
         break;
-
-      default:
-        // Handle any other event types
-        break;
     }
 
     return details;
@@ -498,6 +553,16 @@ class EventRecordTimelineEntry extends StatelessWidget {
 
   Color _getEventColor() {
     switch (event.type) {
+      case EventType.sleeping:
+        return Colors.purple;
+      case EventType.bedtimeRoutine:
+        return Colors.indigo;
+      case EventType.cry:
+        return Colors.orange;
+      case EventType.feedingBreast:
+        return Colors.green;
+      case EventType.feedingBottle:
+        return const Color(0xFF059669);
       case EventType.diaper:
         return const Color(0xFFDC2626);
       case EventType.condition:
@@ -522,17 +587,23 @@ class EventRecordTimelineEntry extends StatelessWidget {
         return const Color(0xFF84CC16);
       case EventType.activity:
         return const Color(0xFFDB2777);
-      case EventType.feedingBottle:
-        return const Color(0xFF059669);
       case EventType.spitUp:
         return const Color(0xFFF97316);
-      default:
-        return AppColors.textSecondary;
     }
   }
 
   IconData _getEventIcon() {
     switch (event.type) {
+      case EventType.sleeping:
+        return Icons.bed;
+      case EventType.bedtimeRoutine:
+        return Icons.nightlight;
+      case EventType.cry:
+        return Icons.sentiment_very_dissatisfied;
+      case EventType.feedingBreast:
+        return Icons.child_care;
+      case EventType.feedingBottle:
+        return Icons.local_drink;
       case EventType.diaper:
         return Icons.baby_changing_station;
       case EventType.condition:
@@ -559,12 +630,8 @@ class EventRecordTimelineEntry extends StatelessWidget {
         return Icons.directions_walk;
       case EventType.activity:
         return Icons.toys;
-      case EventType.feedingBottle:
-        return Icons.baby_changing_station;
       case EventType.spitUp:
         return Icons.water_drop_outlined;
-      default:
-        return Icons.event;
     }
   }
 }

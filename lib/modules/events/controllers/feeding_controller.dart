@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
 import '../models/breast_feeding_event.dart';
 import 'events_controller.dart';
 import '../../children/services/children_store.dart';
@@ -93,7 +94,7 @@ class FeedingController extends GetxController with WidgetsBindingObserver {
     }
     
     final event = BreastFeedingEvent(
-      id: 'feeding_${DateTime.now().millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       childId: activeChildId,
       startAt: startAt.value,
       left: Duration(seconds: leftSec.value),

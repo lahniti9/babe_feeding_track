@@ -19,20 +19,12 @@ class FeedingEditView extends StatefulWidget {
 }
 
 class _FeedingEditViewState extends State<FeedingEditView> {
-  late TextEditingController _commentController;
   late BreastFeedingEvent _currentEvent;
 
   @override
   void initState() {
     super.initState();
     _currentEvent = widget.event;
-    _commentController = TextEditingController(text: _currentEvent.comment ?? '');
-  }
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
   }
 
   @override
@@ -138,73 +130,7 @@ class _FeedingEditViewState extends State<FeedingEditView> {
           ),
         ),
 
-        // Enhanced comment section
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.cardBackgroundSecondary,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.coral.withValues(alpha: 0.2),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.coral.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.comment_rounded,
-                      color: AppColors.coral,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'COMMENT',
-                    style: TextStyle(
-                      color: AppColors.coral,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _commentController,
-                maxLines: 4,
-                maxLength: 300,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-                decoration: const InputDecoration(
-                  hintText: 'Here you can write your comment',
-                  hintStyle: TextStyle(color: Colors.white60),
-                  border: InputBorder.none,
-                  counterStyle: TextStyle(color: Colors.white60),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: (text) {
-                  _currentEvent = _currentEvent.copyWith(comment: text.trim().isEmpty ? null : text.trim());
-                },
-              ),
-            ],
-          ),
-        ),
+
       ],
     );
   }
@@ -263,9 +189,7 @@ class _FeedingEditViewState extends State<FeedingEditView> {
   }
 
   void _saveChanges() {
-    final finalEvent = _currentEvent.copyWith(
-      comment: _commentController.text.trim().isEmpty ? null : _commentController.text.trim(),
-    );
+    final finalEvent = _currentEvent;
 
     // Update the event in the controller
     final eventsController = Get.find<EventsController>();

@@ -10,6 +10,7 @@ class TemperatureController extends GetxController {
   final unit = '°C'.obs;
   final method = <String>{}.obs; // axillary, rectal, oral, ear
   final condition = <String>{}.obs; // fever, normal, low
+  final comment = ''.obs;
 
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
@@ -24,6 +25,9 @@ class TemperatureController extends GetxController {
       return;
     }
 
+    // Add comment if not empty
+    final commentText = comment.value.trim();
+
     await Get.find<EventsStore>().add(EventRecord(
       id: const Uuid().v4(),
       childId: activeChildId,
@@ -35,12 +39,17 @@ class TemperatureController extends GetxController {
         'method': method.toList(),
         'condition': condition.toList(),
       },
+      comment: commentText.isEmpty ? null : commentText,
     ));
     Get.back();
   }
 
   void setValue(double newValue) {
     value.value = newValue;
+  }
+
+  void setComment(String newComment) {
+    comment.value = newComment;
   }
 
   void setUnit(String newUnit) {

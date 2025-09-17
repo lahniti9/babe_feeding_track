@@ -10,6 +10,7 @@ abstract class TimerEventController extends GetxController with WidgetsBindingOb
   final startAt = DateTime.now().obs;
   final seconds = 0.obs;
   final isRunning = false.obs;
+  final comment = ''.obs;
 
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _ticker;
@@ -50,6 +51,10 @@ abstract class TimerEventController extends GetxController with WidgetsBindingOb
     startAt.value = time;
   }
 
+  void setComment(String newComment) {
+    comment.value = newComment;
+  }
+
   String get timeText {
     final s = seconds.value;
     return s >= 60 
@@ -81,6 +86,9 @@ abstract class TimerEventController extends GetxController with WidgetsBindingOb
       ...additionalData,
     };
 
+    // Add comment if not empty
+    final commentText = comment.value.trim();
+
     await Get.find<EventsStore>().add(EventRecord(
       id: const Uuid().v4(),
       childId: activeChildId,
@@ -88,6 +96,7 @@ abstract class TimerEventController extends GetxController with WidgetsBindingOb
       startAt: startAt.value,
       endAt: startAt.value.add(Duration(seconds: seconds.value)),
       data: data,
+      comment: commentText.isEmpty ? null : commentText,
     ));
 
     Get.back();

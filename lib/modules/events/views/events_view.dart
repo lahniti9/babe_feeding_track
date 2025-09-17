@@ -8,6 +8,7 @@ import '../controllers/events_controller.dart';
 import '../widgets/quick_actions_header.dart';
 import '../widgets/timeline_entry.dart';
 import '../widgets/timeline_separator.dart';
+import '../widgets/timeline_container.dart';
 import '../widgets/swipe_actions.dart';
 import '../widgets/sleep_timeline_entry.dart';
 import '../widgets/cry_timeline_entry.dart';
@@ -69,7 +70,7 @@ class EventsView extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: _getTotalItemCount(groupedEvents),
                   itemBuilder: (context, index) {
-                    return _buildAnimatedListItem(context, controller, groupedEvents, index);
+                    return _buildTimelineItem(context, controller, groupedEvents, index);
                   },
                 ),
               );
@@ -167,34 +168,66 @@ class EventsView extends StatelessWidget {
     return count;
   }
 
-  Widget _buildAnimatedListItem(
+  Widget _buildTimelineItem(
     BuildContext context,
     EventsController controller,
     Map<String, List<dynamic>> groupedEvents,
     int index,
   ) {
+    final totalItems = _getTotalItemCount(groupedEvents);
+    final isFirst = index == 0;
+    final isLast = index == totalItems - 1;
+
     final item = _buildListItem(context, controller, groupedEvents, index);
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0.3, 0),
-          end: Offset.zero,
-        ).animate(CurvedAnimation(
-          parent: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
-          curve: Curves.easeOutCubic,
-        )),
-        child: FadeTransition(
-          opacity: Tween<double>(
-            begin: 0.0,
-            end: 1.0,
+    // Check if this is a separator
+    bool isSeparator = false;
+    int currentIndex = 0;
+
+    for (final entry in groupedEvents.entries) {
+      if (currentIndex == index) {
+        isSeparator = true;
+        break;
+      }
+      currentIndex++;
+
+      for (final _ in entry.value) {
+        if (currentIndex == index) {
+          isSeparator = false;
+          break;
+        }
+        currentIndex++;
+      }
+
+      if (currentIndex > index) break;
+    }
+
+    return TimelineContainer(
+      isFirst: isFirst && !isSeparator,
+      isLast: isLast && !isSeparator,
+      isSeparator: isSeparator,
+      lineColor: AppColors.coral.withValues(alpha: 0.3),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.3, 0),
+            end: Offset.zero,
           ).animate(CurvedAnimation(
             parent: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
-            curve: Curves.easeInOut,
+            curve: Curves.easeOutCubic,
           )),
-          child: item,
+          child: FadeTransition(
+            opacity: Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(CurvedAnimation(
+              parent: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
+              curve: Curves.easeInOut,
+            )),
+            child: item,
+          ),
         ),
       ),
     );
@@ -257,13 +290,14 @@ class EventsView extends StatelessWidget {
           time: event.time,
           title: 'Cry',
           subtitle: _getCryEventSubtitle(event),
+          comment: event.comment,
           showPlus: true,
         ),
         onRemove: () => controller.remove(event.id),
         child: CryTimelineEntry(
           event: event,
           onTap: () => controller.edit(event),
-          onPlusTap: () => _openCommentSheet(EventKind.cry), // CryEvent doesn't have comment field
+          onPlusTap: () => _openCommentSheet(EventKind.cry, existingComment: event.comment),
         ),
       );
     } else if (event is BreastFeedingEvent) {

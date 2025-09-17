@@ -110,34 +110,44 @@ class EventsController extends GetxController {
     if (event is EventRecord) {
       // Map EventRecord types to EventKind
       switch (event.type) {
+        case EventType.sleeping:
+          return EventKind.sleeping;
+        case EventType.bedtimeRoutine:
+          return EventKind.bedtimeRoutine;
+        case EventType.cry:
+          return EventKind.cry;
+        case EventType.feedingBreast:
+          return EventKind.feeding;
         case EventType.feedingBottle:
           return EventKind.bottle;
-        case EventType.expressing:
-          return EventKind.expressing;
-        case EventType.spitUp:
-          return EventKind.spitUp;
+        case EventType.food:
+          return EventKind.food;
         case EventType.diaper:
           return EventKind.diaper;
-        case EventType.temperature:
-          return EventKind.temperature;
-        case EventType.weight:
-          return EventKind.weight;
-        case EventType.height:
-          return EventKind.height;
-        case EventType.headCircumference:
-          return EventKind.headCircumference;
+        case EventType.condition:
+          return EventKind.condition;
         case EventType.medicine:
           return EventKind.medicine;
+        case EventType.temperature:
+          return EventKind.temperature;
         case EventType.doctor:
           return EventKind.doctor;
         case EventType.bathing:
           return EventKind.bathing;
         case EventType.walking:
           return EventKind.walking;
-        case EventType.food:
-          return EventKind.food;
-        default:
+        case EventType.activity:
           return EventKind.activity;
+        case EventType.weight:
+          return EventKind.weight;
+        case EventType.height:
+          return EventKind.height;
+        case EventType.headCircumference:
+          return EventKind.headCircumference;
+        case EventType.expressing:
+          return EventKind.expressing;
+        case EventType.spitUp:
+          return EventKind.spitUp;
       }
     }
     return EventKind.activity; // fallback
@@ -513,7 +523,7 @@ class EventsController extends GetxController {
     }
   }
   // Add comment to last event of specific kind
-  void addCommentToLast(EventKind kind, String text) {
+  Future<void> addCommentToLast(EventKind kind, String text) async {
 
     // Find the most recent event of the specified kind
     // Since events are sorted newest first, we want the first match
@@ -525,6 +535,10 @@ class EventsController extends GetxController {
       if (event is EventModel && event.kind == kind) {
         matches = true;
       } else if (event is SleepEvent && kind == EventKind.sleeping) {
+        matches = true;
+      } else if (event is CryEvent && kind == EventKind.cry) {
+        matches = true;
+      } else if (event is BreastFeedingEvent && kind == EventKind.feeding) {
         matches = true;
       } else if (event is EventRecord && _getEventKind(event) == kind) {
         matches = true;
@@ -556,13 +570,42 @@ class EventsController extends GetxController {
         _saveEvents();
         // Trigger UI update
         events.refresh();
+      } else if (event is CryEvent && kind == EventKind.cry) {
+        final updatedEvent = event.copyWith(
+          comment: text.isEmpty ? null : text, // Set to null if empty (deletion)
+        );
+        events[idx] = updatedEvent;
+        _saveEvents();
+        // Trigger UI update
+        events.refresh();
+      } else if (event is BreastFeedingEvent && kind == EventKind.feeding) {
+        final updatedEvent = event.copyWith(
+          comment: text.isEmpty ? null : text, // Set to null if empty (deletion)
+        );
+        events[idx] = updatedEvent;
+        _saveEvents();
+        // Trigger UI update
+        events.refresh();
       } else if (event is EventRecord) {
         // Update EventRecord comment via EventsStore
         final updatedEvent = event.copyWith(
           comment: text.isEmpty ? null : text, // Set to null if empty (deletion)
         );
-        _eventsStore.update(updatedEvent);
-        // The events list will be updated automatically via the reactive listener
+        await _eventsStore.update(updatedEvent);
+
+        // Also update the event in the local events list to ensure immediate UI update
+        events[idx] = updatedEvent;
+        events.refresh();
+
+        // Show success message
+        Get.snackbar(
+          text.isEmpty ? 'Comment Deleted' : 'Comment Added',
+          text.isEmpty ? 'Comment has been removed from the event.' : 'Comment has been added to the event.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.coral.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
       }
     }
   }

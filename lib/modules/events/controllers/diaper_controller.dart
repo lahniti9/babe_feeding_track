@@ -9,6 +9,7 @@ class DiaperController extends GetxController {
   final kind = 'pee'.obs; // 'pee' | 'poop' | 'mixed'
   final color = <String>{}.obs; // yellow/green/brown
   final consistency = <String>{}.obs; // loose/normal/firm
+  final comment = ''.obs;
 
   String? editingEventId;
   final isEditMode = false.obs;
@@ -48,6 +49,9 @@ class DiaperController extends GetxController {
       return;
     }
 
+    // Add comment if not empty
+    final commentText = comment.value.trim();
+
     final eventRecord = EventRecord(
       id: editingEventId ?? const Uuid().v4(),
       childId: activeChildId,
@@ -58,6 +62,7 @@ class DiaperController extends GetxController {
         'color': color.toList(),
         'consistency': consistency.toList(),
       },
+      comment: commentText.isEmpty ? null : commentText,
     );
 
     if (isEditMode.value && editingEventId != null) {
@@ -99,5 +104,9 @@ class DiaperController extends GetxController {
     } else {
       consistency.add(consistencyOption);
     }
+  }
+
+  void setComment(String newComment) {
+    comment.value = newComment;
   }
 }

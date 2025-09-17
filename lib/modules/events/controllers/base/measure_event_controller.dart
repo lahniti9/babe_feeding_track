@@ -8,6 +8,7 @@ abstract class MeasureEventController extends GetxController {
   final time = DateTime.now().obs;
   final value = 0.0.obs;
   final unit = ''.obs;
+  final comment = ''.obs;
 
   // Abstract properties to be implemented by subclasses
   EventType get eventType;
@@ -38,6 +39,10 @@ abstract class MeasureEventController extends GetxController {
     time.value = newTime;
   }
 
+  void setComment(String newComment) {
+    comment.value = newComment;
+  }
+
   Future<void> save() async {
     final childrenStore = Get.find<ChildrenStore>();
     final activeChildId = childrenStore.getValidActiveChildId();
@@ -57,12 +62,16 @@ abstract class MeasureEventController extends GetxController {
       ...additionalData,
     };
 
+    // Add comment if not empty
+    final commentText = comment.value.trim();
+
     await Get.find<EventsStore>().add(EventRecord(
       id: const Uuid().v4(),
       childId: activeChildId,
       type: eventType,
       startAt: time.value,
       data: data,
+      comment: commentText.isEmpty ? null : commentText,
     ));
 
     Get.back();

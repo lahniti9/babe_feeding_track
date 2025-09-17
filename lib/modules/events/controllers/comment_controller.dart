@@ -37,7 +37,7 @@ class CommentController extends GetxController {
   }
 
   // Save comment
-  void save() {
+  Future<void> save() async {
     final trimmedText = text.value.trim();
 
     // If text is empty, handle deletion
@@ -45,7 +45,7 @@ class CommentController extends GetxController {
       if (existingComment != null && existingComment!.isNotEmpty) {
         // Delete existing comment by saving empty string
         final eventsController = Get.find<EventsController>();
-        eventsController.addCommentToLast(kind, '');
+        await eventsController.addCommentToLast(kind, '');
       }
       Get.back();
       text.value = '';
@@ -62,7 +62,7 @@ class CommentController extends GetxController {
 
     // Save the new or modified comment
     final eventsController = Get.find<EventsController>();
-    eventsController.addCommentToLast(kind, trimmedText);
+    await eventsController.addCommentToLast(kind, trimmedText);
 
     Get.back();
     text.value = '';

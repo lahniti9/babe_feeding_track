@@ -19,6 +19,9 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
   final volume = 0.obs;
   final unit = 'ml'.obs;
 
+  // Comment
+  final comment = ''.obs;
+
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _ticker;
 
@@ -108,6 +111,9 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
       if (withVolume) 'unit': unit.value,
     };
 
+    // Add comment if not empty
+    final commentText = comment.value.trim();
+
     await Get.find<EventsStore>().add(EventRecord(
       id: const Uuid().v4(),
       childId: activeChildId,
@@ -115,9 +121,14 @@ class ExpressingController extends GetxController with WidgetsBindingObserver {
       startAt: time.value,
       endAt: time.value.add(Duration(seconds: elapsed.value)),
       data: data,
+      comment: commentText.isEmpty ? null : commentText,
     ));
 
     Get.back(); // Close current sheet
+  }
+
+  void setComment(String newComment) {
+    comment.value = newComment;
   }
 
   @override

@@ -28,7 +28,7 @@ class SpurtCalendarView extends StatelessWidget {
                   // Title
                   const Center(
                     child: Text(
-                      'Spurt Calendar',
+                      'Wonder Weeks Calendar',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -36,16 +36,16 @@ class SpurtCalendarView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Legend
                   _buildLegend(),
-                  
+
                   const SizedBox(height: 20),
-                  
-                  // Grid
-                  _buildGrid(controller),
+
+                  // Enhanced Grid with better week selection
+                  _buildEnhancedGrid(controller),
                 ],
               ),
             ),
@@ -55,17 +55,19 @@ class SpurtCalendarView extends StatelessWidget {
     );
   }
 
+
+
   Widget _buildLegend() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildLegendItem(
-          color: const Color(0xFFFFA629), // Orange
+          color: const Color(0xFFFF6B6B), // Coral
           label: 'Growth Leap',
         ),
-        
+
         const SizedBox(width: 24),
-        
+
         _buildLegendItem(
           color: const Color(0xFF28C076), // Green
           label: 'Fussy Phase',
@@ -101,30 +103,38 @@ class SpurtCalendarView extends StatelessWidget {
     );
   }
 
-  Widget _buildGrid(SpurtController controller) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.05, // Slightly taller than wide
-      ),
-      itemCount: controller.totalWeeks,
-      itemBuilder: (context, index) {
-        final week = index + 1;
-        final episode = controller.episodeForWeek(week);
-        final isCurrent = controller.isCurrentWeek(week);
-        final range = controller.rangeLabel(week);
-        
-        return SpurtTile(
-          week: week,
-          episode: episode,
-          isCurrent: isCurrent,
-          range: range,
-        );
-      },
-    );
+  Widget _buildEnhancedGrid(SpurtController controller) {
+    return Obx(() {
+      // Access reactive properties to ensure GetX tracks them
+      controller.dueDate.value; // Trigger reactivity
+      controller.episodes.length; // Trigger reactivity
+
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.05, // Slightly taller than wide
+        ),
+        itemCount: controller.totalWeeks,
+        itemBuilder: (context, index) {
+          final week = index + 1;
+          final episode = controller.episodeForWeek(week);
+          final isCurrent = controller.isCurrentWeek(week);
+          final range = controller.rangeLabel(week);
+          final weekStatus = controller.getWeekStatus(week);
+
+          return SpurtTile(
+            week: week,
+            episode: episode,
+            isCurrent: isCurrent,
+            range: range,
+            weekStatus: weekStatus,
+          );
+        },
+      );
+    });
   }
 }

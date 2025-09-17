@@ -57,8 +57,8 @@ class SpurtDetailView extends StatelessWidget {
   }
 
   Widget _buildHeader(SpurtDetailController controller) {
-    final accentColor = controller.episode.type == SpurtType.growthLeap
-        ? const Color(0xFFFFA629) // Orange
+    final accentColor = controller.episode.type == SpurtType.leap
+        ? const Color(0xFFFF6B6B) // Coral
         : const Color(0xFF28C076); // Green
 
     return Column(
@@ -125,8 +125,8 @@ class SpurtDetailView extends StatelessWidget {
   }
 
   Widget _buildDateStrip(SpurtDetailController controller) {
-    final accentColor = controller.episode.type == SpurtType.growthLeap
-        ? const Color(0xFFFFA629) // Orange
+    final accentColor = controller.episode.type == SpurtType.leap
+        ? const Color(0xFFFF6B6B) // Coral
         : const Color(0xFF28C076); // Green
 
     return DateStrip(

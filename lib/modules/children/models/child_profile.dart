@@ -5,6 +5,7 @@ class ChildProfile {
   String name;
   BabyGender gender;
   DateTime birthDate;
+  DateTime? dueDate; // Due date for Wonder Weeks calculations
   String? avatar; // file path / url
   String? timezone; // timezone name (e.g., 'America/New_York')
 
@@ -13,6 +14,7 @@ class ChildProfile {
     required this.name,
     required this.gender,
     required this.birthDate,
+    this.dueDate,
     this.avatar,
     this.timezone,
   });
@@ -54,6 +56,7 @@ class ChildProfile {
       'name': name,
       'gender': gender.name,
       'birthDate': birthDate.toIso8601String(),
+      'dueDate': dueDate?.toIso8601String(),
       'avatar': avatar,
       'timezone': timezone,
     };
@@ -66,6 +69,7 @@ class ChildProfile {
       name: json['name'],
       gender: BabyGender.values.firstWhere((g) => g.name == json['gender']),
       birthDate: DateTime.parse(json['birthDate']),
+      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
       avatar: json['avatar'],
       timezone: json['timezone'],
     );
@@ -77,6 +81,7 @@ class ChildProfile {
     String? name,
     BabyGender? gender,
     DateTime? birthDate,
+    DateTime? dueDate,
     String? avatar,
     String? timezone,
   }) {
@@ -85,6 +90,7 @@ class ChildProfile {
       name: name ?? this.name,
       gender: gender ?? this.gender,
       birthDate: birthDate ?? this.birthDate,
+      dueDate: dueDate ?? this.dueDate,
       avatar: avatar ?? this.avatar,
       timezone: timezone ?? this.timezone,
     );

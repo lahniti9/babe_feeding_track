@@ -149,10 +149,6 @@ class SleepExactView extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Enhanced comment section
-                  _EnhancedCommentBox(controller: c),
-                  const SizedBox(height: 24),
-
                   // Enhanced sleep tags sections
                   _EnhancedSleepSection(
                     title: 'START OF SLEEP',
@@ -360,104 +356,7 @@ class _EnhancedTimeRow extends StatelessWidget {
   }
 }
 
-class _EnhancedCommentBox extends StatefulWidget {
-  final SleepEntryController controller;
 
-  const _EnhancedCommentBox({required this.controller});
-
-  @override
-  State<_EnhancedCommentBox> createState() => _EnhancedCommentBoxState();
-}
-
-class _EnhancedCommentBoxState extends State<_EnhancedCommentBox> {
-  late TextEditingController _textController;
-
-  @override
-  void initState() {
-    super.initState();
-    _textController = TextEditingController(text: widget.controller.comment.value);
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackgroundSecondary,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.coral.withValues(alpha: 0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.coral.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.comment_rounded,
-                  color: AppColors.coral,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'COMMENT',
-                style: TextStyle(
-                  color: AppColors.coral,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _textController,
-            maxLines: 4,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-            decoration: const InputDecoration(
-              hintText: 'Here you can write your comment',
-              hintStyle: TextStyle(color: Colors.white60),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-            onChanged: widget.controller.updateComment,
-          ),
-          const SizedBox(height: 12),
-          Obx(() => Text(
-            '${widget.controller.commentCharacterCount} / 300',
-            style: TextStyle(
-              color: widget.controller.commentAtLimit ? Colors.red : Colors.white60,
-              fontSize: 12,
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-}
 
 class _EnhancedSleepSection extends StatelessWidget {
   final String title;

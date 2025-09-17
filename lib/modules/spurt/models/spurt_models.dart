@@ -1,4 +1,48 @@
-enum SpurtType { growthLeap, fussyPhase }
+enum SpurtType { fussy, leap }
+
+enum WeekStatus { current, upcoming, recent, past, future }
+
+// Legacy enum for backward compatibility
+enum LegacySpurtType { growthLeap, fussyPhase }
+
+// Extension to convert between old and new enums
+extension SpurtTypeExtension on SpurtType {
+  LegacySpurtType get legacy {
+    switch (this) {
+      case SpurtType.leap:
+        return LegacySpurtType.growthLeap;
+      case SpurtType.fussy:
+        return LegacySpurtType.fussyPhase;
+    }
+  }
+}
+
+extension LegacySpurtTypeExtension on LegacySpurtType {
+  SpurtType get modern {
+    switch (this) {
+      case LegacySpurtType.growthLeap:
+        return SpurtType.leap;
+      case LegacySpurtType.fussyPhase:
+        return SpurtType.fussy;
+    }
+  }
+}
+
+class SpurtWeek {
+  final SpurtType type;
+  final String title;          // Card header under the big date
+  final List<String> behavior; // "What's happening"
+  final List<String> skills;   // optional extra points (used as 'Skill development')
+  final List<String> tips;     // "During this period it is important"
+
+  const SpurtWeek({
+    required this.type,
+    required this.title,
+    required this.behavior,
+    this.skills = const [],
+    this.tips = const [],
+  });
+}
 
 class SpurtEpisode {
   /// Week index since birth (1-based). The colored tile "number" you show.
