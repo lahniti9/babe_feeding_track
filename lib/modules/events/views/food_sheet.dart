@@ -5,6 +5,8 @@ import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 
 class FoodSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -24,11 +26,13 @@ class FoodSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.food);
+
     return Obx(() => EventSheet(
       title: 'Food',
       subtitle: 'Track baby feeding',
-      icon: Icons.restaurant,
-      accentColor: const Color(0xFFFFB03A),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -36,7 +40,7 @@ class FoodSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFFFFB03A),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedCommentRow(
@@ -44,7 +48,7 @@ class FoodSheet extends StatelessWidget {
           value: controller.food.value,
           onChanged: controller.setFood,
           icon: Icons.restaurant_rounded,
-          accentColor: const Color(0xFFFFB03A),
+          accentColor: eventStyle.color,
           hint: 'Enter food name (e.g., Banana, Apple, Rice cereal)...',
         ),
 
@@ -54,7 +58,7 @@ class FoodSheet extends StatelessWidget {
           selected: _formatAmount(controller.amount.value),
           onSelect: controller.setAmount,
           icon: Icons.straighten_rounded,
-          accentColor: const Color(0xFFFFB03A),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -63,7 +67,7 @@ class FoodSheet extends StatelessWidget {
           selected: controller.reaction.value.isEmpty ? '' : controller.reaction.value.capitalizeFirst!,
           onSelect: controller.setReaction,
           icon: Icons.sentiment_satisfied_rounded,
-          accentColor: const Color(0xFFFFB03A),
+          accentColor: eventStyle.color,
         ),
       ],
     ));

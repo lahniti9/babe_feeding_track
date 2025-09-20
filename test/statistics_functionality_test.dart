@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/modules/events/models/event_record.dart';
-import '../lib/modules/stats/models/stats_models.dart';
+import 'package:babe_feeding_track/modules/events/models/event_record.dart';
+import 'package:babe_feeding_track/modules/stats/models/stats_models.dart';
 
 void main() {
   group('Statistics Functionality Tests', () {

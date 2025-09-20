@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import '../../events/repositories/event_repository.dart';
+import '../../events/services/events_store.dart';
 import '../../events/models/event_record.dart';
 import '../../children/services/children_store.dart';
 import '../services/enhanced_stats_service.dart';
 import '../services/timezone_clock.dart';
 
 /// Live summaries controller that powers the statistics tiles
-/// Subscribes to repository with filters that change when active child changes
+/// Subscribes to events store with filters that change when active child changes
 class StatsHomeController extends GetxController {
-  final _repo = Get.find<EventRepository>();
+  final _eventsStore = Get.find<EventsStore>();
   final _children = Get.find<ChildrenStore>();
 
   // Reactive child + clock
@@ -68,81 +68,101 @@ class StatsHomeController extends GetxController {
     final monthEnd = DateTime(now.year, now.month + 1, 1);
 
     // ---- HEIGHT ----
-    _subs.add(_repo.watch(childId: child.id, types: {EventType.height})
-        .listen((evts) {
-      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'valueCm', clock: c);
+    void loadHeightData() {
+      final allEvents = _eventsStore.getByChild(child.id);
+      final heightEvents = allEvents.where((e) => e.type == EventType.height).toList();
+      final m = EnhancedStatsService.latestPerDayNumber(heightEvents, key: 'valueCm', clock: c);
       lastHeightCm.value = m.values.isEmpty ? null : m.values.last;
-    }));
+    }
+    _subs.add(_eventsStore.items.listen((_) => loadHeightData()));
+    loadHeightData(); // Load initial data
 
     // ---- WEIGHT ---- (store SI internally: kg)
-    _subs.add(_repo.watch(childId: child.id, types: {EventType.weight})
-        .listen((evts) {
-      final m = EnhancedStatsService.latestPerDayNumber(evts, key: 'valueKg', clock: c);
+    void loadWeightData() {
+      final allEvents = _eventsStore.getByChild(child.id);
+      final weightEvents = allEvents.where((e) => e.type == EventType.weight).toList();
+      final m = EnhancedStatsService.latestPerDayNumber(weightEvents, key: 'valueKg', clock: c);
       lastWeightKg.value = m.values.isEmpty ? null : m.values.last;
-    }));
+    }
+    _subs.add(_eventsStore.items.listen((_) => loadWeightData()));
+    loadWeightData(); // Load initial data
 
     // ---- FEEDING TODAY (bottle + expressing volume) ----
-    _subs.add(_repo.watch(
-      childId: child.id,
-      types: {EventType.feedingBottle, EventType.expressing},
-      from: day0,
-      to: day1,
-    ).listen((evts) {
+    void loadFeedingData() {
+      final allEvents = _eventsStore.getByChild(child.id);
+      final feedingEvents = allEvents
+          .where((e) => e.type == EventType.feedingBottle || e.type == EventType.expressing)
+          .where((e) => e.startAt.isAfter(day0.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(day1.add(const Duration(microseconds: 1))))
+          .toList();
+
       double sumMl = 0;
-      for (final e in evts) {
+      for (final e in feedingEvents) {
         // Normalize: prefer ml if you store SI
         final ml = (e.data['volumeMl'] as num?)?.toDouble();
         final oz = (e.data['volumeOz'] as num?)?.toDouble();
         sumMl += ml ?? (oz != null ? (oz * 29.5735) : 0);
       }
       todayFeedVolumeMl.value = sumMl;
-    }));
+    }
+    _subs.add(_eventsStore.items.listen((_) => loadFeedingData()));
+    loadFeedingData(); // Load initial data
 
     // ---- SLEEP TODAY (minutes) ----
-    _subs.add(_repo.watch(
-      childId: child.id,
-      types: {EventType.sleeping},
-      from: day0,
-      to: day1,
-    ).listen((evts) {
-      final perDay = EnhancedStatsService.sumMinutesPerDay(evts, clock: c);
+    void loadSleepData() {
+      final allEvents = _eventsStore.getByChild(child.id);
+      final sleepEvents = allEvents
+          .where((e) => e.type == EventType.sleeping)
+          .where((e) => e.startAt.isAfter(day0.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(day1.add(const Duration(microseconds: 1))))
+          .toList();
+
+      final perDay = EnhancedStatsService.sumMinutesPerDay(sleepEvents, clock: c);
       final key = DateTime(day0.year, day0.month, day0.day);
       todaySleepMinutes.value = perDay[key] ?? 0.0;
-    }));
+    }
+    _subs.add(_eventsStore.items.listen((_) => loadSleepData()));
+    loadSleepData(); // Load initial data
 
     // ---- DIAPERS TODAY ----
-    _subs.add(_repo.watch(
-      childId: child.id,
-      types: {EventType.diaper},
-      from: day0,
-      to: day1,
-    ).listen((evts) {
-      final per = EnhancedStatsService.diaperCounts(evts, clock: c);
+    void loadDiaperData() {
+      final allEvents = _eventsStore.getByChild(child.id);
+      final diaperEvents = allEvents
+          .where((e) => e.type == EventType.diaper)
+          .where((e) => e.startAt.isAfter(day0.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(day1.add(const Duration(microseconds: 1))))
+          .toList();
+
+      final per = EnhancedStatsService.diaperCounts(diaperEvents, clock: c);
       final key = DateTime(day0.year, day0.month, day0.day);
       final map = per[key] ?? const <String, int>{};
       todayWet.value = map['pee'] ?? map['wet'] ?? 0;
       todayPoop.value = map['poop'] ?? map['dirty'] ?? 0;
       todayMixed.value = map['mixed'] ?? 0;
-    }));
+    }
+    _subs.add(_eventsStore.items.listen((_) => loadDiaperData()));
+    loadDiaperData(); // Load initial data
 
     // ---- MONTHLY OVERVIEW (days with any tracked type) ----
-    _subs.add(_repo.watch(
-      childId: child.id,
-      from: monthStart,
-      to: monthEnd,
-      types: {
-        EventType.feedingBreast,
-        EventType.feedingBottle,
-        EventType.sleeping,
-        EventType.diaper,
-        EventType.medicine,
-        EventType.temperature,
-        EventType.doctor,
-        EventType.activity,
-      },
-    ).listen((evts) {
+    void loadMonthlyData() {
+      final allEvents = _eventsStore.getByChild(child.id);
+      final monthlyEvents = allEvents
+          .where((e) => {
+                EventType.feedingBreast,
+                EventType.feedingBottle,
+                EventType.sleeping,
+                EventType.diaper,
+                EventType.medicine,
+                EventType.temperature,
+                EventType.doctor,
+                EventType.activity,
+              }.contains(e.type))
+          .where((e) => e.startAt.isAfter(monthStart.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(monthEnd.add(const Duration(microseconds: 1))))
+          .toList();
+
       final tagDays = EnhancedStatsService.tagsByDay(
-        evts,
+        monthlyEvents,
         includedTypes: {
           EventType.feedingBreast,
           EventType.feedingBottle,
@@ -156,7 +176,9 @@ class StatsHomeController extends GetxController {
         clock: c,
       );
       monthlyActiveDays.value = tagDays.length;
-    }));
+    }
+    _subs.add(_eventsStore.items.listen((_) => loadMonthlyData()));
+    loadMonthlyData(); // Load initial data
   }
 
   void _cancel() {

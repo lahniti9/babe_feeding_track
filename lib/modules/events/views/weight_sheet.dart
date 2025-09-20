@@ -3,9 +3,10 @@ import 'package:get/get.dart';
 import '../controllers/weight_controller.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
-
 import '../widgets/big_number_wheel.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 
 class WeightSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -25,11 +26,13 @@ class WeightSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.weight);
+
     return Obx(() => EventSheet(
       title: 'Weight',
       subtitle: 'Track weight measurements',
-      icon: Icons.monitor_weight_rounded,
-      accentColor: const Color(0xFF10B981),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -37,7 +40,7 @@ class WeightSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF10B981),
+          accentColor: eventStyle.color,
         ),
 
         Container(
@@ -45,15 +48,15 @@ class WeightSheet extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF10B981).withValues(alpha: 0.05),
-                const Color(0xFF10B981).withValues(alpha: 0.02),
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF10B981).withValues(alpha: 0.2),
+              color: eventStyle.color.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -65,20 +68,20 @@ class WeightSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                      color: eventStyle.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.monitor_weight_rounded,
-                      color: Color(0xFF10B981),
+                      color: eventStyle.color,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'WEIGHT',
                     style: TextStyle(
-                      color: Color(0xFF10B981),
+                      color: eventStyle.color,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -89,11 +92,14 @@ class WeightSheet extends StatelessWidget {
               const SizedBox(height: 20),
               BigNumberWheel(
                 value: controller.value.value,
-                unit: 'kg',
+                unit: controller.unit.value,
                 onChange: controller.setValue,
+                onUnitChange: controller.setUnit,
+                unitOptions: const ['kg', 'lb'],
                 min: 0.0,
                 max: 50.0,
                 decimals: 2,
+                accentColor: eventStyle.color,
               ),
             ],
           ),

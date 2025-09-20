@@ -4,6 +4,7 @@ import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../models/event.dart';
+import '../utils/event_colors.dart';
 import 'pill_tag.dart';
 import 'timeline_container.dart';
 
@@ -218,48 +219,10 @@ class TimelineEntry extends StatelessWidget {
   }
 
   Color _getKindColor() {
-    switch (model.kind) {
-      case EventKind.sleeping:
-        return const Color(0xFF6B46C1);
-      case EventKind.bedtimeRoutine:
-        return const Color(0xFF7C3AED);
-      case EventKind.bottle:
-        return const Color(0xFF059669);
-      case EventKind.diaper:
-        return const Color(0xFFDC2626);
-      case EventKind.condition:
-        return const Color(0xFFF59E0B);
-      case EventKind.weight:
-        return const Color(0xFF0891B2);
-      case EventKind.height:
-        return const Color(0xFF7C2D12);
-      case EventKind.activity:
-        return const Color(0xFFDB2777);
-      default:
-        return AppColors.textSecondary;
-    }
+    return EventColors.getEventKindColor(model.kind);
   }
 
   IconData _getKindIcon() {
-    switch (model.kind) {
-      case EventKind.sleeping:
-        return Icons.bed;
-      case EventKind.bedtimeRoutine:
-        return Icons.nightlight;
-      case EventKind.bottle:
-        return Icons.local_drink;
-      case EventKind.diaper:
-        return Icons.baby_changing_station;
-      case EventKind.condition:
-        return Icons.mood;
-      case EventKind.weight:
-        return Icons.monitor_weight;
-      case EventKind.height:
-        return Icons.height;
-      case EventKind.activity:
-        return Icons.sports_gymnastics;
-      default:
-        return Icons.circle;
-    }
+    return EventColors.getEventKindIcon(model.kind);
   }
 }

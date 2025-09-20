@@ -12,6 +12,7 @@ class BigNumberWheel extends StatelessWidget {
   final double? min;
   final double? max;
   final int decimals;
+  final Color? accentColor;
 
   const BigNumberWheel({
     super.key,
@@ -23,10 +24,12 @@ class BigNumberWheel extends StatelessWidget {
     this.min,
     this.max,
     this.decimals = 1,
+    this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAccentColor = accentColor ?? const Color(0xFFFF8A00);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
       child: Row(
@@ -57,7 +60,7 @@ class BigNumberWheel extends StatelessWidget {
                   borderSide: BorderSide(color: AppColors.coral),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.coral, width: 3),
+                  borderSide: BorderSide(color: effectiveAccentColor, width: 3),
                 ),
                 hintText: '0',
                 hintStyle: TextStyle(
@@ -80,29 +83,29 @@ class BigNumberWheel extends StatelessWidget {
           // Unit display or selector
           if (unitOptions != null && onUnitChange != null)
             GestureDetector(
-              onTap: () => _showUnitPicker(context),
+              onTap: () => _showUnitPicker(context, effectiveAccentColor),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2E2E2E),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFFF8A00), width: 1),
+                  border: Border.all(color: effectiveAccentColor, width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       unit,
-                      style: const TextStyle(
-                        color: Color(0xFFFF8A00),
+                      style: TextStyle(
+                        color: effectiveAccentColor,
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.keyboard_arrow_down,
-                      color: Color(0xFFFF8A00),
+                      color: effectiveAccentColor,
                       size: 20,
                     ),
                   ],
@@ -112,8 +115,8 @@ class BigNumberWheel extends StatelessWidget {
           else
             Text(
               unit,
-              style: const TextStyle(
-                color: Color(0xFFFF8A00),
+              style: TextStyle(
+                color: effectiveAccentColor,
                 fontSize: 24,
                 fontWeight: FontWeight.w500,
               ),
@@ -123,7 +126,7 @@ class BigNumberWheel extends StatelessWidget {
     );
   }
 
-  void _showUnitPicker(BuildContext context) {
+  void _showUnitPicker(BuildContext context, Color accentColor) {
     if (unitOptions == null || onUnitChange == null) return;
     
     showModalBottomSheet(
@@ -150,7 +153,7 @@ class BigNumberWheel extends StatelessWidget {
               title: Text(
                 option,
                 style: TextStyle(
-                  color: option == unit ? const Color(0xFFFF8A00) : Colors.white,
+                  color: option == unit ? accentColor : Colors.white,
                   fontWeight: option == unit ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),

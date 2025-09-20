@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/bottle_controller.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
 import '../widgets/number_row.dart';
+import '../utils/event_colors.dart';
 
 class BottleSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -21,11 +23,13 @@ class BottleSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.bottle);
+
     return Obx(() => EventSheet(
       title: 'Bottle',
       subtitle: 'Track bottle feeding',
-      icon: Icons.baby_changing_station_rounded,
-      accentColor: const Color(0xFF3B82F6),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -33,7 +37,7 @@ class BottleSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: (date) => controller.time.value = date,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF3B82F6),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -42,7 +46,7 @@ class BottleSheet extends StatelessWidget {
           selected: controller.feedType.value == 'formula' ? 'Formula' : 'Breast milk',
           onSelect: controller.setFeedType,
           icon: Icons.local_drink_rounded,
-          accentColor: const Color(0xFF3B82F6),
+          accentColor: eventStyle.color,
         ),
 
         Container(
@@ -50,15 +54,15 @@ class BottleSheet extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF3B82F6).withValues(alpha: 0.05),
-                const Color(0xFF3B82F6).withValues(alpha: 0.02),
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+              color: eventStyle.color.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -70,20 +74,20 @@ class BottleSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                      color: eventStyle.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.water_drop_rounded,
-                      color: Color(0xFF3B82F6),
+                      color: eventStyle.color,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'VOLUME',
                     style: TextStyle(
-                      color: Color(0xFF3B82F6),
+                      color: eventStyle.color,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -102,6 +106,7 @@ class BottleSheet extends StatelessWidget {
                 min: 0,
                 max: 500,
                 decimals: 1,
+                accentColor: eventStyle.color,
               ),
             ],
           ),

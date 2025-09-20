@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/bathing_controller.dart';
+import '../models/event.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
 import '../widgets/timer_circle.dart';
+import '../utils/event_colors.dart';
 
 class BathingSheet extends StatelessWidget {
   const BathingSheet({super.key});
@@ -13,11 +15,13 @@ class BathingSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(BathingController());
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.bathing);
+
     return Obx(() => EventSheet(
       title: 'Bathing',
       subtitle: 'Track bath time',
-      icon: Icons.bathtub_rounded,
-      accentColor: const Color(0xFF06B6D4),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -25,7 +29,7 @@ class BathingSheet extends StatelessWidget {
           value: controller.startAt.value,
           onChange: controller.setStartTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF06B6D4),
+          accentColor: eventStyle.color,
         ),
 
         // Timer section
@@ -34,15 +38,15 @@ class BathingSheet extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF06B6D4).withValues(alpha: 0.05),
-                const Color(0xFF06B6D4).withValues(alpha: 0.02),
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF06B6D4).withValues(alpha: 0.2),
+              color: eventStyle.color.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -53,20 +57,20 @@ class BathingSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
+                      color: eventStyle.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.timer_rounded,
-                      color: Color(0xFF06B6D4),
+                      color: eventStyle.color,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'BATH TIMER',
                     style: TextStyle(
-                      color: Color(0xFF06B6D4),
+                      color: eventStyle.color,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -79,8 +83,8 @@ class BathingSheet extends StatelessWidget {
                 isRunning: controller.isRunning.value,
                 timeText: controller.timeText,
                 onToggle: controller.toggle,
-                gradientStart: const Color(0xFF06B6D4),
-                gradientEnd: const Color(0xFF0891B2),
+                gradientStart: eventStyle.color,
+                gradientEnd: eventStyle.color.withValues(alpha: 0.8),
               ),
             ],
           ),
@@ -92,7 +96,7 @@ class BathingSheet extends StatelessWidget {
           selected: controller.aids,
           multiSelect: true,
           icon: Icons.bathtub_outlined,
-          accentColor: const Color(0xFF06B6D4),
+          accentColor: eventStyle.color,
           onTap: controller.toggleAid,
         ),
 
@@ -102,7 +106,7 @@ class BathingSheet extends StatelessWidget {
           selected: controller.mood,
           multiSelect: true,
           icon: Icons.sentiment_satisfied_rounded,
-          accentColor: const Color(0xFF06B6D4),
+          accentColor: eventStyle.color,
           onTap: controller.toggleMood,
         ),
       ],

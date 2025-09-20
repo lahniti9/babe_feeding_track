@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/expressing_controller.dart';
-import '../widgets/event_sheet_scaffold.dart';
-import '../widgets/time_row.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
+import '../widgets/event_sheet.dart';
+import '../widgets/enhanced_time_row.dart';
 import '../widgets/timer_circle.dart';
 import '../widgets/single_select_chips.dart';
-
-import '../widgets/primary_pill.dart';
 import '../../../core/theme/spacing.dart';
 
 class ExpressingSheet extends StatelessWidget {
@@ -15,75 +15,65 @@ class ExpressingSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ExpressingController());
+    final eventStyle = EventColors.getEventKindStyle(EventKind.expressing);
 
-    return EventSheetScaffold(
+    return Obx(() => EventSheet(
       title: 'Expressing',
-      child: Obx(() => Column(
-        children: [
-          TimeRow(
-            value: controller.time.value,
-            onChange: controller.setTime,
-          ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          // Timer circle
-          TimerCircle(
-            isRunning: controller.running.value,
-            timeText: controller.timeText,
-            onToggle: controller.toggleTimer,
-            gradientStart: const Color(0xFFE14E63),
-            gradientEnd: const Color(0xFFB71C1C),
-          ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          _buildSideChips(controller),
+      subtitle: 'Track expressing sessions',
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
+      onSubmit: controller.completeFlow,
+      sections: [
+        EnhancedTimeRow(
+          label: 'Time',
+          value: controller.time.value,
+          onChange: controller.setTime,
+          icon: Icons.access_time_rounded,
+          accentColor: eventStyle.color,
+        ),
 
-          _buildMethodChips(controller),
-          
-          const SizedBox(height: AppSpacing.lg),
-          
-          // Bottom controls
-          Row(
+        // Timer section
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: eventStyle.color.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
             children: [
-              // Reset button
-              GestureDetector(
-                onTap: controller.resetTimer,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E2E2E),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.refresh,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
+              // Timer circle
+              TimerCircle(
+                isRunning: controller.running.value,
+                timeText: controller.timeText,
+                onToggle: controller.toggleTimer,
+                gradientStart: eventStyle.color,
+                gradientEnd: eventStyle.color.withValues(alpha: 0.8),
               ),
 
-              const SizedBox(width: AppSpacing.md),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Complete button
-              Expanded(
-                child: PrimaryPill(
-                  label: 'Done',
-                  icon: Icons.check,
-                  onTap: controller.completeFlow,
-                  enabled: controller.elapsed.value > 0,
-                ),
-              ),
+              _buildSideChips(controller, eventStyle),
+
+              _buildMethodChips(controller, eventStyle),
             ],
           ),
-        ],
-      )),
-    );
+        ),
+      ],
+    ));
   }
 
-  Widget _buildSideChips(ExpressingController controller) {
+  Widget _buildSideChips(ExpressingController controller, ({Color color, IconData icon}) eventStyle) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: Column(
@@ -91,16 +81,16 @@ class ExpressingSheet extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.pregnant_woman,
-                color: Color(0xFFE14E63),
+                color: eventStyle.color,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'SIDE',
                 style: TextStyle(
-                  color: const Color(0xFFE14E63),
+                  color: eventStyle.color,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -113,14 +103,14 @@ class ExpressingSheet extends StatelessWidget {
             selected: controller.side,
             onTap: controller.setSide,
             getDisplayName: (side) => side.displayName,
-            accentColor: const Color(0xFFE14E63),
+            accentColor: eventStyle.color,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMethodChips(ExpressingController controller) {
+  Widget _buildMethodChips(ExpressingController controller, ({Color color, IconData icon}) eventStyle) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: Column(
@@ -128,16 +118,16 @@ class ExpressingSheet extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.settings,
-                color: Color(0xFFE14E63),
+                color: eventStyle.color,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'METHOD',
                 style: TextStyle(
-                  color: const Color(0xFFE14E63),
+                  color: eventStyle.color,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -150,7 +140,7 @@ class ExpressingSheet extends StatelessWidget {
             selected: controller.method,
             onTap: controller.setMethod,
             getDisplayName: (method) => method.displayName,
-            accentColor: const Color(0xFFE14E63),
+            accentColor: eventStyle.color,
           ),
         ],
       ),

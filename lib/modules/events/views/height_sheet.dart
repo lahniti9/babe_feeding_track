@@ -6,6 +6,8 @@ import '../widgets/enhanced_time_row.dart';
 import '../widgets/big_number_wheel.dart';
 import '../widgets/segmented_row.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 
 class HeightSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -23,11 +25,13 @@ class HeightSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.height);
+
     return Obx(() => EventSheet(
       title: 'Height',
       subtitle: 'Track height measurements',
-      icon: Icons.height_rounded,
-      accentColor: const Color(0xFF7C2D12),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -35,7 +39,7 @@ class HeightSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF7C2D12),
+          accentColor: eventStyle.color,
         ),
 
         Container(
@@ -43,15 +47,15 @@ class HeightSheet extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF7C2D12).withValues(alpha: 0.05),
-                const Color(0xFF7C2D12).withValues(alpha: 0.02),
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF7C2D12).withValues(alpha: 0.2),
+              color: eventStyle.color.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -63,20 +67,20 @@ class HeightSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF7C2D12).withValues(alpha: 0.15),
+                      color: eventStyle.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.height_rounded,
-                      color: Color(0xFF7C2D12),
+                      color: eventStyle.color,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'HEIGHT',
                     style: TextStyle(
-                      color: Color(0xFF7C2D12),
+                      color: eventStyle.color,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -91,6 +95,7 @@ class HeightSheet extends StatelessWidget {
                 items: const ['cm', 'in'],
                 selected: () => controller.unit.value,
                 onSelect: controller.setUnit,
+                accentColor: eventStyle.color,
               ),
 
               const SizedBox(height: 20),
@@ -99,9 +104,10 @@ class HeightSheet extends StatelessWidget {
                 value: controller.unit.value == 'cm' ? controller.cm.value : controller.inches.value,
                 unit: controller.unit.value,
                 onChange: controller.unit.value == 'cm' ? controller.setCm : controller.setInches,
-                min: controller.unit.value == 'cm' ? 30.0 : 12.0,
+                min: 0.0,
                 max: controller.unit.value == 'cm' ? 120.0 : 47.0,
                 decimals: 1,
+                accentColor: eventStyle.color,
               ),
             ],
           ),

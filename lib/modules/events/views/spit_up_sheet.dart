@@ -5,6 +5,8 @@ import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 
 class SpitUpSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -24,11 +26,13 @@ class SpitUpSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.spitUp);
+
     return Obx(() => EventSheet(
       title: 'Spit-up',
       subtitle: 'Track spit-up incidents',
-      icon: Icons.water_drop_outlined,
-      accentColor: const Color(0xFFF59E0B),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -36,7 +40,7 @@ class SpitUpSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFFF59E0B),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -45,7 +49,7 @@ class SpitUpSheet extends StatelessWidget {
           selected: controller.amount.value.capitalizeFirst!,
           onSelect: controller.setAmount,
           icon: Icons.straighten_rounded,
-          accentColor: const Color(0xFFF59E0B),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -54,7 +58,7 @@ class SpitUpSheet extends StatelessWidget {
           selected: controller.kind.value.capitalizeFirst!,
           onSelect: controller.setKind,
           icon: Icons.category_rounded,
-          accentColor: const Color(0xFFF59E0B),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedCommentRow(
@@ -62,7 +66,7 @@ class SpitUpSheet extends StatelessWidget {
           value: controller.note.value,
           onChanged: controller.setNote,
           icon: Icons.note_rounded,
-          accentColor: const Color(0xFFF59E0B),
+          accentColor: eventStyle.color,
           hint: 'Add any additional notes...',
         ),
       ],

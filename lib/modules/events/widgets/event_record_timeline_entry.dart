@@ -5,6 +5,7 @@ import '../../../core/theme/colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 import '../models/event_record.dart';
+import '../utils/event_colors.dart';
 import '../../children/services/children_store.dart';
 import 'timeline_container.dart';
 
@@ -152,7 +153,7 @@ class EventRecordTimelineEntry extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(top: 8, right: 8),
               decoration: BoxDecoration(
-                color: _getEventColor().withOpacity(0.6),
+                color: _getEventColor().withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
             ),
@@ -557,83 +558,10 @@ class EventRecordTimelineEntry extends StatelessWidget {
   }
 
   Color _getEventColor() {
-    switch (event.type) {
-      case EventType.sleeping:
-        return Colors.purple;
-      case EventType.bedtimeRoutine:
-        return Colors.indigo;
-      case EventType.cry:
-        return Colors.orange;
-      case EventType.feedingBreast:
-        return Colors.green;
-      case EventType.feedingBottle:
-        return const Color(0xFF059669);
-      case EventType.diaper:
-        return const Color(0xFFDC2626);
-      case EventType.condition:
-        return const Color(0xFFF59E0B);
-      case EventType.medicine:
-        return const Color(0xFF059669);
-      case EventType.temperature:
-        return const Color(0xFFEF4444);
-      case EventType.weight:
-      case EventType.height:
-        return const Color(0xFF0891B2);
-      case EventType.expressing:
-        return const Color(0xFF8B5CF6);
-      case EventType.food:
-        return const Color(0xFF10B981);
-      case EventType.doctor:
-        return const Color(0xFF3B82F6);
-      case EventType.bathing:
-        return const Color(0xFF06B6D4);
-      case EventType.walking:
-        return const Color(0xFF84CC16);
-      case EventType.activity:
-        return const Color(0xFFDB2777);
-      case EventType.spitUp:
-        return const Color(0xFFF97316);
-    }
+    return EventColors.getEventTypeColor(event.type);
   }
 
   IconData _getEventIcon() {
-    switch (event.type) {
-      case EventType.sleeping:
-        return Icons.bed;
-      case EventType.bedtimeRoutine:
-        return Icons.nightlight;
-      case EventType.cry:
-        return Icons.sentiment_very_dissatisfied;
-      case EventType.feedingBreast:
-        return Icons.child_care;
-      case EventType.feedingBottle:
-        return Icons.local_drink;
-      case EventType.diaper:
-        return Icons.baby_changing_station;
-      case EventType.condition:
-        return Icons.mood;
-      case EventType.medicine:
-        return Icons.medication;
-      case EventType.temperature:
-        return Icons.thermostat;
-      case EventType.weight:
-        return Icons.scale;
-      case EventType.height:
-        return Icons.height;
-      case EventType.expressing:
-        return Icons.water_drop;
-      case EventType.food:
-        return Icons.restaurant;
-      case EventType.doctor:
-        return Icons.local_hospital;
-      case EventType.bathing:
-        return Icons.bathtub;
-      case EventType.walking:
-        return Icons.directions_walk;
-      case EventType.activity:
-        return Icons.toys;
-      case EventType.spitUp:
-        return Icons.water_drop_outlined;
-    }
+    return EventColors.getEventTypeIcon(event.type);
   }
 }

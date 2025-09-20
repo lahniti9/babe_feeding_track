@@ -14,6 +14,7 @@ class NumberRow extends StatelessWidget {
   final double? min;
   final double? max;
   final int decimals;
+  final Color? accentColor;
 
   const NumberRow({
     super.key,
@@ -26,10 +27,12 @@ class NumberRow extends StatelessWidget {
     this.min,
     this.max,
     this.decimals = 1,
+    this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAccentColor = accentColor ?? const Color(0xFFFF8A00);
     return Container(
       margin: const EdgeInsets.only(bottom: 16), // Reduced from AppSpacing.lg (20) to 16
       child: Column(
@@ -96,29 +99,29 @@ class NumberRow extends StatelessWidget {
               if (unitOptions != null && onUnitChange != null)
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => _showUnitPicker(context),
+                    onTap: () => _showUnitPicker(context, effectiveAccentColor),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: const Color(0xFF2E2E2E),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFFF8A00), width: 1),
+                        border: Border.all(color: effectiveAccentColor, width: 1),
                       ),
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
                               unit,
-                              style: const TextStyle(
-                                color: Color(0xFFFF8A00),
+                              style: TextStyle(
+                                color: effectiveAccentColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.keyboard_arrow_down,
-                            color: Color(0xFFFF8A00),
+                            color: effectiveAccentColor,
                             size: 20,
                           ),
                         ],
@@ -129,8 +132,8 @@ class NumberRow extends StatelessWidget {
               else
                 Text(
                   unit,
-                  style: const TextStyle(
-                    color: Color(0xFFFF8A00),
+                  style: TextStyle(
+                    color: effectiveAccentColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
@@ -142,7 +145,7 @@ class NumberRow extends StatelessWidget {
     );
   }
 
-  void _showUnitPicker(BuildContext context) {
+  void _showUnitPicker(BuildContext context, Color accentColor) {
     if (unitOptions == null || onUnitChange == null) return;
     
     showModalBottomSheet(
@@ -165,7 +168,7 @@ class NumberRow extends StatelessWidget {
               title: Text(
                 option,
                 style: TextStyle(
-                  color: option == unit ? const Color(0xFFFF8A00) : Colors.white,
+                  color: option == unit ? accentColor : Colors.white,
                   fontWeight: option == unit ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),

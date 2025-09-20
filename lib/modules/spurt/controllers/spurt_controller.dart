@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../models/spurt_models.dart';
 import '../data/spurt_presets.dart';
 import '../../children/services/children_store.dart';
+import '../../../data/services/spurt_content_service.dart';
+import '../../../utils/spurt_content_demo.dart';
 
 class SpurtController extends GetxController {
   // Reactive properties that update when active child changes
@@ -13,15 +15,27 @@ class SpurtController extends GetxController {
   final childId = RxnString();
 
   late final ChildrenStore _childrenStore;
+  late final SpurtContentService _contentService;
 
   @override
   void onInit() {
     super.onInit();
     _childrenStore = Get.find<ChildrenStore>();
+    _contentService = Get.find<SpurtContentService>();
     _initializeFromActiveChild();
     _setupChildChangeListener();
     // Set initial selected week to current week
     selectedWeek.value = currentWeek;
+    // Ensure content is loaded
+    _ensureContentLoaded();
+  }
+
+  /// Ensure content service has loaded data
+  Future<void> _ensureContentLoaded() async {
+    await _contentService.ensureContentLoaded();
+
+    // Demonstrate the new content system in debug mode
+    SpurtContentDemo.demonstrateContentSystem();
   }
 
   void _initializeFromActiveChild() {
@@ -56,8 +70,16 @@ class SpurtController extends GetxController {
     }
   }
 
-  final episodes = spurtEpisodes.obs;
   final selectedWeek = 1.obs;
+
+  /// Get episodes from content service (with fallback to hardcoded data)
+  List<SpurtEpisode> get episodes {
+    if (_contentService.isLoaded) {
+      return _contentService.episodes;
+    }
+    // Fallback to hardcoded data if content service isn't loaded yet
+    return spurtEpisodes;
+  }
 
   /// Calculate current week since due date (1-based) for Wonder Weeks
   int get currentWeek {
@@ -129,6 +151,10 @@ class SpurtController extends GetxController {
 
   /// Get content for a specific episode
   SpurtContent? getContent(String contentKey) {
+    if (_contentService.isLoaded) {
+      return _contentService.getLegacyContent(contentKey);
+    }
+    // Fallback to hardcoded data if content service isn't loaded yet
     return spurtContent[contentKey];
   }
 
@@ -207,6 +233,10 @@ class SpurtController extends GetxController {
 
   /// Get Wonder Weeks data for a specific week
   SpurtWeek? getSpurtWeek(int week) {
+    if (_contentService.isLoaded) {
+      return _contentService.getSpurtWeek(week);
+    }
+    // Fallback to hardcoded data if content service isn't loaded yet
     return kSpurtWeeks[week];
   }
 

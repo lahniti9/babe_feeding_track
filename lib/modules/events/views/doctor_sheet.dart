@@ -5,6 +5,8 @@ import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/chip_group_row.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 
 class DoctorSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -22,11 +24,13 @@ class DoctorSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.doctor);
+
     return Obx(() => EventSheet(
       title: 'Doctor',
       subtitle: 'Track medical visits',
-      icon: Icons.local_hospital_rounded,
-      accentColor: const Color(0xFF6F86FF),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -34,7 +38,7 @@ class DoctorSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF6F86FF),
+          accentColor: eventStyle.color,
         ),
 
         Container(
@@ -42,15 +46,15 @@ class DoctorSheet extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF6F86FF).withValues(alpha: 0.05),
-                const Color(0xFF6F86FF).withValues(alpha: 0.02),
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF6F86FF).withValues(alpha: 0.2),
+              color: eventStyle.color.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -62,20 +66,20 @@ class DoctorSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6F86FF).withValues(alpha: 0.15),
+                      color: eventStyle.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.local_hospital_rounded,
-                      color: Color(0xFF6F86FF),
+                      color: eventStyle.color,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'DOCTOR VISIT',
                     style: TextStyle(
-                      color: Color(0xFF6F86FF),
+                      color: eventStyle.color,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -91,7 +95,7 @@ class DoctorSheet extends StatelessWidget {
                 selected: controller.reason,
                 multi: true,
                 icon: Icons.local_hospital,
-                iconColor: const Color(0xFF6F86FF),
+                iconColor: eventStyle.color,
               ),
 
               const SizedBox(height: 16),
@@ -102,7 +106,7 @@ class DoctorSheet extends StatelessWidget {
                 selected: controller.outcome,
                 multi: true,
                 icon: Icons.assignment_turned_in,
-                iconColor: const Color(0xFF6F86FF),
+                iconColor: eventStyle.color,
               ),
             ],
           ),

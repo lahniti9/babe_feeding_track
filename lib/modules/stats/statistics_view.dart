@@ -4,6 +4,7 @@ import '../../core/theme/spacing.dart';
 import '../../core/widgets/bc_scaffold.dart';
 import '../statistics/controllers/stats_home_controller.dart';
 import '../statistics/views/live_sleeping_chart_view.dart';
+import '../paywall/widgets/premium_gate.dart';
 import 'views/height_view.dart';
 import 'views/weight_view.dart';
 import 'views/monthly_overview_view.dart';
@@ -207,26 +208,34 @@ class StatisticsView extends StatelessWidget {
   }
 
   Widget _buildHeightTile(StatsHomeController controller) {
-    return _buildCompactStatsTile(
-      title: 'Height',
-      value: controller.lastHeightCm.value?.toStringAsFixed(1) ?? '--',
-      unit: 'cm',
-      subtitle: 'Latest measurement',
-      color: const Color(0xFF7C2D12),
-      icon: Icons.height,
+    return PremiumTile(
+      featureName: 'Height Tracking',
       onTap: () => _navigateToHeight(controller),
+      child: _buildCompactStatsTile(
+        title: 'Height',
+        value: controller.lastHeightCm.value?.toStringAsFixed(1) ?? '--',
+        unit: 'cm',
+        subtitle: 'Latest measurement',
+        color: const Color(0xFF7C2D12),
+        icon: Icons.height,
+        onTap: () => _navigateToHeight(controller),
+      ),
     );
   }
 
   Widget _buildWeightTile(StatsHomeController controller) {
-    return _buildCompactStatsTile(
-      title: 'Weight',
-      value: controller.lastWeightKg.value?.toStringAsFixed(1) ?? '--',
-      unit: 'kg',
-      subtitle: 'Latest measurement',
-      color: const Color(0xFF0891B2),
-      icon: Icons.monitor_weight,
+    return PremiumTile(
+      featureName: 'Weight Tracking',
       onTap: () => _navigateToWeight(controller),
+      child: _buildCompactStatsTile(
+        title: 'Weight',
+        value: controller.lastWeightKg.value?.toStringAsFixed(1) ?? '--',
+        unit: 'kg',
+        subtitle: 'Latest measurement',
+        color: const Color(0xFF0891B2),
+        icon: Icons.monitor_weight,
+        onTap: () => _navigateToWeight(controller),
+      ),
     );
   }
 
@@ -268,16 +277,20 @@ class StatisticsView extends StatelessWidget {
   }
 
   Widget _buildMonthlyOverviewTile(StatsHomeController controller) {
-    return SizedBox(
-      width: double.infinity,
-      child: _buildCompactStatsTile(
-        title: 'Monthly Overview',
-        value: '${controller.monthlyActiveDays.value}',
-        unit: 'days',
-        subtitle: 'Active tracking',
-        color: const Color(0xFFDB2777),
-        icon: Icons.calendar_view_month,
-        onTap: () => _navigateToMonthlyOverview(controller),
+    return PremiumTile(
+      featureName: 'Monthly Analytics',
+      onTap: () => _navigateToMonthlyOverview(controller),
+      child: SizedBox(
+        width: double.infinity,
+        child: _buildCompactStatsTile(
+          title: 'Monthly Overview',
+          value: '${controller.monthlyActiveDays.value}',
+          unit: 'days',
+          subtitle: 'Active tracking',
+          color: const Color(0xFFDB2777),
+          icon: Icons.calendar_view_month,
+          onTap: () => _navigateToMonthlyOverview(controller),
+        ),
       ),
     );
   }
@@ -327,7 +340,10 @@ class StatisticsView extends StatelessWidget {
   // Navigation methods
   void _navigateToHeight(StatsHomeController controller) {
     if (controller.currentChildId.value != null) {
-      Get.to(() => HeightView(childId: controller.currentChildId.value!));
+      requirePremium(
+        () => Get.to(() => HeightView(childId: controller.currentChildId.value!)),
+        feature: 'Height Tracking',
+      );
     } else {
       Get.snackbar(
         "No Child Selected",
@@ -340,7 +356,10 @@ class StatisticsView extends StatelessWidget {
 
   void _navigateToWeight(StatsHomeController controller) {
     if (controller.currentChildId.value != null) {
-      Get.to(() => WeightView(childId: controller.currentChildId.value!));
+      requirePremium(
+        () => Get.to(() => WeightView(childId: controller.currentChildId.value!)),
+        feature: 'Weight Tracking',
+      );
     } else {
       Get.snackbar(
         "No Child Selected",
@@ -353,7 +372,10 @@ class StatisticsView extends StatelessWidget {
 
   void _navigateToMonthlyOverview(StatsHomeController controller) {
     if (controller.currentChildId.value != null) {
-      Get.to(() => MonthlyOverviewView(childId: controller.currentChildId.value!));
+      requirePremium(
+        () => Get.to(() => MonthlyOverviewView(childId: controller.currentChildId.value!)),
+        feature: 'Monthly Analytics',
+      );
     } else {
       Get.snackbar("Error", "No active child selected");
     }

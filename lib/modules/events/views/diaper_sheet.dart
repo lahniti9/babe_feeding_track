@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/diaper_controller.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
+import '../utils/event_colors.dart';
 
 class DiaperSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -20,11 +22,13 @@ class DiaperSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.diaper);
+
     return Obx(() => EventSheet(
       title: 'Diaper',
       subtitle: 'Track diaper changes',
-      icon: Icons.child_care_rounded,
-      accentColor: const Color(0xFF8B5CF6),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -32,7 +36,7 @@ class DiaperSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: (date) => controller.time.value = date,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF8B5CF6),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -41,7 +45,7 @@ class DiaperSheet extends StatelessWidget {
           selected: controller.kind.value.capitalize!,
           onSelect: controller.setKind,
           icon: Icons.category_rounded,
-          accentColor: const Color(0xFF8B5CF6),
+          accentColor: eventStyle.color,
         ),
 
         if (controller.kind.value == 'poop' || controller.kind.value == 'mixed')
@@ -51,7 +55,7 @@ class DiaperSheet extends StatelessWidget {
             selected: controller.color,
             multiSelect: true,
             icon: Icons.palette_rounded,
-            accentColor: const Color(0xFF8B5CF6),
+            accentColor: eventStyle.color,
             onTap: (option) => controller.color.contains(option)
               ? controller.color.remove(option)
               : controller.color.add(option),

@@ -6,6 +6,8 @@ import '../widgets/enhanced_time_row.dart';
 import '../widgets/number_row.dart';
 import '../widgets/chip_group_row.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/theme/text.dart';
 
@@ -25,11 +27,13 @@ class MedicineSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.medicine);
+
     return Obx(() => EventSheet(
       title: 'Medicine',
       subtitle: 'Track medication doses',
-      icon: Icons.medication_rounded,
-      accentColor: const Color(0xFF3BB3C4),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -37,7 +41,7 @@ class MedicineSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF3BB3C4),
+          accentColor: eventStyle.color,
         ),
         
         // Medicine name input
@@ -84,6 +88,7 @@ class MedicineSheet extends StatelessWidget {
           min: 0,
           max: 100,
           decimals: 1,
+          accentColor: eventStyle.color,
         ),
         
         ChipGroupRow(
@@ -92,7 +97,7 @@ class MedicineSheet extends StatelessWidget {
           selected: controller.reason,
           multi: true,
           icon: Icons.medication_outlined,
-          iconColor: const Color(0xFF3BB3C4),
+          iconColor: eventStyle.color,
         ),
         
         // Reminder toggle
@@ -102,7 +107,7 @@ class MedicineSheet extends StatelessWidget {
             children: [
               Icon(
                 Icons.notifications_outlined,
-                color: const Color(0xFF3BB3C4),
+                color: eventStyle.color,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -117,7 +122,7 @@ class MedicineSheet extends StatelessWidget {
               Switch(
                 value: controller.reminderEnabled.value,
                 onChanged: (_) => controller.toggleReminder(),
-                activeColor: const Color(0xFFFF8A00),
+                activeColor: eventStyle.color,
               ),
             ],
           ),
@@ -129,7 +134,7 @@ class MedicineSheet extends StatelessWidget {
             value: controller.reminderTime.value,
             onChange: controller.setReminderTime,
             icon: Icons.alarm_rounded,
-            accentColor: const Color(0xFF3BB3C4),
+            accentColor: eventStyle.color,
           ),
       ],
     ));

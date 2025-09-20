@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/condition_controller.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
 import '../widgets/event_sheet.dart';
 import '../widgets/enhanced_time_row.dart';
 import '../widgets/enhanced_chip_group.dart';
+import '../utils/event_colors.dart';
 
 class ConditionSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -22,11 +24,13 @@ class ConditionSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.condition);
+
     return Obx(() => EventSheet(
       title: 'Condition',
       subtitle: 'Track health and mood',
-      icon: Icons.favorite_rounded,
-      accentColor: const Color(0xFFEC4899),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -34,7 +38,7 @@ class ConditionSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFFEC4899),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -43,7 +47,7 @@ class ConditionSheet extends StatelessWidget {
           selected: controller.mood.value.capitalize!,
           onSelect: controller.setMood,
           icon: Icons.sentiment_satisfied_rounded,
-          accentColor: const Color(0xFFEC4899),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedSegmentedControl(
@@ -52,7 +56,7 @@ class ConditionSheet extends StatelessWidget {
           selected: controller.severity.value.capitalize!,
           onSelect: controller.setSeverity,
           icon: Icons.warning_rounded,
-          accentColor: const Color(0xFFEC4899),
+          accentColor: eventStyle.color,
         ),
 
         EnhancedCommentRow(
@@ -60,7 +64,7 @@ class ConditionSheet extends StatelessWidget {
           value: controller.note.value,
           onChanged: controller.setNote,
           icon: Icons.note_rounded,
-          accentColor: const Color(0xFFEC4899),
+          accentColor: eventStyle.color,
           hint: 'Add any additional notes...',
         ),
       ],

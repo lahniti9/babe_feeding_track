@@ -210,6 +210,7 @@ class EnhancedSleepingStatsController extends GetxController {
   }
   
   // Refresh data manually
+  @override
   void refresh() {
     _initializeData();
   }

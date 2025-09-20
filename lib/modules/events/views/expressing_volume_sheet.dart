@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../controllers/expressing_controller.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 import '../widgets/event_sheet_scaffold.dart';
 import '../../../core/theme/spacing.dart';
 
@@ -15,6 +17,8 @@ class ExpressingVolumeSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final eventStyle = EventColors.getEventKindStyle(EventKind.expressing);
+
     return EventSheetScaffold(
       title: 'Expressing completed',
       child: Column(
@@ -52,18 +56,18 @@ class ExpressingVolumeSheet extends StatelessWidget {
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFFF8A00)),
+                      borderSide: BorderSide(color: eventStyle.color),
                     ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFFF8A00)),
+                      borderSide: BorderSide(color: eventStyle.color),
                     ),
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFFF8A00), width: 2),
+                      borderSide: BorderSide(color: eventStyle.color, width: 2),
                     ),
                     hintText: '0',
-                    hintStyle: TextStyle(
+                    hintStyle: const TextStyle(
                       color: Color(0xFF5B5B5B),
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -77,29 +81,29 @@ class ExpressingVolumeSheet extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               GestureDetector(
-                onTap: () => _showUnitPicker(context),
+                onTap: () => _showUnitPicker(context, eventStyle),
                 child: Obx(() => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFF2E2E2E),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFFF8A00)),
+                    border: Border.all(color: eventStyle.color),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         controller.unit.value,
-                        style: const TextStyle(
-                          color: Color(0xFFFF8A00),
+                        style: TextStyle(
+                          color: eventStyle.color,
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.keyboard_arrow_down,
-                        color: Color(0xFFFF8A00),
+                        color: eventStyle.color,
                         size: 16,
                       ),
                     ],
@@ -152,7 +156,7 @@ class ExpressingVolumeSheet extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF8A00),
+                      color: eventStyle.color,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: const Center(
@@ -175,7 +179,7 @@ class ExpressingVolumeSheet extends StatelessWidget {
     );
   }
 
-  void _showUnitPicker(BuildContext context) {
+  void _showUnitPicker(BuildContext context, ({Color color, IconData icon}) eventStyle) {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF151515),
@@ -200,7 +204,7 @@ class ExpressingVolumeSheet extends StatelessWidget {
               title: Text(
                 option,
                 style: TextStyle(
-                  color: option == controller.unit.value ? const Color(0xFFFF8A00) : Colors.white,
+                  color: option == controller.unit.value ? eventStyle.color : Colors.white,
                   fontWeight: option == controller.unit.value ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),

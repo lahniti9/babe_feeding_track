@@ -8,6 +8,7 @@ import '../../../core/widgets/metric_toggle.dart';
 import '../../children/services/children_store.dart';
 import '../../children/models/child_profile.dart';
 import '../../profile/profile_controller.dart';
+import '../../paywall/controllers/launch_controller.dart';
 
 class OnboardingController extends GetxController {
   final _storage = GetStorage();
@@ -214,7 +215,15 @@ class OnboardingController extends GetxController {
     _createFirstChildProfile();
 
     _storage.write('onboarding_completed', true);
-    Get.offAllNamed(Routes.tabs);
+
+    // Use launch controller to handle navigation
+    try {
+      final launchController = Get.find<LaunchController>();
+      launchController.onOnboardingCompleted();
+    } catch (e) {
+      // Fallback if launch controller not found
+      Get.offAllNamed(Routes.tabs);
+    }
   }
 
   // Create first child profile from onboarding data

@@ -7,6 +7,7 @@ class SegmentedRow extends StatelessWidget {
   final List<String> items;
   final String Function() selected;
   final Function(String) onSelect;
+  final Color? accentColor;
 
   const SegmentedRow({
     super.key,
@@ -14,10 +15,12 @@ class SegmentedRow extends StatelessWidget {
     required this.items,
     required this.selected,
     required this.onSelect,
+    this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAccentColor = accentColor ?? AppColors.coral;
     return Container(
       margin: const EdgeInsets.only(bottom: 16), // Reduced from AppSpacing.lg (20) to 16
       child: Column(
@@ -55,7 +58,7 @@ class SegmentedRow extends StatelessWidget {
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 10), // Reduced from 12 to 10
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.coral : Colors.transparent,
+                        color: isSelected ? effectiveAccentColor : Colors.transparent,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(isFirst ? 10 : 0),
                           bottomLeft: Radius.circular(isFirst ? 10 : 0),
@@ -64,7 +67,7 @@ class SegmentedRow extends StatelessWidget {
                         ),
                         boxShadow: isSelected ? [
                           BoxShadow(
-                            color: AppColors.coral.withValues(alpha: 0.3),
+                            color: effectiveAccentColor.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),

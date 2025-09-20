@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import '../../../core/theme/colors.dart';
-import '../../../routes/app_routes.dart';
+import '../../paywall/controllers/launch_controller.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -89,17 +88,9 @@ class _SplashViewState extends State<SplashView>
   }
 
   void _navigateToOnboarding() {
-    // Check if onboarding is completed
-    final storage = GetStorage();
-    final isOnboardingCompleted = storage.read('onboarding_completed') ?? false;
-
-    if (isOnboardingCompleted) {
-      // Navigate to main app
-      Get.offNamed(Routes.tabs);
-    } else {
-      // Navigate to onboarding
-      Get.offNamed(Routes.startGoal);
-    }
+    // Initialize launch controller to handle navigation
+    Get.put(LaunchController());
+    // The launch controller will handle navigation based on app state
   }
 
   @override

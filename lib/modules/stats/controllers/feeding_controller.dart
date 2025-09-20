@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/stats_models.dart';
-import '../../events/repositories/event_repository.dart';
+import '../../events/services/events_store.dart';
 import '../../events/models/event_record.dart';
 import '../../events/controllers/events_controller.dart';
 import '../../events/models/breast_feeding_event.dart';
@@ -32,13 +32,12 @@ class FeedingController extends GetxController {
     super.onInit();
     _loadFeedingData();
 
-    // Listen to repository changes
+    // Listen to events store changes
     try {
-      final repository = Get.find<EventRepository>();
-      repository.watch(childId: childId, types: {EventType.feedingBottle, EventType.feedingBreast})
-          .listen((_) => _loadFeedingData());
+      final eventsStore = Get.find<EventsStore>();
+      eventsStore.items.listen((_) => _loadFeedingData());
     } catch (e) {
-      debugPrint('EventRepository not available: $e');
+      debugPrint('EventsStore not available: $e');
     }
 
     // Listen to events controller changes for breast feeding
@@ -68,14 +67,14 @@ class FeedingController extends GetxController {
     final range = _getRangeForPeriod(_volumePeriod.value);
 
     try {
-      // Get bottle feeding events from Repository
-      final repository = Get.find<EventRepository>();
-      final bottleEvents = await repository.watch(
-        childId: childId,
-        types: {EventType.feedingBottle},
-        from: range.start,
-        to: range.end,
-      ).first;
+      // Get bottle feeding events from EventsStore
+      final eventsStore = Get.find<EventsStore>();
+      final allEvents = eventsStore.getByChild(childId);
+      final bottleEvents = allEvents
+          .where((e) => e.type == EventType.feedingBottle)
+          .where((e) => e.startAt.isAfter(range.start.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(range.end.add(const Duration(microseconds: 1))))
+          .toList();
 
       // Group by day and sum volumes
       final volumeByDay = <String, double>{};
@@ -99,14 +98,14 @@ class FeedingController extends GetxController {
     final range = _getRangeForPeriod(_countPeriod.value);
 
     try {
-      // Get bottle feeding events from Repository
-      final repository = Get.find<EventRepository>();
-      final bottleEvents = await repository.watch(
-        childId: childId,
-        types: {EventType.feedingBottle},
-        from: range.start,
-        to: range.end,
-      ).first;
+      // Get bottle feeding events from EventsStore
+      final eventsStore = Get.find<EventsStore>();
+      final allEvents = eventsStore.getByChild(childId);
+      final bottleEvents = allEvents
+          .where((e) => e.type == EventType.feedingBottle)
+          .where((e) => e.startAt.isAfter(range.start.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(range.end.add(const Duration(microseconds: 1))))
+          .toList();
 
       // Group by day and count events
       final countByDay = <String, double>{};
@@ -129,14 +128,14 @@ class FeedingController extends GetxController {
     final range = StatsRange.currentMonth();
 
     try {
-      // Get breast feeding events from Repository
-      final repository = Get.find<EventRepository>();
-      final breastEvents = await repository.watch(
-        childId: childId,
-        types: {EventType.feedingBreast},
-        from: range.start,
-        to: range.end,
-      ).first;
+      // Get breast feeding events from EventsStore
+      final eventsStore = Get.find<EventsStore>();
+      final allEvents = eventsStore.getByChild(childId);
+      final breastEvents = allEvents
+          .where((e) => e.type == EventType.feedingBreast)
+          .where((e) => e.startAt.isAfter(range.start.subtract(const Duration(microseconds: 1))) &&
+                       e.startAt.isBefore(range.end.add(const Duration(microseconds: 1))))
+          .toList();
 
       // Also get from EventsController for BreastFeedingEvent objects
       final eventsController = Get.find<EventsController>();

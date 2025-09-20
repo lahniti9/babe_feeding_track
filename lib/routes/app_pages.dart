@@ -62,6 +62,10 @@ import '../modules/events/views/sleep_exact_view.dart';
 import '../modules/spurt/views/spurt_calendar_view.dart';
 import '../modules/spurt/views/spurt_detail_view.dart';
 import '../modules/spurt/bindings/spurt_binding.dart';
+import '../modules/paywall/views/paywall_screen.dart';
+import '../modules/paywall/views/paywall_story.dart';
+import '../modules/paywall/views/debug_paywall_view.dart';
+import '../modules/paywall/bindings/paywall_binding.dart';
 
 class AppPages {
   static const initial = Routes.splash;
@@ -310,6 +314,52 @@ class AppPages {
       name: Routes.jumpstart,
       page: () => const JumpstartView(),
       binding: OnboardingBinding(),
+    ),
+
+    // Paywall
+    GetPage(
+      name: Routes.paywall,
+      page: () => const PaywallScreen(),
+      binding: PaywallBinding(),
+    ),
+    GetPage(
+      name: Routes.paywallStory,
+      page: () => const PaywallStory(
+        loop: true, // Enable infinite looping
+        pages: [
+          PaywallStoryPage(
+            quoteText: 'This app changed my life as a new mom!',
+            author: 'Sarah M.',
+            duration: Duration(seconds: 3),
+          ),
+          PaywallStoryPage(
+            quoteText: 'Finally, an app that actually helps with feeding schedules.',
+            author: 'Jessica K.',
+            duration: Duration(seconds: 3),
+          ),
+          PaywallStoryPage(
+            quoteText: 'My baby sleeps better since using this app!',
+            author: 'Maria L.',
+            duration: Duration(seconds: 3),
+          ),
+          PaywallStoryPage(
+            quoteText: 'Worth every penny. Best parenting investment ever!',
+            author: 'Amanda R.',
+            duration: Duration(seconds: 3),
+          ),
+          PaywallStoryPage(
+            quoteText: 'Perfect for tracking everything about my baby!',
+            author: 'Emily T.',
+            duration: Duration(seconds: 3),
+          ),
+        ],
+      ),
+      binding: PaywallBinding(),
+    ),
+    GetPage(
+      name: Routes.debugPaywall,
+      page: () => const DebugPaywallView(),
+      binding: PaywallBinding(),
     ),
 
     GetPage(

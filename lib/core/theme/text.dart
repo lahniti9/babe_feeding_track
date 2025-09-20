@@ -16,7 +16,14 @@ class AppTextStyles {
     color: AppColors.textPrimary,
     height: 1.2,
   );
-  
+
+  static const TextStyle titleSmall = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
   // Option text (15-16sp) - for tiles and buttons
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16.0,
@@ -31,7 +38,14 @@ class AppTextStyles {
     color: AppColors.textPrimary,
     height: 1.4,
   );
-  
+
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 14.0,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
   // Small captions (grey)
   static const TextStyle caption = TextStyle(
     fontSize: 12.0,

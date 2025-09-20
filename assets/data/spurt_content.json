@@ -1,0 +1,430 @@
+{
+  "schema_version": "1.0.0",
+  "last_updated": "2024-01-01",
+  "description": "Wonder Weeks spurt and leap content data",
+  "content": {
+    "weeks": {
+      "4": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 1)",
+        "behavior": [
+          "More clingy/startly; wants contact",
+          "Sleep and feeds feel less predictable"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: quiet, low-stim feeds",
+          "Sleep: short soothing, swaddle/white noise",
+          "Communication: soft voice, skin-to-skin"
+        ]
+      },
+      "5": {
+        "type": "leap",
+        "title": "Leap 1: Changing Sensations",
+        "behavior": [
+          "Becomes more sensitive to surroundings",
+          "May cry more, sleep less",
+          "Wants more attention and contact"
+        ],
+        "skills": [
+          "Shows first deliberate smile",
+          "Follows objects with eyes",
+          "Responds to sounds more clearly"
+        ],
+        "tips": [
+          "Feeding: may feed more often for comfort",
+          "Sleep: keep environment calm and consistent",
+          "Communication: talk and sing to your baby more"
+        ]
+      },
+      "7": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 2)",
+        "behavior": [
+          "More demanding of attention",
+          "May resist being put down",
+          "Feeding patterns may change"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: be patient with changing patterns",
+          "Sleep: maintain consistent routines",
+          "Communication: provide extra comfort and reassurance"
+        ]
+      },
+      "8": {
+        "type": "leap",
+        "title": "Leap 2: Patterns",
+        "behavior": [
+          "Notices patterns in the world",
+          "May be fussier as brain develops",
+          "Shows more interest in surroundings"
+        ],
+        "skills": [
+          "Recognizes familiar faces and voices",
+          "Begins to notice patterns in daily routines",
+          "Shows more deliberate movements"
+        ],
+        "tips": [
+          "Feeding: establish regular feeding patterns",
+          "Sleep: create consistent bedtime routines",
+          "Communication: point out patterns in daily life"
+        ]
+      },
+      "9": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 3)",
+        "behavior": [
+          "May be more restless",
+          "Wants more stimulation",
+          "Sleep may be disrupted"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: may want to feed more frequently",
+          "Sleep: be patient with sleep disruptions",
+          "Communication: provide varied sensory experiences"
+        ]
+      },
+      "11": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 3 continued)",
+        "behavior": [
+          "Continued restlessness",
+          "May be more demanding",
+          "Shows signs of boredom"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: maintain patience with feeding changes",
+          "Sleep: stick to routines despite disruptions",
+          "Communication: introduce new activities and toys"
+        ]
+      },
+      "12": {
+        "type": "leap",
+        "title": "Leap 3: Smooth Transitions",
+        "behavior": [
+          "Movements become smoother",
+          "More aware of body control",
+          "May be fussy as skills develop"
+        ],
+        "skills": [
+          "Better head control",
+          "Smoother arm and leg movements",
+          "Beginning to reach for objects"
+        ],
+        "tips": [
+          "Feeding: may show more interest in feeding process",
+          "Sleep: movements may disturb sleep initially",
+          "Communication: encourage reaching and grasping"
+        ]
+      },
+      "15": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 4)",
+        "behavior": [
+          "More active and restless",
+          "Wants constant entertainment",
+          "May resist routine activities"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: may be distracted during feeds",
+          "Sleep: may fight sleep more",
+          "Communication: provide varied activities"
+        ]
+      },
+      "16": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 4 continued)",
+        "behavior": [
+          "Continued restlessness",
+          "May be more clingy",
+          "Shows frustration more easily"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: create calm feeding environment",
+          "Sleep: maintain consistent sleep routines",
+          "Communication: offer comfort and patience"
+        ]
+      },
+      "17": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 4 continued)",
+        "behavior": [
+          "Peak fussiness before leap",
+          "Very demanding of attention",
+          "May have sleep disruptions"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: be flexible with feeding times",
+          "Sleep: extra comfort may be needed",
+          "Communication: provide lots of reassurance"
+        ]
+      },
+      "18": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 4 final)",
+        "behavior": [
+          "Final fussy period before major leap",
+          "May be very clingy",
+          "Shows signs of major development coming"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: maintain patience and flexibility",
+          "Sleep: prepare for potential sleep changes",
+          "Communication: extra cuddles and comfort"
+        ]
+      },
+      "19": {
+        "type": "leap",
+        "title": "Leap 4: Events",
+        "behavior": [
+          "Understands cause and effect",
+          "More interactive and playful",
+          "Shows clear preferences"
+        ],
+        "skills": [
+          "Laughs and shows joy",
+          "Reaches for and grasps objects",
+          "Shows anticipation for events"
+        ],
+        "tips": [
+          "Feeding: may show preferences for foods",
+          "Sleep: bedtime routines become more important",
+          "Communication: play peek-a-boo and interactive games"
+        ]
+      },
+      "24": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 5)",
+        "behavior": [
+          "More mobile and restless",
+          "Wants to explore everything",
+          "May be frustrated by limitations"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: may be distracted by surroundings",
+          "Sleep: may resist sleep due to excitement",
+          "Communication: provide safe exploration opportunities"
+        ]
+      },
+      "25": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 5 continued)",
+        "behavior": [
+          "Continued restlessness",
+          "Very curious about environment",
+          "May have separation anxiety"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: create distraction-free feeding space",
+          "Sleep: maintain consistent routines",
+          "Communication: stay close during exploration"
+        ]
+      },
+      "26": {
+        "type": "leap",
+        "title": "Leap 5: Relationships",
+        "behavior": [
+          "Understands relationships between things",
+          "More social and interactive",
+          "Shows clear attachment preferences"
+        ],
+        "skills": [
+          "Sits without support",
+          "Transfers objects between hands",
+          "Shows stranger awareness"
+        ],
+        "tips": [
+          "Feeding: may want to self-feed",
+          "Sleep: separation anxiety may affect sleep",
+          "Communication: encourage social interaction"
+        ]
+      },
+      "35": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 6)",
+        "behavior": [
+          "Very active and mobile",
+          "Wants independence but needs help",
+          "May be frustrated easily"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: encourage self-feeding attempts",
+          "Sleep: may resist bedtime routines",
+          "Communication: balance independence with safety"
+        ]
+      },
+      "36": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 6 continued)",
+        "behavior": [
+          "Peak mobility and curiosity",
+          "May be destructive in exploration",
+          "Shows strong will"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: be patient with messy eating",
+          "Sleep: maintain firm but gentle boundaries",
+          "Communication: redirect rather than restrict"
+        ]
+      },
+      "37": {
+        "type": "leap",
+        "title": "Leap 6: Categories",
+        "behavior": [
+          "Groups things into categories",
+          "More systematic in exploration",
+          "Shows planning abilities"
+        ],
+        "skills": [
+          "Crawls or moves purposefully",
+          "Sorts objects by characteristics",
+          "Shows problem-solving skills"
+        ],
+        "tips": [
+          "Feeding: may categorize foods by preference",
+          "Sleep: understands bedtime routine sequence",
+          "Communication: name categories and groups"
+        ]
+      },
+      "43": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 7)",
+        "behavior": [
+          "Very mobile and determined",
+          "Wants to do everything independently",
+          "May have tantrums when frustrated"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: encourage self-feeding with finger foods",
+          "Sleep: may resist sleep due to activity",
+          "Communication: acknowledge feelings and offer choices"
+        ]
+      },
+      "44": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 7 continued)",
+        "behavior": [
+          "Peak independence seeking",
+          "May be defiant or testing boundaries",
+          "Shows strong preferences"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: offer variety and let them choose",
+          "Sleep: maintain consistent boundaries",
+          "Communication: use simple choices and clear limits"
+        ]
+      },
+      "45": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 7 final)",
+        "behavior": [
+          "Final push before major leap",
+          "May be very demanding",
+          "Shows signs of complex thinking"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: be patient with food exploration",
+          "Sleep: prepare for potential sleep regression",
+          "Communication: encourage problem-solving attempts"
+        ]
+      },
+      "46": {
+        "type": "leap",
+        "title": "Leap 7: Sequences",
+        "behavior": [
+          "Understands sequences and order",
+          "More methodical in activities",
+          "Shows planning and memory"
+        ],
+        "skills": [
+          "Follows multi-step instructions",
+          "Remembers sequences of events",
+          "Shows logical thinking"
+        ],
+        "tips": [
+          "Feeding: can follow mealtime sequences",
+          "Sleep: understands bedtime routine order",
+          "Communication: explain sequences and next steps"
+        ]
+      },
+      "52": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 8)",
+        "behavior": [
+          "Very active and exploratory",
+          "Wants to understand everything",
+          "May be overwhelmed by complexity"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: may be very particular about food",
+          "Sleep: may have vivid dreams affecting sleep",
+          "Communication: explain the world around them"
+        ]
+      },
+      "53": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 8 continued)",
+        "behavior": [
+          "Peak curiosity and questioning",
+          "May be anxious about new situations",
+          "Shows complex emotional responses"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: maintain patience with food preferences",
+          "Sleep: provide extra comfort and security",
+          "Communication: answer questions and provide reassurance"
+        ]
+      },
+      "54": {
+        "type": "fussy",
+        "title": "Fussy phase (pre-Leap 8 final)",
+        "behavior": [
+          "Final preparation for major leap",
+          "May be very sensitive",
+          "Shows signs of abstract thinking"
+        ],
+        "skills": [],
+        "tips": [
+          "Feeding: respect their growing autonomy",
+          "Sleep: maintain consistent comfort routines",
+          "Communication: validate their complex feelings"
+        ]
+      },
+      "55": {
+        "type": "leap",
+        "title": "Leap 8: Programs",
+        "behavior": [
+          "Understands complex programs and systems",
+          "More sophisticated in thinking",
+          "Shows advanced problem-solving"
+        ],
+        "skills": [
+          "Follows complex instructions",
+          "Understands cause and effect chains",
+          "Shows creative problem-solving"
+        ],
+        "tips": [
+          "Feeding: can participate in meal planning",
+          "Sleep: understands sleep importance",
+          "Communication: engage in complex conversations"
+        ]
+      }
+    }
+  }
+}

@@ -52,6 +52,11 @@ class Routes {
 
   static const String jumpstart = '/jumpstart';
 
+  // Paywall
+  static const String paywall = '/paywall';
+  static const String paywallStory = '/paywall-story';
+  static const String debugPaywall = '/debug-paywall';
+
   static const String wellDone = '/well-done';
   static const String habit = '/habit';
   static const String alreadyAdded = '/already-added';

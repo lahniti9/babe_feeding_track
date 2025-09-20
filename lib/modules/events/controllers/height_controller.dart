@@ -7,8 +7,8 @@ import '../../children/services/children_store.dart';
 class HeightController extends GetxController {
   final time = DateTime.now().obs;
   final unit = 'cm'.obs;
-  final cm = 61.0.obs;
-  final inches = 24.0.obs;
+  final cm = 0.0.obs;
+  final inches = 0.0.obs;
   final comment = ''.obs;
 
   String? editingEventId;
@@ -26,7 +26,7 @@ class HeightController extends GetxController {
 
     // Load data from event
     final data = event.data;
-    final valueCm = data['valueCm'] as double? ?? 61.0;
+    final valueCm = data['valueCm'] as double? ?? 0.0;
     final eventUnit = data['unit'] as String? ?? 'cm';
 
     // Set the unit first
@@ -123,8 +123,8 @@ class HeightController extends GetxController {
     editingEventId = null;
     time.value = DateTime.now();
     unit.value = 'cm';
-    cm.value = 61.0;
-    inches.value = 24.0;
+    cm.value = 0.0;
+    inches.value = 0.0;
     comment.value = '';
   }
 

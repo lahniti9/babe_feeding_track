@@ -6,6 +6,8 @@ import '../widgets/enhanced_time_row.dart';
 import '../widgets/number_row.dart';
 import '../widgets/chip_group_row.dart';
 import '../models/event_record.dart';
+import '../models/event.dart';
+import '../utils/event_colors.dart';
 
 class TemperatureSheet extends StatelessWidget {
   final EventRecord? existingEvent;
@@ -23,11 +25,13 @@ class TemperatureSheet extends StatelessWidget {
       controller.editEvent(existingEvent!);
     }
 
+    final eventStyle = EventColors.getEventKindStyle(EventKind.temperature);
+
     return Obx(() => EventSheet(
       title: 'Temperature',
       subtitle: 'Track body temperature',
-      icon: Icons.thermostat_rounded,
-      accentColor: const Color(0xFF3BB3C4),
+      icon: eventStyle.icon,
+      accentColor: eventStyle.color,
       onSubmit: controller.save,
       sections: [
         EnhancedTimeRow(
@@ -35,7 +39,7 @@ class TemperatureSheet extends StatelessWidget {
           value: controller.time.value,
           onChange: controller.setTime,
           icon: Icons.access_time_rounded,
-          accentColor: const Color(0xFF3BB3C4),
+          accentColor: eventStyle.color,
         ),
 
         Container(
@@ -43,15 +47,15 @@ class TemperatureSheet extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF3BB3C4).withValues(alpha: 0.05),
-                const Color(0xFF3BB3C4).withValues(alpha: 0.02),
+                eventStyle.color.withValues(alpha: 0.05),
+                eventStyle.color.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF3BB3C4).withValues(alpha: 0.2),
+              color: eventStyle.color.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -63,20 +67,20 @@ class TemperatureSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3BB3C4).withValues(alpha: 0.15),
+                      color: eventStyle.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.thermostat_rounded,
-                      color: Color(0xFF3BB3C4),
+                      color: eventStyle.color,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'TEMPERATURE',
                     style: TextStyle(
-                      color: Color(0xFF3BB3C4),
+                      color: eventStyle.color,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                       letterSpacing: 1.2,
@@ -96,6 +100,7 @@ class TemperatureSheet extends StatelessWidget {
                 min: 30.0,
                 max: 45.0,
                 decimals: 1,
+                accentColor: eventStyle.color,
               ),
 
               const SizedBox(height: 20),
@@ -106,7 +111,7 @@ class TemperatureSheet extends StatelessWidget {
                 selected: controller.method,
                 multi: false,
                 icon: Icons.thermostat,
-                iconColor: const Color(0xFF3BB3C4),
+                iconColor: eventStyle.color,
               ),
 
               const SizedBox(height: 16),
@@ -117,7 +122,7 @@ class TemperatureSheet extends StatelessWidget {
                 selected: controller.condition,
                 multi: false,
                 icon: Icons.health_and_safety,
-                iconColor: const Color(0xFF3BB3C4),
+                iconColor: eventStyle.color,
               ),
             ],
           ),
